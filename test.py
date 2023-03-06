@@ -1,14 +1,19 @@
 # Imports
 import requests as req
+from datetime import datetime
 
 # Local Imports
-from db.api.binance.interface import Binance
-
+from lib.api.binance.interface import Binance
+from tests.battery import *
 
 # Test
-test_obj = Binance()
-test_obj.is_connected()
+test_exchange = Binance()
 
-# ret_dat = req.get("https://data.binance.com/api/v3/exchangeInfo")
-# print(ret_dat)
-# print(ret_dat.json())
+test_exact(
+    True,
+    Binance().is_connected,
+    None,
+    True
+)
+
+print(test_exchange.server_status())
