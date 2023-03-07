@@ -1,1 +1,6 @@
 .env
+tests/bin/*
+
+db/info/*
+db/klines/*
+db/orderbook/*

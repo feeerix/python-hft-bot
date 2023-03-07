@@ -1,6 +1,9 @@
 # Import
 import requests as req
 
+# Local Import
+from ..gopher import get_data
+
 endpoints = {
     'ping': '/api/v3/ping',
     'server_time': '/api/v3/time',
@@ -15,3 +18,6 @@ def server_time() -> int:
 
 def server_status():
     return req.get(f"https://api.binance.com{endpoints['server_status']}")
+
+def exchange_info():
+    return req.get("https://data.binance.com/api/v3/exchangeInfo")
