@@ -11,7 +11,9 @@ from tests.battery import *
 
 # Test
 Binance().exchange_info()
-
+print(req.get(
+    "https://api.binance.com/api/v3/depth")
+)
 exit()
 binance = Binance()
 
