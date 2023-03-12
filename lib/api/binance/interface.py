@@ -3,12 +3,13 @@ import json
 import pandas as pd
 
 # Local Import
-from .endpoints import ping, server_status, exchange_info, fetch_kline
+from .endpoints import ping, server_status, exchange_info, fetch_kline, bulk
 from .endpoints import server_time as binance_time
 from lib.file.writer import *
 
-from lib.api.api import API
 
+from lib.api.api import API
+from lib.file.finder import *
 
 def process_kline(input_kline:list) -> dict:
     # Remember to remove unused 
@@ -71,7 +72,7 @@ class Binance(API):
         self.verbose = verbosity
 
         # Get base URL
-        self.base_url = super().base_url(url_index)    
+        self.base_url = super().base_url(url_index)
 
     # API Calls -> Server
     def is_online(self) -> bool: # function to check we get a ping response
@@ -117,5 +118,16 @@ class Binance(API):
         print(ret_data)
         write_db(ret_data, self.name, symbol, interval, '2023-03')
 
-    def test_bulk_klines(self):
+    def test_bulk_klines(self, symbol:str="", interval:str="", batch:int=""):
+
+        # 
+        bulk(
+            'klines',
+            self.verbose,
+            {
+                'symbol':symbol,
+                'interval': interval,
+                'timestamp': 1647114396
+            }
+        )
         

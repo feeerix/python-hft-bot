@@ -10,10 +10,11 @@ from tests.battery import *
 
 
 # Test
-Binance().test_klines(
-    "ltcbtc",
-    "1m"
-)
+Binance().test_bulk_klines('ethbtc','1m')
+# Binance().test_klines(
+#     "ltcbtc",
+#     "1m"
+# )
 exit()
 with open("db/info/binance/exchange_info.json", "r") as exchange_info:
     test = json.load(exchange_info)

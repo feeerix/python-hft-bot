@@ -4,7 +4,9 @@ from zipfile import ZipFile
 import hashlib
 
 def download_file(url, path, filename):
-    r = req.get(f'{url}{filename}')
+    # https://data.binance.vision/data/spot/monthly/klines/ETHBTC/1m/ETHBTC-1m-2017-09.zip
+    r = req.get(f'{url}')
+    print(r.status_code)
     f = open(f'{path}{filename}', 'wb')
     if r.status_code == 200:
         for chunk in r.iter_content(1024):
@@ -12,15 +14,6 @@ def download_file(url, path, filename):
     f.close()
 
 def get_checksum(filename, hash_function):
-    """Generate checksum for file baed on hash function (MD5 or SHA256).
-    Args:
-        filename (str): Path to file that will have the checksum generated.
-        hash_function (str):  Hash function name - supports MD5 or SHA256
-    Returns:
-        str`: Checksum based on Hash function of choice.
-    Raises:
-        Exception: Invalid hash function is entered.
-    """
     hash_function = hash_function.lower()
     with open(filename, "rb") as f:
         bytes_data = f.read()  # read file as bytes
@@ -34,21 +27,19 @@ def get_checksum(filename, hash_function):
     return readable_hash
 
 
-def unzip_file(filepath, dest_dir):
-    file_msg = filepath.split('/')[-1]
-    with ZipFile(filepath, 'r') as zf:
+def unzip_file(filepath, filename):
+    print(filepath+filename+".zip")
+    # exit()
+    with ZipFile(filepath+filename+".zip", 'w') as zf:
         zf.extractall(
-            path=dest_dir
+            path=filepath
         )
-        print(f'Unzipped: {file_msg}')
+        print(f'Unzipped: {filename}.zip')
+    zf.close()
+
 
 
 def compare_checksum(file, checksum):
-    """
-    Compares checksum to file, making sure it is the correct file.
-    Currently set to SHA256
-    :return: bool
-    """
     f = open(checksum, "r")
     if f.read().split(' ')[0] == get_checksum(file, 'SHA256'):
         return True
@@ -67,3 +58,7 @@ def get_checksum(filename, hash_function):
             print("Invalid hash function.")
 
     return readable_hash
+
+def link_exists(path) -> bool:
+    r = req.head(path)
+    return r.status_code == req.codes.ok

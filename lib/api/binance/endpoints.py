@@ -1,8 +1,11 @@
 # Import
 import requests as req
+from datetime import datetime
 
 # Local Import
 from ..gopher import get_data
+
+from lib.file.finder import *
 
 endpoints = {
     'ping': '/api/v3/ping',
@@ -35,10 +38,38 @@ def fetch_kline(base_url:str, verbose:bool, params:dict):
         params=params
     )
 
-def download_file(url, path, filename):
-    r = req.get(f'{url}{filename}')
-    f = open(f'{path}{filename}', 'wb')
-    if r.status_code == 200:
-        for chunk in r.iter_content(1024):
-            f.write(chunk)
-    f.close()
+def bulk_url(trade_type:str, data_type:str, symbol:str, interval:str, year:str, month:str):
+    # https://data.binance.vision/data/spot/monthly/klines/ETHBTC/1m/ETHBTC-1m-2017-08.zip
+    return f"https://data.binance.vision/data/{trade_type}/monthly/{data_type}/{symbol}/{interval}/{symbol}-{interval}-{year}-{month}.zip"
+
+def bulk(base_url:str, verbose:bool, params:dict):
+    if verbose:
+        print(f"Params: {params}")
+    
+    year = datetime.fromtimestamp(params['timestamp']).strftime("%Y")
+    month = datetime.fromtimestamp(params['timestamp']).strftime("%m")
+    
+    current_url = bulk_url(
+            "spot",
+            "klines",
+            params['symbol'].upper(),
+            params['interval'],
+            year,
+            month
+        )
+
+    
+    filename = f'binance-{params["symbol"]}-{params["interval"]}-{year}-{month}'
+    filepath = f'db/klines/{params["symbol"]}/{params["interval"]}/'
+    
+    # Download file
+    download_file(
+        current_url,
+        filepath,
+        filename+".zip"
+    )
+    unzip_file(
+        filepath,
+        filename
+    )
+    return None
