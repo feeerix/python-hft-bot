@@ -34,3 +34,11 @@ def fetch_kline(base_url:str, verbose:bool, params:dict):
         f"{base_url}{endpoints['klines']}",
         params=params
     )
+
+def download_file(url, path, filename):
+    r = req.get(f'{url}{filename}')
+    f = open(f'{path}{filename}', 'wb')
+    if r.status_code == 200:
+        for chunk in r.iter_content(1024):
+            f.write(chunk)
+    f.close()

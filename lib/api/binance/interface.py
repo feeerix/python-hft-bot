@@ -116,3 +116,6 @@ class Binance(API):
         # print(ret_data.status_code)
         print(ret_data)
         write_db(ret_data, self.name, symbol, interval, '2023-03')
+
+    def test_bulk_klines(self):
+        
