@@ -10,10 +10,32 @@ from tests.battery import *
 
 
 # Test
-Binance().exchange_info()
-print(req.get(
-    "https://api.binance.com/api/v3/depth")
-)
+
+exit()
+with open("db/info/binance/exchange_info.json", "r") as exchange_info:
+    test = json.load(exchange_info)
+
+
+properties = [
+    'symbol',
+    'status',
+    'baseAsset',
+    'baseAssetPrecision',
+    'quoteAsset',
+    'quotePrecision',
+    'quoteAssetPrecision'
+]
+asset_list = []
+for asset in test['symbols']:
+    current_asset = {}
+
+    for prop in properties:
+        current_asset[prop] = asset[prop]
+    
+    asset_list.append(current_asset)
+
+for a in asset_list:
+    print(a)
 exit()
 binance = Binance()
 
