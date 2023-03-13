@@ -30,7 +30,7 @@ def get_checksum(filename, hash_function):
 def unzip_file(filepath, filename):
     print(filepath+filename+".zip")
     # exit()
-    with ZipFile(filepath+filename+".zip", 'w') as zf:
+    with ZipFile(filepath+filename+".zip", 'r') as zf:
         zf.extractall(
             path=filepath
         )
