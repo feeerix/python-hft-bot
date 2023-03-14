@@ -1,6 +1,8 @@
 # Import
 import json
 import pandas as pd
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 # Local Import
 from .endpoints import ping, server_status, exchange_info, fetch_kline, bulk
@@ -119,15 +121,23 @@ class Binance(API):
         write_db(ret_data, self.name, symbol, interval, '2023-03')
 
     def test_bulk_klines(self, symbol:str="", interval:str="", batch:int=""):
+        
+        # 1504216800 1st sep 2017
+        timestamp = 1504216800
 
-        # 
-        bulk(
-            'klines',
-            self.verbose,
-            {
-                'symbol':symbol,
-                'interval': interval,
-                'timestamp': 1647114396
-            }
-        )
+        dt_starttime = datetime.fromtimestamp(timestamp)
+        dt_endtime = datetime.fromtimestamp(1672527600)
+
+        while dt_starttime < dt_endtime:
+            bulk(
+                'klines',
+                self.verbose,
+                {
+                    'symbol':symbol,
+                    'interval': interval,
+                    'timestamp': dt_starttime.timestamp()
+                }
+            )
+
+            dt_starttime += relativedelta(months=1)
         

@@ -1,6 +1,8 @@
 # Import
 import requests as req
 from datetime import datetime
+import pandas as pd
+import os
 
 # Local Import
 from ..gopher import get_data
@@ -11,7 +13,7 @@ endpoints = {
     'ping': '/api/v3/ping',
     'server_time': '/api/v3/time',
     'server_status': '/sapi/v1/system/status',
-    'exchange_info': '/api/v3/exchangeInfo',
+    'exchange_info': '/api/v3/exchangeInfo', # spot
     'klines': '/api/v3/klines'
 }
 
@@ -68,8 +70,45 @@ def bulk(base_url:str, verbose:bool, params:dict):
         filepath,
         filename+".zip"
     )
+    # unzip the file
     unzip_file(
         filepath,
         filename
     )
+    og_filename = f"{params['symbol'].upper()}-{params['interval']}-{year}-{month}.csv"
+
+    # read csv as pandas dataframe
+    data = pd.read_csv(
+        filepath+og_filename,
+        header=None,
+        names=[
+            'time',
+            'open',
+            'high',
+            'low',
+            'close',
+            'volume',
+            'close_time',
+            'quote_volume',
+            'trade_number',
+            'taker_buy_volume',
+            'taker_quote_volume',
+            'na'
+        ]
+    )
+
+    # Write to csv
+    data.to_csv(
+        filepath+filename+".csv",
+        index=False
+    )
+
+    # Test print
+    if verbose:
+        print(data)
+    
+    # remove files
+    os.remove(filepath+og_filename)
+    os.remove(filepath+filename+".zip")
+
     return None
