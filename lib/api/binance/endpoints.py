@@ -48,9 +48,11 @@ def bulk(base_url:str, verbose:bool, params:dict):
     if verbose:
         print(f"Params: {params}")
     
+    # Get the month and year
     year = datetime.fromtimestamp(params['timestamp']).strftime("%Y")
     month = datetime.fromtimestamp(params['timestamp']).strftime("%m")
     
+    # Create the URL
     current_url = bulk_url(
             "spot",
             "klines",
@@ -60,7 +62,7 @@ def bulk(base_url:str, verbose:bool, params:dict):
             month
         )
 
-    
+    # Filename and filepath
     filename = f'binance-{params["symbol"]}-{params["interval"]}-{year}-{month}'
     filepath = f'db/klines/{params["symbol"]}/{params["interval"]}/'
     
@@ -111,4 +113,4 @@ def bulk(base_url:str, verbose:bool, params:dict):
     os.remove(filepath+og_filename)
     os.remove(filepath+filename+".zip")
 
-    return None
+    

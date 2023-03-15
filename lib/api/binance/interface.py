@@ -94,9 +94,10 @@ class Binance(API):
 
         # If we received an OK status
         if ret_data.status_code == 200:
+            
             # Write file to JSON
             with open(f'db/info/{self.name}/exchange_info.json', "w") as outfile:
-                outfile.write(json.dumps())
+                json.dump(ret_data.json(), outfile)
             
             # Return that we completed this task
             return True
@@ -104,6 +105,20 @@ class Binance(API):
             
             # Else something went wrong
             return False
+        
+    def get_print_symbols(self, status="TRADING") -> list:
+        sym_list = []
+        if self.exchange_info():
+            with open(f'db/info/{self.name}/exchange_info.json', "r") as f:
+                # data = json.load(f)
+                data = json.load(f)
+
+            for sym in data['symbols']:
+                sym_list.append(sym['symbol'])
+                
+            return sym_list
+        else:
+            return sym_list
         
     def test_klines(self, symbol:str="", interval:str="", start:int=0, end:int=0, limit:int=500):
         
@@ -123,10 +138,14 @@ class Binance(API):
     def test_bulk_klines(self, symbol:str="", interval:str="", batch:int=""):
         
         # 1504216800 1st sep 2017
-        timestamp = 1504216800
+        timestamp = 1569880800
 
         dt_starttime = datetime.fromtimestamp(timestamp)
         dt_endtime = datetime.fromtimestamp(1672527600)
+
+        if not folder_exists(symbol,'db/klines/'):
+            create_folder(symbol, 'db/klines/')
+            create_folder(interval, f'db/klines/{symbol}/')
 
         while dt_starttime < dt_endtime:
             bulk(

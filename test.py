@@ -10,7 +10,8 @@ from tests.battery import *
 
 
 # Test
-Binance().test_bulk_klines('ethbtc','1m')
+Binance().test_bulk_klines('ethbusd','1m')
+# print(Binance().get_print_symbols())
 # Binance().test_klines(
 #     "ltcbtc",
 #     "1m"
