@@ -106,19 +106,28 @@ class Binance(API):
             # Else something went wrong
             return False
         
-    def get_print_symbols(self, status="TRADING") -> list:
+    def get_print_symbols(self, live:bool=False, status:str="TRADING") -> list:
         sym_list = []
-        if self.exchange_info():
-            with open(f'db/info/{self.name}/exchange_info.json', "r") as f:
-                # data = json.load(f)
-                data = json.load(f)
+        if live:
+            # Make sure we have the latest info
+            self.exchange_info(): # Download the latest info and if done correctly
+        
+        # Open the file
+        with open(f'db/info/{self.name}/exchange_info.json', "r") as f:
+            
+            # Pull the data
+            data = json.load(f)
 
-            for sym in data['symbols']:
+        # For each line in the data['symbols']
+        for sym in data['symbols']:
+            # If the status is what we're looking for (generally trading)
+            if sym['status'] == status:
+
+                # Add the symbol to the list
                 sym_list.append(sym['symbol'])
+        
+        return sym_list
                 
-            return sym_list
-        else:
-            return sym_list
         
     def test_klines(self, symbol:str="", interval:str="", start:int=0, end:int=0, limit:int=500):
         
@@ -135,7 +144,7 @@ class Binance(API):
         print(ret_data)
         write_db(ret_data, self.name, symbol, interval, '2023-03')
 
-    def test_bulk_klines(self, symbol:str="", interval:str="", batch:int=""):
+    def test_bulk_klines(self, symbol:str, interval:str):
         
         # 1504216800 1st sep 2017
         timestamp = 1569880800
@@ -143,9 +152,9 @@ class Binance(API):
         dt_starttime = datetime.fromtimestamp(timestamp)
         dt_endtime = datetime.fromtimestamp(1672527600)
 
-        if not folder_exists(symbol,'db/klines/'):
-            create_folder(symbol, 'db/klines/')
-            create_folder(interval, f'db/klines/{symbol}/')
+        if not folder_exists(symbol.lower(),'db/klines/'):
+            create_folder(symbol.lower(), 'db/klines/')
+            create_folder(interval, f'db/klines/{symbol.lower()}/')
 
         while dt_starttime < dt_endtime:
             bulk(
