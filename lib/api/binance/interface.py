@@ -5,10 +5,10 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 # Local Import
-from .endpoints import ping, server_status, exchange_info, fetch_kline, bulk
+from .endpoints import ping, server_status, exchange_info, fetch_kline, bulk, bulk_url
 from .endpoints import server_time as binance_time
 from lib.file.writer import *
-
+from lib.file.reader import file_exists
 
 from lib.api.api import API
 from lib.file.finder import *
@@ -30,7 +30,7 @@ def process_kline(input_kline:list) -> dict:
         'na'
     ])
 
-def pre_check(exchange:str, symbol:str, interval:str):
+def pre_check(symbol:str, interval:str):
     # Check that the folder has been created
     if not folder_exists(symbol, f"db/klines/"):
         create_folder(
@@ -110,7 +110,7 @@ class Binance(API):
         sym_list = []
         if live:
             # Make sure we have the latest info
-            self.exchange_info(): # Download the latest info and if done correctly
+            self.exchange_info() # Download the latest info and if done correctly
         
         # Open the file
         with open(f'db/info/{self.name}/exchange_info.json', "r") as f:
@@ -140,32 +140,58 @@ class Binance(API):
                 'limit': 500
             }
         ).json())
-        # print(ret_data.status_code)
+
         print(ret_data)
         write_db(ret_data, self.name, symbol, interval, '2023-03')
 
-    def test_bulk_klines(self, symbol:str, interval:str):
+    def test_bulk_klines(self, symbol:str, interval:str, starttime:datetime=None):
+        # Goes backward to get the last bulk till earliest
+
+        # If we don't specify month
+        if starttime is None:
+            # get first of last month
+            dt_starttime = datetime.today().replace(day=1,hour=0,second=0,microsecond=0) - relativedelta(months=1)
+        else:
+            # use specified start time (and works backwards!)
+            dt_starttime = starttime
         
-        # 1504216800 1st sep 2017
-        timestamp = 1569880800
+        pre_check(symbol.lower(), interval)
 
-        dt_starttime = datetime.fromtimestamp(timestamp)
-        dt_endtime = datetime.fromtimestamp(1672527600)
+        # Loop for each bulk file
+        while True:
+            # If file does not exist
+            filepath = f"db/klines/{symbol.lower()}/{interval}/binance-{symbol}-{interval}-{dt_starttime.year}-{dt_starttime.month:02d}.csv"
+            if not file_exists(filepath):
+                # Download kline data
+                bulk(
+                    'klines',
+                    self.verbose,
+                    {
+                        'symbol':symbol,
+                        'interval': interval,
+                        'timestamp': dt_starttime.timestamp()
+                    }
+                )
+            else:
+                print(f'Already exists: {filepath}')
 
-        if not folder_exists(symbol.lower(),'db/klines/'):
-            create_folder(symbol.lower(), 'db/klines/')
-            create_folder(interval, f'db/klines/{symbol.lower()}/')
-
-        while dt_starttime < dt_endtime:
-            bulk(
-                'klines',
-                self.verbose,
-                {
-                    'symbol':symbol,
-                    'interval': interval,
-                    'timestamp': dt_starttime.timestamp()
-                }
-            )
-
-            dt_starttime += relativedelta(months=1)
-        
+            # Get the next time
+            next_time = dt_starttime - relativedelta(months=1)
+            
+            # If the link exists
+            if link_exists(
+                # Getting url
+                bulk_url(
+                    'spot',
+                    'klines',
+                    symbol,
+                    interval,
+                    next_time.year,
+                    f"{next_time.month:02d}"
+                )
+            ):
+                # Link exists - Change the date
+                dt_starttime -= relativedelta(months=1)
+            else:
+                # Link doesn't exist - exit loop
+                break

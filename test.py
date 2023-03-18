@@ -11,9 +11,9 @@ from tests.battery import *
 
 # Test
 binance = Binance()
-binance.test_bulk_klines('BTCUSDT','1m')
-binance.test_bulk_klines('ETHUSDT', '1m')
-# print(Binance().get_print_symbols())
+# binance.test_bulk_klines('BTCUSDT','1m')
+binance.test_bulk_klines('BNBUSDT', '1m')
+# print(binance.get_print_symbols())
 # Binance().test_klines(
 #     "ltcbtc",
 #     "1m"

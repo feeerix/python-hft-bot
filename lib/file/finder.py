@@ -3,6 +3,7 @@ import requests as req
 from zipfile import ZipFile
 import hashlib
 
+
 def download_file(url, path, filename):
     # https://data.binance.vision/data/spot/monthly/klines/ETHBTC/1m/ETHBTC-1m-2017-09.zip
     r = req.get(f'{url}')
@@ -62,3 +63,4 @@ def get_checksum(filename, hash_function):
 def link_exists(path) -> bool:
     r = req.head(path)
     return r.status_code == req.codes.ok
+

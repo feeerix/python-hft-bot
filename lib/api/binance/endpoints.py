@@ -41,7 +41,6 @@ def fetch_kline(base_url:str, verbose:bool, params:dict):
     )
 
 def bulk_url(trade_type:str, data_type:str, symbol:str, interval:str, year:str, month:str):
-    # https://data.binance.vision/data/spot/monthly/klines/ETHBTC/1m/ETHBTC-1m-2017-08.zip
     return f"https://data.binance.vision/data/{trade_type}/monthly/{data_type}/{symbol}/{interval}/{symbol}-{interval}-{year}-{month}.zip"
 
 def bulk(base_url:str, verbose:bool, params:dict):
