@@ -35,7 +35,6 @@ def process_kline(input_kline:list) -> dict:
     #     ret_data[x].round(decimals=0)
     return ret_data
 
-
 def pre_check(symbol:str, interval:str):
     # Check that the folder has been created
     if not folder_exists(symbol, f"db/klines/"):
@@ -88,13 +87,16 @@ class Binance(API):
             return True # Connected!
         else:
             return False # Not Connected!
-        
+    
+    # Server time
     def server_time(self) -> int: # function to check server time
         return binance_time(self.base_url, self.verbose).json()['serverTime']
     
+    # Server status
     def server_status(self) -> bool: # function to check if server is under maintenence
         return server_status(self.base_url, self.verbose).json()
     
+    # Get exchange info
     def exchange_info(self) -> bool:
         ret_data = exchange_info(self.base_url, self.verbose)
 
@@ -112,6 +114,7 @@ class Binance(API):
             # Else something went wrong
             return False
         
+    # Printing list for symbols
     def get_print_symbols(self, live:bool=False, status:str="TRADING") -> list:
         sym_list = []
         if live:
@@ -133,23 +136,8 @@ class Binance(API):
                 sym_list.append(sym['symbol'])
         
         return sym_list
-                
         
-    def test_klines(self, symbol:str, interval:str, start:int=0, end:int=0, limit:int=500):
-        
-        ret_data = process_kline(fetch_kline(
-            self.base_url,
-            self.verbose,
-            {
-                'symbol': 'ETHBTC',
-                'interval': '1m',
-                'limit': 500
-            }
-        ).json())
-
-        print(ret_data)
-        
-
+    # Bulk klines
     def update_bulk_klines(self, symbol:str, interval:Interval, starttime:datetime=None):
         # Goes backward to get the last bulk till earliest
 
@@ -173,8 +161,8 @@ class Binance(API):
                     'klines',
                     self.verbose,
                     {
-                        'symbol':symbol,
-                        'interval': interval.str_rep().upper(),
+                        'symbol':symbol.upper(),
+                        'interval': interval.str_rep(),
                         'timestamp': dt_starttime.timestamp()
                     }
                 )
@@ -206,6 +194,9 @@ class Binance(API):
     # Current function being created
     def update_klines(self, symbol:str, interval:Interval):
         
+        # Pre-check
+        pre_check(symbol.lower(), interval.str_rep())
+
         # Last Close
         starttime = int(interval.last_close()/1000)
         
@@ -267,7 +258,7 @@ class Binance(API):
             'na'
         ])
             
-        # Get klines via fetch till start of the month - TODO
+        # Get klines via fetch till start of last updated csv
         while True:
             if self.verbose:
                 print(f"Count reminaing: {count}")
@@ -302,9 +293,9 @@ class Binance(API):
         ret_data = pd.concat([ret_data, temp_df], ignore_index=True)
 
         # Test print
-        print(ret_data)
-        print(f"First time: {datetime.fromtimestamp(int(ret_data['time'].iloc[0])/1000)}")
-        print(f"Last time: {datetime.fromtimestamp(int(ret_data['time'].iloc[-1])/1000)}")
+        if self.verbose:
+            print(f"First time: {datetime.fromtimestamp(int(ret_data['time'].iloc[0])/1000)}")
+            print(f"Last time: {datetime.fromtimestamp(int(ret_data['time'].iloc[-1])/1000)}")
         
         # Write to file
         pd.DataFrame.to_csv(
