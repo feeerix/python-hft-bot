@@ -1,5 +1,6 @@
 # Import
 import os
+import json
 
 # Local Import
 
@@ -14,3 +15,7 @@ def folder_exists(folder_name:str, folder_path:str) -> bool:
         return True
     else:
         return False
+    
+def write_json(file_data:dict, filename:str, folder_path:str):
+    with open(f"{folder_path}{filename}") as outjson:
+        json.dump(file_data, outjson)

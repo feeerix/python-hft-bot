@@ -7,7 +7,7 @@ def get_json(path:str) -> dict:
         data = json.load(json_file)
     return data
 
-def file_exists(path) -> bool:
+def file_exists(path:str) -> bool:
     if os.path.isfile(path):
         return True
     else:
