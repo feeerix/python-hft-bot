@@ -7,7 +7,6 @@ def get_last_closed_time(interval_tc:int):
 
 
 
-
 # Not sure if a whole class is required yet - will leave in and go from there
 class Interval:
     def __init__(self, str_interval:str, ms:bool=False):
@@ -30,6 +29,7 @@ class Interval:
         return self.interval_table[self.str_interval]
     
     def str_rep(self) -> str:
+        
         return self.str_interval
     
     def last_close(self) -> int:
