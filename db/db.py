@@ -9,7 +9,7 @@ from lib.api.binance.local import filename
 
 class database:
     def __init__(self):
-        pass
+        self.df = None
 
     def kline_df(self, symbol:str, interval:str, starttime:int, endtime:int) -> pd.DataFrame:
         # Filepath based on inputs
@@ -47,5 +47,7 @@ class database:
             # Go to next month
             dt_start += relativedelta(months=1)
 
+        self.df = ret_data
         # Return data
         return ret_data
+    
