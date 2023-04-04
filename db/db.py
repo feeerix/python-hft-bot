@@ -34,6 +34,8 @@ class database:
             'taker_quote_volume',
             'na'
         ])
+
+        
         
         # build loop
         while dt_start < dt_end:

@@ -23,3 +23,7 @@ class Backtester:
 
         # init db
         self.db = self.db[['stoch_rsi_k', 'stoch_rsi_d']] = ta.stochrsi(self.db['close'],window=14,smooth_k=3,smooth_d=3)
+
+
+    def start_test(self, initial_capital:int):
+        pass
