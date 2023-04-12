@@ -37,7 +37,13 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 # test_indicator = indicator()
 # Backtester().test_strat()
 write_required_params()
-get_required_params('stochrsi')
+
+required_params = get_required_params('stochrsi')
+for required_bool in required_params.keys():
+    print(f"{required_bool} // {required_params[required_bool]}")
+    if required_params[required_bool]:
+        # check that we've added
+        
 exit()
 df = database().kline_df('ETHUSDT', '4h', 1640995200, 1672531200)
 # print(df)

@@ -2,6 +2,7 @@
 
 # Local Imports
 from lib.file.writer import *
+from backtest.strat.composer import get_required_params, write_required_params
 
 class settings:
     # The main reason we create this class is so that we can load settings from the coresponding folders
@@ -9,7 +10,8 @@ class settings:
         # Add the setting details based on what's added
 
         # settings = {
-        #     "name": setting_name
+        #     "name": setting_name,
+        #     "func_name": func_name 
         #     "columns": [],
         #     "settings": {
         #         "arg1": default_value1,
@@ -20,13 +22,25 @@ class settings:
         # Settings
         self.settings = {
             "name": name,
+            "func_name": func_name,
             "columns": [], # Programatically get column names
             "settings": settings
         }
 
     def validate_settings(self): 
-        pass
+        required_params = get_required_params(self.settings['func_name'])
+        for data_type in required_params.keys():
+            print(f"{data_type} // {required_params[data_type]}")
+            # If data is required
+            if required_params[data_type]:
+                # and the data is NOT within settings
+                if not data_type in self.settings['settings']:
+
+                    # INVALID - return false
+                    return False
         
+        # Correct
+        return True
          
 
     def write_settings(self):

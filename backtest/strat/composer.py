@@ -57,5 +57,8 @@ def write_required_params(verbosity:bool=False): # TODO - Make sure to add verbo
     # TODO - Make sure to add correct return values
     return True
 
-def get_required_params(func_name:str, verbosity:bool=False):
-    print(get_json("db/strategies/indicators/required_ta_params.json")[func_name])
+def get_required_params(func_name:str, verbosity:bool=False) -> dict:
+    if verbosity:
+        print(f"Getting required params for: {func_name}")
+
+    return get_json("db/strategies/indicators/required_ta_params.json")[func_name]
