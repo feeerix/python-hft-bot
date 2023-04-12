@@ -8,7 +8,8 @@ import inspect
 # Loca Imports
 from db.db import database
 from backtest.strat.settings.settings import settings
-from backtest.strat.indicator import indicator, get_params, write_params
+from backtest.strat.composer import get_required_params, write_required_params
+from backtest.strat.indicator import indicator
 
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -35,7 +36,8 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
 # test_indicator = indicator()
 # Backtester().test_strat()
-write_params()
+write_required_params()
+get_required_params('stochrsi')
 exit()
 df = database().kline_df('ETHUSDT', '4h', 1640995200, 1672531200)
 # print(df)
