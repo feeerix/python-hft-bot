@@ -3,6 +3,10 @@ import pandas as pd
 import pandas_ta as ta
 import inspect
 
+# Local Imports
+from lib.file.writer import *
+from backtest.strat.settings import settings
+
 # Quick and dirty way to get the require params
 def get_params(verbosity:bool=False):
     # Get functions
@@ -41,30 +45,37 @@ def get_params(verbosity:bool=False):
     
     return ret_dat
     
-
-def check_func(ind_func:ta, settings:dict):
-    print(ind_func.__code__.co_varnames)
+def write_params(verbosity:bool=False):
+    write_data = get_params()
+    write_json(
+        write_data,
+        "test.json",
+        "db/strategies/indicators/"
+    )
 
 
 
 class indicator:
-    def __init__(self, ind_func:ta, settings:dict):
+    def __init__(self, ind_func:ta, _settings:settings):
         # Add the func into the class
         self.ind_func = ind_func
         
-        # Settings
-        self.settings = settings
+        # Settings - a way to set up the indicator
+        self.settings = _settings.settings
         # settings = {
+        #     "name": setting_name
         #     "columns": [],
         #     "settings": {
-        #         "arg1": None,
-        #         "arg2": None
+        #         "arg1": default_value1,
+        #         "arg2": default_value2
         #     }
         # }
+        
+        self.add_indicator()
     
     def print_settings(self):
         print(self.settings)
 
-    def add_indicator(self):
-        pass
+    def add_indicator(self, df:pd.DataFrame) -> pd.DataFrame:
+        return df[settings['columns']] 
     
