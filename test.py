@@ -4,6 +4,8 @@ import pandas_ta as ta
 import plotly.graph_objects as go
 import plotly.express as px
 import inspect
+import numpy as np
+import warnings
 
 # Loca Imports
 from db.db import database
@@ -16,8 +18,9 @@ from backtest.strat.indicator import indicator
 # pd.set_option('display.width', None)
 # pd.set_option('display.max_colwidth', None)
 pd.set_option('display.float_format', lambda x: '%.5f' % x)
-# Get a list of all the functions in the pandas_ta module
 
+# Ignoring future warning initially
+warnings.simplefilter(action='ignore',category=FutureWarning)
 
 
 
@@ -31,22 +34,21 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 #     print(all_params)
 
 
-# print(ta.bbands.__code__.co_varnames)
+print(get_required_params('stochrsi'))
 
 # test_indicator = indicator()
 # Backtester().test_strat()
-test_settings = settings("test", "ema", {'close': 'close', 'length': 21})
-print(get_required_params('ema'))
+test_settings = settings("test", "ema", {'length': 21})
+# print(get_required_params('ema'))
 
 test_indicator = indicator(ta.ema,test_settings)
 df = database().kline_df('ETHUSDT', '4h', 1640995200, 1672531200)
-# df1 = ta.ema(df['close'], length=21)
-df2 = ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
-print(df2)
-# print(df1.name)
-# test_result = test_indicator.add_indicator(df)
-# ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
-# print(test_result)
+df['ema21'] = ta.ema(df['close'], length=21)
+# df2 = ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
+
+test_result = test_indicator.add_indicator(df)
+
+print(test_result)
 exit()
 
 # print(df)
