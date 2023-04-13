@@ -31,25 +31,28 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 #     print(all_params)
 
 
-# print(ta.ema.__code__.co_varnames)
 # print(ta.bbands.__code__.co_varnames)
 
 # test_indicator = indicator()
 # Backtester().test_strat()
-write_required_params()
+test_settings = settings("test", "ema", {'close': 'close', 'length': 21})
+print(get_required_params('ema'))
 
-required_params = get_required_params('stochrsi')
-for required_bool in required_params.keys():
-    print(f"{required_bool} // {required_params[required_bool]}")
-    if required_params[required_bool]:
-        # check that we've added
-        
-exit()
+test_indicator = indicator(ta.ema,test_settings)
 df = database().kline_df('ETHUSDT', '4h', 1640995200, 1672531200)
+# df1 = ta.ema(df['close'], length=21)
+df2 = ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
+print(df2)
+# print(df1.name)
+# test_result = test_indicator.add_indicator(df)
+# ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
+# print(test_result)
+exit()
+
 # print(df)
 df[['k', 'd']] = ta.stochrsi(df['close'],window=21,smooth_k=5,smooth_d=5)
 print(df)
-# self.db[['stoch_rsi_k', 'stoch_rsi_d']] = ta.stochrsi(self.db['close'],window=14,smooth_k=3,smooth_d=3)
+self.db[['stoch_rsi_k', 'stoch_rsi_d']] = ta.stochrsi(self.db['close'],window=14,smooth_k=3,smooth_d=3)
 
 # df[['k','d']] = ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
 # df['ema21'] = ta.ema(close=df['close'],length=21,talib=False)

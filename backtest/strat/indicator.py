@@ -18,18 +18,19 @@ class indicator:
         self.settings = _settings.settings
         # settings = {
         #     "name": setting_name
-        #     "columns": [],
-        #     "settings": {
+        #     "arguments": {
         #         "arg1": default_value1,
         #         "arg2": default_value2
         #     }
         # }
-        
-        self.add_indicator()
+
     
     def print_settings(self):
         print(self.settings)
 
     def add_indicator(self, df:pd.DataFrame) -> pd.DataFrame:
-        return df[settings['columns']] 
+        # ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
+        df['ema'] = self.ind_func(self.settings['arguments'])
+        return df
+        
     
