@@ -62,3 +62,24 @@ def get_required_params(func_name:str, verbosity:bool=False) -> dict:
         print(f"Getting required params for: {func_name}")
 
     return get_json("db/strategies/indicators/required_ta_params.json")[func_name]
+
+
+def write_settings(setting_name:str, verbosity:bool=False): # TODO - Make sure to add verbosity and return
+    write_data = get_params()
+
+    # Write to file
+    write_json(
+        write_data,
+        f"{setting_name}.json",
+        "db/strategies/indicators/settings/"
+    )
+
+    # TODO - Make sure to add correct return values
+    return True
+
+
+def get_settings(setting_name:str, verbosity:bool=False) -> dict:
+    if verbosity:
+        print(f"Getting required params for: {setting_name}")
+
+    return get_json(f"db/strategies/indicators/settings/{setting_name}.json")

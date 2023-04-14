@@ -19,24 +19,31 @@ class settings:
         # }
 
         # Settings
-        self.settings = {
+        self.data = {
             "name": name,
             "func_name": func_name,
             "columns": [], # Programatically get column names
             "arguments": arguments
         }
-        if verbose:
-            print(self.settings)
+
+        self.verbose = verbose
+        if self.verbose:
+            print(self.data)
+
 
     def validate_settings(self): 
-        required_params = get_required_params(self.settings['func_name'])
-        for data_type in required_params.keys():
-            print(f"{data_type} // {required_params[data_type]}")
-            # If data is required
-            if required_params[data_type]:
-                # and the data is NOT within settings
-                if not data_type in self.settings['settings']:
+        required_params = get_required_params(self.data['func_name'])
+        ohlcv = ['open', 'high', 'low', 'close', 'volume']
 
+        for data_type in required_params.keys():
+
+            # Verbose print
+            if self.verbose:
+                print(f"{data_type} // {required_params[data_type]}")
+            
+            # If data is required and the data is NOT within settings
+            if required_params[data_type] and data_type not in ohlcv:    
+                if not data_type in self.data['arguments']:
                     # INVALID - return false
                     return False
         

@@ -10,40 +10,56 @@ from backtest.strat.composer import get_required_params, write_required_params
 
 
 class indicator:
-    def __init__(self, ind_func:ta, _settings:settings):
+    def __init__(self, _settings:settings):
         # Add the func into the class
-        self.ind_func = ind_func
+        self.ind_func = getattr(ta, _settings.data['func_name'])
         
         # Settings - a way to set up the indicator
-        self.settings = _settings.settings
+        self.settings = _settings
         # settings = {
         #     "name": setting_name
+        #     "columns": []
         #     "arguments": {  -> None df related arguments
         #         "arg1": default_value1,
         #         "arg2": default_value2
         #     }
         # }
-
     
     def print_settings(self):
-        print(self.settings)
+        print(self.settings.data)
 
-    def add_indicator(self, df:pd.DataFrame, verbose:bool=False) -> pd.DataFrame:
-        
-        # ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
-        # df1 = ta.ema(df['close'], length=21)
-        # df2 = ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
+    def ret_indicator(self, df:pd.DataFrame, verbose:bool=False) -> pd.DataFrame:
 
-        # check if args include open high low close or volume
+        # initialise empty settings
         ind_settings = {}
-        req_params = get_required_params('ema')
+        # initialise ohlcv
         ohlcv = ['open', 'high', 'low', 'close', 'volume']
+
+        # Get the required parameters (OHLCV)
+        req_params = get_required_params('ema')
+
+        # For for the list
         for val in ohlcv:
+            # check if args include open high low close or volume
             if val in req_params:
                 ind_settings.update({val: df[val]})
-        ind_settings.update(self.settings['arguments'])
         
+        # Add settings to indicator settings
+        ind_settings.update(self.settings.data['arguments'])
+        
+        # Verbosity prints
         if verbose:
             print(ind_settings)
-        return self.ind_func(**ind_settings)
+
+        # Return
+        ret_data = self.ind_func(**ind_settings)
+        if type(ret_data) == pd.DataFrame:
+            self.settings.data['columns'] = ret_data.columns.tolist()
+            return ret_data
+        else:
+            self.settings.data['columns'] = [ret_data.name]
+            return pd.DataFrame(ret_data, columns=self.settings.data['columns'])
+
+        
+        
     

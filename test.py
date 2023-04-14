@@ -6,11 +6,12 @@ import plotly.express as px
 import inspect
 import numpy as np
 import warnings
+from datetime import datetime
 
 # Loca Imports
 from db.db import database
+from backtest.strat.strat import strategy
 from backtest.strat.settings.settings import settings
-from backtest.strat.composer import get_required_params, write_required_params
 from backtest.strat.indicator import indicator
 
 # pd.set_option('display.max_rows', None)
@@ -22,67 +23,38 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 # Ignoring future warning initially
 warnings.simplefilter(action='ignore',category=FutureWarning)
 
+stochrsi_setting = settings("test", "stochrsi", {'window':21,'smooth_k':5,'smooth_d':5}, verbose=False)
+ema21_setting = settings("ema21", "ema", {'length': 21}, verbose=False)
+ema144_setting = settings("ema144", "ema", {'length': 144}, verbose=False)
+ema233_setting = settings("ema233", "ema", {'length': 233}, verbose=False)
+
+
+start = 1640995200
+end = 1672531200
+df = database().kline_df('ETHUSD', '4h', start, end)
+
+print(f"start: {datetime.fromtimestamp(start)}")
+print(f"end: {datetime.fromtimestamp(end)}")
+
+test_strat = strategy("test_strategy",False)
+test_strat.init_df(df)
+test_strat.add_indicator(indicator(stochrsi_setting))
+test_strat.add_indicator(indicator(ema21_setting))
+test_strat.add_indicator(indicator(ema144_setting))
+test_strat.add_indicator(indicator(ema233_setting))
+
+print(test_strat.df)
+
+# test_settings = settings("test", "stochrsi", {'window':21,'smooth_k':5,'smooth_d':5}, verbose=False)
+# test2_settings = settings("test2", "ema", {'length': 21}, verbose=False)
+# test_indicator = indicator(test_settings)
+# test2_indicator = indicator(test2_settings)
+# df = database().kline_df('ETHUSDT', '4h', 1640995200, 1672531200)
+# test_result = test_indicator.ret_indicator(df)
+# test2_result = test2_indicator.ret_indicator(df)
+# print(df)
+# print(pd.concat([test_result, test2_result], axis=1 ,ignore_index=True))
 
 
 
-# ta_funcs = inspect.getmembers(ta, inspect.isfunction)
-# for x in ta_funcs:
-#     print(x[0])
-
-#     all_params = x[1].__code__.co_varnames
-    
-#     print(all_params)
-
-
-print(get_required_params('stochrsi'))
-
-# test_indicator = indicator()
-# Backtester().test_strat()
-test_settings = settings("test", "ema", {'length': 21})
-# print(get_required_params('ema'))
-
-test_indicator = indicator(ta.ema,test_settings)
-df = database().kline_df('ETHUSDT', '4h', 1640995200, 1672531200)
-df['ema21'] = ta.ema(df['close'], length=21)
-# df2 = ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
-
-test_result = test_indicator.add_indicator(df)
-
-print(test_result)
 exit()
-
-# print(df)
-df[['k', 'd']] = ta.stochrsi(df['close'],window=21,smooth_k=5,smooth_d=5)
-print(df)
-self.db[['stoch_rsi_k', 'stoch_rsi_d']] = ta.stochrsi(self.db['close'],window=14,smooth_k=3,smooth_d=3)
-
-# df[['k','d']] = ta.stochrsi(close=df['close'], length=21, rsi_length=21, k=5, d=5)
-# df['ema21'] = ta.ema(close=df['close'],length=21,talib=False)
-# df['ema144'] = ta.ema(close=df['close'],length=144,talib=False)
-
-
-# fig = px.histogram(df['testdiff'], x='testdiff', nbins=1000)
-# fig.show()
-# print(df)
-# fig = go.Figure(data=[
-#     go.Candlestick(
-#         x=df['time'],
-#         open=df['open'],
-#         high=df['high'],
-#         low=df['low'],
-#         close=df['close']
-#     ),
-    # go.Scatter(
-    #     x=df['time'],
-    #     y=df['ema21']
-    # ),
-    # go.Scatter(
-    #     x=df['time'],
-    #     y=df['ema144']
-    # )
-# ])
-# fig.update_layout(xaxis_rangeslider_visible=False)
-# fig.show()
-# df = database().kline_df('ETHUSDT', '1m', 1640995200, 1640995300)
-
-
