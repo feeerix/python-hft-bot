@@ -17,9 +17,9 @@ class indicator:
         # Settings - a way to set up the indicator
         self.settings = _settings
         # settings = {
-        #     "name": setting_name
-        #     "columns": []
-        #     "arguments": {  -> None df related arguments
+        #     "name": setting_name,
+        #     "func_name": func_name 
+        #     "arguments": {
         #         "arg1": default_value1,
         #         "arg2": default_value2
         #     }
@@ -29,21 +29,26 @@ class indicator:
         print(self.settings.data)
 
     def ret_indicator(self, df:pd.DataFrame, verbose:bool=False) -> pd.DataFrame:
-
         # initialise empty settings
         ind_settings = {}
-        # initialise ohlcv
-        ohlcv = ['open', 'high', 'low', 'close', 'volume']
 
         # Get the required parameters (OHLCV)
-        req_params = get_required_params('ema')
+        req_params = get_required_params(self.settings.data['func_name'])
+        if self.settings.utility:
+            for val in [self.settings.arguments['series_a'], self.settings.arguments['series_b']]:
+                if val in req_params:
+                    ind_settings.update({val: df[val]})
+        else:
+            
+            # initialise ohlcv
+            ohlcv = ['open', 'high', 'low', 'close', 'volume']
 
-        # For for the list
-        for val in ohlcv:
-            # check if args include open high low close or volume
-            if val in req_params:
-                ind_settings.update({val: df[val]})
-        
+            # For for the list
+            for val in ohlcv:
+                # check if args include open high low close or volume
+                if val in req_params:
+                    ind_settings.update({val: df[val]})
+            
         # Add settings to indicator settings
         ind_settings.update(self.settings.data['arguments'])
         

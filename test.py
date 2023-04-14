@@ -13,6 +13,7 @@ from db.db import database
 from backtest.strat.strat import strategy
 from backtest.strat.settings.settings import settings
 from backtest.strat.indicator import indicator
+from backtest.strat.composer import get_required_params
 
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -22,6 +23,7 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
 # Ignoring future warning initially
 warnings.simplefilter(action='ignore',category=FutureWarning)
+
 
 stochrsi_setting = settings("test", "stochrsi", {'window':21,'smooth_k':5,'smooth_d':5}, verbose=False)
 ema21_setting = settings("ema21", "ema", {'length': 21}, verbose=False)
@@ -33,9 +35,6 @@ start = 1640995200
 end = 1672531200
 df = database().kline_df('ETHUSDT', '1m', start, end)
 
-print(f"start: {datetime.fromtimestamp(start)}")
-print(f"end: {datetime.fromtimestamp(end)}")
-
 test_strat = strategy("test_strategy",False)
 test_strat.init_df(df)
 test_strat.add_indicator(indicator(stochrsi_setting))
@@ -43,7 +42,11 @@ test_strat.add_indicator(indicator(ema21_setting))
 test_strat.add_indicator(indicator(ema144_setting))
 test_strat.add_indicator(indicator(ema233_setting))
 
-print(test_strat.df)
+print(get_required_params('above'))
+
+# print(ta.above(test_strat.df['EMA_144'],test_strat.df['EMA_233']))
+
+# print(test_strat.df)
 
 # test_settings = settings("test", "stochrsi", {'window':21,'smooth_k':5,'smooth_d':5}, verbose=False)
 # test2_settings = settings("test2", "ema", {'length': 21}, verbose=False)

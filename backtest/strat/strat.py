@@ -20,10 +20,13 @@ class strategy:
             # ignore_index=True
         )
         # self.df = self.df[indicator.settings['columns']] = indicator.ind_func(indicator.settings.data['arguments'])
-        
-    def add_entry():
+
+    # def add_condition(self, )    
+    
+    def add_entry(is_long:bool=False):
         # Long/short entries
-        pass
+        if is_long:
+            pass
 
     def add_hardstop():
         # Make sure the bot doesn't get you liquidated and lose all your money

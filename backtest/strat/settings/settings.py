@@ -1,4 +1,5 @@
 # Imports
+import pandas_ta as ta
 
 # Local Imports
 from lib.file.writer import *
@@ -25,6 +26,12 @@ class settings:
             "columns": [], # Programatically get column names
             "arguments": arguments
         }
+        
+        utility = ['above', 'above_value', 'below', 'below_value', 'cross']
+        if self.data['func_name'] in utility:
+            self.utility = True
+        else:
+            self.utility = False
 
         self.verbose = verbose
         if self.verbose:
@@ -33,22 +40,25 @@ class settings:
 
     def validate_settings(self): 
         required_params = get_required_params(self.data['func_name'])
-        ohlcv = ['open', 'high', 'low', 'close', 'volume']
+        if self.utility:
+            pass # TODO - set up validation
+        else:
+            ohlcv = ['open', 'high', 'low', 'close', 'volume']
 
-        for data_type in required_params.keys():
+            for data_type in required_params.keys():
 
-            # Verbose print
-            if self.verbose:
-                print(f"{data_type} // {required_params[data_type]}")
+                # Verbose print
+                if self.verbose:
+                    print(f"{data_type} // {required_params[data_type]}")
+                
+                # If data is required and the data is NOT within settings
+                if required_params[data_type] and data_type not in ohlcv:    
+                    if not data_type in self.data['arguments']:
+                        # INVALID - return false
+                        return False
             
-            # If data is required and the data is NOT within settings
-            if required_params[data_type] and data_type not in ohlcv:    
-                if not data_type in self.data['arguments']:
-                    # INVALID - return false
-                    return False
-        
-        # Correct
-        return True
+            # Correct
+            return True
          
 
     def write_settings(self):
