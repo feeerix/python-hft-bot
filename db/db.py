@@ -44,7 +44,7 @@ class database:
             fn = filename(symbol, interval, f"{dt_start.year}", f"{dt_start.month:02d}")
             
             # add new data to return df
-            ret_data = pd.concat([ret_data, pd.read_csv(f'{filepath}{fn}')])
+            ret_data = pd.concat([ret_data, pd.read_csv(f'{filepath}{fn}')], axis=0, ignore_index=True)
 
             # Go to next month
             dt_start += relativedelta(months=1)

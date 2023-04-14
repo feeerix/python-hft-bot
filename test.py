@@ -31,7 +31,7 @@ ema233_setting = settings("ema233", "ema", {'length': 233}, verbose=False)
 
 start = 1640995200
 end = 1672531200
-df = database().kline_df('ETHUSD', '4h', start, end)
+df = database().kline_df('ETHUSDT', '1m', start, end)
 
 print(f"start: {datetime.fromtimestamp(start)}")
 print(f"end: {datetime.fromtimestamp(end)}")
