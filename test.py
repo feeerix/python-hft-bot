@@ -25,7 +25,7 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 warnings.simplefilter(action='ignore',category=FutureWarning)
 
 
-stochrsi_setting = settings("test", "stochrsi", {'window':21,'smooth_k':5,'smooth_d':5}, verbose=False)
+stochrsi_setting = settings("test", "stochrsi", {'length':21,'rsi_length':21,'k':5,'d':5}, verbose=False)
 ema21_setting = settings("ema21", "ema", {'length': 21}, verbose=False)
 ema144_setting = settings("ema144", "ema", {'length': 144}, verbose=False)
 ema233_setting = settings("ema233", "ema", {'length': 233}, verbose=False)
@@ -33,7 +33,7 @@ ema233_setting = settings("ema233", "ema", {'length': 233}, verbose=False)
 
 start = 1640995200
 end = 1672531200
-df = database().kline_df('ETHUSDT', '1m', start, end)
+df = database().kline_df('ETHUSDT', '4h', start, end)
 
 test_strat = strategy("test_strategy",False)
 test_strat.init_df(df)
@@ -42,11 +42,11 @@ test_strat.add_indicator(indicator(ema21_setting))
 test_strat.add_indicator(indicator(ema144_setting))
 test_strat.add_indicator(indicator(ema233_setting))
 
-print(get_required_params('above'))
 
+# ta.stochrsi
 # print(ta.above(test_strat.df['EMA_144'],test_strat.df['EMA_233']))
 
-# print(test_strat.df)
+print(test_strat.df)
 
 # test_settings = settings("test", "stochrsi", {'window':21,'smooth_k':5,'smooth_d':5}, verbose=False)
 # test2_settings = settings("test2", "ema", {'length': 21}, verbose=False)

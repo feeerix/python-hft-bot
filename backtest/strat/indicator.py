@@ -2,6 +2,7 @@
 import pandas as pd
 import pandas_ta as ta
 import inspect
+from pprint import pprint
 
 # Local Imports
 from lib.file.writer import *
@@ -34,12 +35,14 @@ class indicator:
 
         # Get the required parameters (OHLCV)
         req_params = get_required_params(self.settings.data['func_name'])
+        
         if self.settings.utility:
-            for val in [self.settings.arguments['series_a'], self.settings.arguments['series_b']]:
-                if val in req_params:
-                    ind_settings.update({val: df[val]})
-        else:
             
+            comparison = {'series_a', 'series_b'}
+            ind_settings.update({'series_a': df[self.settings.data['arguments']['series_a']]})
+            ind_settings.update({'series_b': df[self.settings.data['arguments']['series_b']]})
+        else:
+            pprint(self.settings.data)
             # initialise ohlcv
             ohlcv = ['open', 'high', 'low', 'close', 'volume']
 
@@ -55,6 +58,11 @@ class indicator:
         # Verbosity prints
         if verbose:
             print(ind_settings)
+        
+        # if self.settings.utility:
+        #     print(ind_settings)
+        #     print("1111")
+        #     exit()
 
         # Return
         ret_data = self.ind_func(**ind_settings)
