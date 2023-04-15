@@ -26,6 +26,7 @@ warnings.simplefilter(action='ignore',category=FutureWarning)
 
 
 stochrsi_setting = settings("test", "stochrsi", {'length':21,'rsi_length':21,'k':5,'d':5}, verbose=False)
+ema8_setting = settings("ema8", "ema", {'length': 8}, verbose=False)
 ema21_setting = settings("ema21", "ema", {'length': 21}, verbose=False)
 ema144_setting = settings("ema144", "ema", {'length': 144}, verbose=False)
 ema233_setting = settings("ema233", "ema", {'length': 233}, verbose=False)
@@ -38,10 +39,29 @@ df = database().kline_df('ETHUSDT', '4h', start, end)
 test_strat = strategy("test_strategy",False)
 test_strat.init_df(df)
 test_strat.add_indicator(indicator(stochrsi_setting))
+test_strat.add_indicator(indicator(ema8_setting))
 test_strat.add_indicator(indicator(ema21_setting))
 test_strat.add_indicator(indicator(ema144_setting))
 test_strat.add_indicator(indicator(ema233_setting))
 
+# print(test_strat.df.columns)
+
+cond_8above21_setting = settings("8above21", "above", {'series_a':'EMA_8','series_b':'EMA_21'})
+cond_8below21_setting = settings("8below21", "below", {'series_a':'EMA_8','series_b':'EMA_21'})
+
+cond_144above233_setting = settings("144above233", "above", {'series_a':'EMA_144','series_b':'EMA_233'})
+cond_144below233_setting = settings("144below233", "below", {'series_a':'EMA_144','series_b':'EMA_233'})
+
+
+test_strat.add_indicator(indicator(cond_8above21_setting))
+test_strat.add_indicator(indicator(cond_8below21_setting))
+
+test_strat.add_indicator(indicator(cond_144above233_setting))
+test_strat.add_indicator(indicator(cond_144below233_setting))
+
+print(test_strat.df)
+exit()
+# test_strat.add_indicator(indicator())
 
 # ta.stochrsi
 # print(ta.above(test_strat.df['EMA_144'],test_strat.df['EMA_233']))

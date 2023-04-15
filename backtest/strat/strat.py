@@ -19,11 +19,15 @@ class strategy:
             axis=1, 
             # ignore_index=True
         )
-        # self.df = self.df[indicator.settings['columns']] = indicator.ind_func(indicator.settings.data['arguments'])
 
-    # def add_condition(self, )    
+    def add_condition(self, settings:dict):
+        self.df = pd.concat(
+            [
+                self.df
+            ]
+        )    
     
-    def add_entry(is_long:bool=False):
+    def add_entry(self, is_long:bool=False):
         # Long/short entries
         if is_long:
             pass

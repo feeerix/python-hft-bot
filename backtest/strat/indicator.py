@@ -37,8 +37,6 @@ class indicator:
         req_params = get_required_params(self.settings.data['func_name'])
         
         if self.settings.utility:
-            
-            comparison = {'series_a', 'series_b'}
             ind_settings.update({'series_a': df[self.settings.data['arguments']['series_a']]})
             ind_settings.update({'series_b': df[self.settings.data['arguments']['series_b']]})
         else:
@@ -52,8 +50,7 @@ class indicator:
                 if val in req_params:
                     ind_settings.update({val: df[val]})
             
-        # Add settings to indicator settings
-        ind_settings.update(self.settings.data['arguments'])
+        
         
         # Verbosity prints
         if verbose:
@@ -65,7 +62,16 @@ class indicator:
         #     exit()
 
         # Return
-        ret_data = self.ind_func(**ind_settings)
+        if self.settings.utility:
+            ret_data = self.ind_func(**ind_settings)
+        else:
+            # Add settings to indicator settings
+            ind_settings.update(self.settings.data['arguments'])
+
+            # call ta function
+            ret_data = self.ind_func(**ind_settings)
+
+        # --------------------------------------------------------------
         if type(ret_data) == pd.DataFrame:
             self.settings.data['columns'] = ret_data.columns.tolist()
             return ret_data
