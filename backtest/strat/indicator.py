@@ -2,7 +2,6 @@
 import pandas as pd
 import pandas_ta as ta
 import inspect
-from pprint import pprint
 
 # Local Imports
 from lib.file.writer import *
@@ -39,8 +38,8 @@ class indicator:
         if self.settings.utility:
             ind_settings.update({'series_a': df[self.settings.data['arguments']['series_a']]})
             ind_settings.update({'series_b': df[self.settings.data['arguments']['series_b']]})
+
         else:
-            pprint(self.settings.data)
             # initialise ohlcv
             ohlcv = ['open', 'high', 'low', 'close', 'volume']
 
@@ -49,9 +48,7 @@ class indicator:
                 # check if args include open high low close or volume
                 if val in req_params:
                     ind_settings.update({val: df[val]})
-            
-        
-        
+
         # Verbosity prints
         if verbose:
             print(ind_settings)
