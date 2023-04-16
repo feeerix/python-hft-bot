@@ -8,7 +8,7 @@ from backtest.strat.indicator import indicator
 from backtest.strat.settings import settings
 
 class strategy:
-    def __init__(self, name:str, verbose:bool=True): 
+    def __init__(self, name:str, verbose:bool=False): 
         self.name = name
         self.verbose = verbose
         self.df = None
@@ -31,7 +31,7 @@ class strategy:
         self.df['in_position'] = 0
 
     def add_indicator(self, _indicator:indicator):
-        self.indicator_list.append(_indicator)
+        # self.indicator_list.append(_indicator)
 
         # Add individual indicator
         self.df = pd.concat(

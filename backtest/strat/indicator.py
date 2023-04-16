@@ -52,6 +52,7 @@ class indicator:
         # Verbosity prints
         if verbose:
             print(ind_settings)
+            exit()
         
         # Return
         if self.settings.utility:
