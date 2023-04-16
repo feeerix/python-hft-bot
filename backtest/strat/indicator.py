@@ -53,11 +53,6 @@ class indicator:
         if verbose:
             print(ind_settings)
         
-        # if self.settings.utility:
-        #     print(ind_settings)
-        #     print("1111")
-        #     exit()
-
         # Return
         if self.settings.utility:
             ret_data = self.ind_func(**ind_settings)

@@ -12,8 +12,15 @@ class strategy:
         self.name = name
         self.verbose = verbose
         self.df = None
+        # ------------------
+        # indicator_example = [
+        #     {
+        #         indicator.settings.data
+        #     }, ...
+        # ]
+        self.indicator_settings_list = []
+        # ------------------
 
-        self.indicator_list = []
         self.longshort_condition_settings = {
             "long": [],
             "short": []
@@ -21,6 +28,7 @@ class strategy:
 
     def init_df(self, df:pd.DataFrame):
         self.df = df
+        self.df['in_position'] = 0
 
     def add_indicator(self, _indicator:indicator):
         self.indicator_list.append(_indicator)
@@ -35,12 +43,9 @@ class strategy:
     
     def add_entry(self, _settings:settings):
         # Long/short entries
-        # if self.verbose:
-        print(_settings.data)
-        # if _settings.data['func_name'] == "long":
-        #     pass
-        # elif _settings.data['func_name'] == "short":
-        #     pass
+
+        if self.verbose:
+            print(_settings.data)
 
         self.df[_settings.data['name']] = np.where((
                 (self.df[_settings.data['arguments']['open'][1]].all(axis=1)) &
