@@ -60,7 +60,6 @@ class Backtester:
         end = 1672531200
         self.create_db('ETHUSDT', '1m', start, end)
         test_strat = strategy("test_strat", False)
-
         test_strat.init_df(self.db)
 
         for _indicator_settings in test_settings_list:

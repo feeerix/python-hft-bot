@@ -37,7 +37,7 @@ ema233_setting = settings("ema233", "ema", {'length': 233}, verbose=False)
 
 start = 1640995200
 end = 1672531200
-df = database().kline_df('ETHUSDT', '1m', start, end)
+df = database().kline_df('ETHUSDT', '1h', start, end)
 test_strat = strategy("test")
 test_strat.init_df(df)
 
@@ -85,16 +85,20 @@ test_strat.add_entry(long1)
 test_strat.add_entry(short1)
 
 # print(test_strat.df.columns.to_list())
-long_count = 0
-short_count = 0
-for x in range(len(test_strat.df)):
-    if test_strat.df['long1'].iloc[x] == 1:
-        long_count += 1
-    if test_strat.df['short1'].iloc[x] == 1:
-        short_count += 1
+# long_count = 0
+# short_count = 0
+# for x in range(len(test_strat.df)):
+#     if test_strat.df['long1'].iloc[x] == 1:
+#         long_count += 1
+#     if test_strat.df['short1'].iloc[x] == 1:
+#         short_count += 1
 
 
 # print(test_strat.df)
-print(long_count)
-print(short_count)
+# print(test_strat.indicator_settings_list)
+# test_strat.write_settings()
+new_test = strategy("test", create=True)
+print(new_test.indicator_settings_list)
+# print(long_count)
+# print(short_count)
 exit()

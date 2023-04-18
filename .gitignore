@@ -7,6 +7,7 @@ db/orderbook/*
 db/strategies/indicators/*.json
 db/strategies/indicators/settings/*
 db/strategies/results/*
+db/strategies/settings/*
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
