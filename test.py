@@ -38,21 +38,8 @@ ema233_setting = settings("ema233", "ema", {'length': 233}, verbose=False)
 start = 1640995200
 end = 1672531200
 df = database().kline_df('ETHUSDT', '1h', start, end)
-test_strat = strategy("test")
-test_strat.init_df(df)
+test_strat = strategy("test", df)
 
-# test_ind0 = indicator(stochrsi_setting)
-# test_ind1 = indicator(ema8_setting)
-# test_list = [
-#     test_ind0,
-#     test_ind1
-# ]
-
-# for x in test_list:
-#     print(x.settings.data)
-
-# exit()
-# exit()
 test_strat.add_indicator(indicator(stochrsi_setting))
 test_strat.add_indicator(indicator(ema8_setting))
 test_strat.add_indicator(indicator(ema21_setting))
@@ -78,8 +65,8 @@ test_strat.add_indicator(indicator(stoch_bull))
 test_strat.add_indicator(indicator(stoch_bear))
 
 
-long1 = settings("long1","long",{"open":{1:["EMA_8_B_EMA_21", "EMA_144_A_EMA_233"],0:[]}, "close":{1:[],0:[]}})
-short1 = settings("short1","short",{"open":{1:["EMA_8_A_EMA_21", "EMA_144_B_EMA_233"],0:[]}, "close":{1:[],0:[]}})
+long1 = settings("long1","long",{"open":{True:["EMA_8_B_EMA_21", "EMA_144_A_EMA_233"],False:[]}, "close":{True:[],False:[]}})
+short1 = settings("short1","short",{"open":{True:["EMA_8_A_EMA_21", "EMA_144_B_EMA_233"],False:[]}, "close":{False:[],False:[]}})
 
 test_strat.add_entry(long1)
 test_strat.add_entry(short1)
@@ -95,10 +82,13 @@ test_strat.add_entry(short1)
 
 
 # print(test_strat.df)
-# print(test_strat.indicator_settings_list)
-# test_strat.write_settings()
-new_test = strategy("test", create=True)
+
+test_strat.write_settings()
+
+new_test = strategy("test", df, retreive=True)
+
 print(new_test.indicator_settings_list)
+print(new_test.position_condition_settings)
 # print(long_count)
 # print(short_count)
 exit()

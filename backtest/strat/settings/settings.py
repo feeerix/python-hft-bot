@@ -5,6 +5,16 @@ import pandas_ta as ta
 from lib.file.writer import *
 from backtest.strat.composer import get_required_params, write_required_params
 
+def import_setting(settings_data:dict, verbose:bool=False):
+    ret_data = settings(
+        settings_data["name"], 
+        settings_data["func_name"],
+        arguments=settings_data["arguments"],
+        verbose=verbose
+    )
+    ret_data.data = settings_data
+    return ret_data
+
 class settings:
     # The main reason we create this class is so that we can load settings from the coresponding folders
     def __init__(self, name:str, func_name:str, arguments:dict=None, verbose:bool=False) -> None:
