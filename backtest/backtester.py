@@ -59,8 +59,8 @@ class Backtester:
         start = 1640995200
         end = 1672531200
         self.create_db('ETHUSDT', '1m', start, end)
-        test_strat = strategy("test_strat", False)
-        test_strat.init_df(self.db)
+        test_strat = strategy("test_strat", self.db, False)
+        # test_strat.init_df(self.db)
 
         for _indicator_settings in test_settings_list:
             test_strat.add_indicator(indicator(_indicator_settings))
@@ -70,6 +70,55 @@ class Backtester:
         
 
         print(test_strat.df)
+
+        position = None
+        opening_price = None
+        closing_price = None
+        positions = []
+        # Loop through rows
+        for i, row in test_strat.df.iterrows():
+            # If long position is possible and no position is open, open long position
+            if row['long1'] == 1 and position is None:
+                position = 'long'
+                opening_price = row['Close']
+            # If short position is possible and no position is open, open short position
+            elif row['short1'] == 1 and position is None:
+                position = 'short'
+                opening_price = row['Close']
+            # If long position is open and long_close is 1, close long position and calculate profit
+            elif position == 'long' and row['long_close'] == 1:
+                closing_price = row['Close']
+                profit = closing_price - opening_price
+                positions.append({
+                    'Open Time': test_strat.df.iloc[i-1].name,
+                    'Close Time': row.name,
+                    'Type': 'long',
+                    'Opening Price': opening_price,
+                    'Closing Price': closing_price,
+                    'Profit': profit
+                })
+                position = None
+                opening_price = None
+                closing_price = None
+            # If short position is open and short_close is 1, close short position and calculate profit
+            elif position == 'short' and row['short_close'] == 1:
+                closing_price = row['Close']
+                profit = opening_price - closing_price
+                positions.append({
+                    'Open Time': test_strat.df.iloc[i-1].name,
+                    'Close Time': row.name,
+            'Type': 'short',
+            'Opening Price': opening_price,
+            'Closing Price': closing_price,
+            'Profit': profit
+        })
+        position = None
+        opening_price = None
+        closing_price = None
+
+        # Create positions dataframe
+        positions_df = pd.DataFrame(positions)
+        print(positions_df)
 
 
     def start_test(self, initial_capital:int):

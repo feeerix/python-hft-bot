@@ -27,6 +27,7 @@ class strategy:
             "long": [],
             "short": []
         }
+        
         self.init_df(df)
         if retreive:
             self.get_settings()
