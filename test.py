@@ -64,14 +64,15 @@ test_strat.add_indicator(indicator(cond_8below21_setting))
 test_strat.add_indicator(indicator(cond_144above233_setting))
 test_strat.add_indicator(indicator(cond_144below233_setting))
 
-stoch_bull = settings("stochrsi_bull", "above", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5'}, verbose=False)
-stoch_bear = settings("stochrsi_bear", "below", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5'}, verbose=False)
+stoch_bull = settings("stochrsi_bull", "cross", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5', 'above':True}, verbose=False)
+stoch_bear = settings("stochrsi_bear", "cross", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5', 'above':False}, verbose=False)
 
 test_strat.add_indicator(indicator(stoch_bull))
 test_strat.add_indicator(indicator(stoch_bear))
 
-long1 = settings("long1","long",{"open": {True: ["EMA_8_B_EMA_21", "EMA_144_A_EMA_233"],False:[]}, "close":{True:[],False:[]}})
-short1 = settings("short1","short",{"open":{True:["EMA_8_A_EMA_21", "EMA_144_B_EMA_233"],False:[]}, "close":{True:[],False:[]}})
+
+long1 = settings("long1","long",{"open": {True: ["EMA_8_B_EMA_21", "EMA_144_A_EMA_233", "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5"],False:[]}, "close":{True:[],False:[]}})
+short1 = settings("short1","short",{"open":{True:["EMA_8_A_EMA_21", "EMA_144_B_EMA_233", "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5"],False:[]}, "close":{True:[],False:[]}})
 
 long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:[],False:["EMA_8_B_EMA_21", "EMA_144_A_EMA_233"]}})
 short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:[],False:["EMA_8_A_EMA_21", "EMA_144_B_EMA_233"]}})
@@ -95,6 +96,7 @@ test_strat.add_close(short1_close)
 
 print(test_strat.df)
 print('---'*32)
+exit()
 # exit()
 test_strat.write_settings()
 

@@ -38,6 +38,9 @@ class indicator:
         if self.settings.utility:
             ind_settings.update({'series_a': df[self.settings.data['arguments']['series_a']]})
             ind_settings.update({'series_b': df[self.settings.data['arguments']['series_b']]})
+            # TODO - Putting in for cross function for now - to update to be dynamic
+            if 'above' in self.settings.data['arguments'].keys():
+                ind_settings.update({'above': self.settings.data['arguments']['above']})
 
         else:
             # initialise ohlcv
