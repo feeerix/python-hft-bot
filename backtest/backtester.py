@@ -44,7 +44,8 @@ test_settings_list = [
 
 long1 = settings("long1","long",{"open":{1:["EMA_8_B_EMA_21", "EMA_144_A_EMA_233"],0:[]}, "close":{1:[],0:[]}})
 short1 = settings("short1","short",{"open":{1:["EMA_8_A_EMA_21", "EMA_144_B_EMA_233"],0:[]}, "close":{1:[],0:[]}})
-
+long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:[],False:["EMA_8_B_EMA_21", "EMA_144_A_EMA_233"]}})
+short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:[],False:["EMA_8_A_EMA_21", "EMA_144_B_EMA_233"]}})
 
 class Backtester:
     def __init__(self):
@@ -58,7 +59,7 @@ class Backtester:
     def test_strat(self):
         start = 1640995200
         end = 1672531200
-        self.create_db('ETHUSDT', '1m', start, end)
+        self.create_db('ETHUSDT', '4h', start, end)
         test_strat = strategy("test_strat", self.db, False)
         # test_strat.init_df(self.db)
 
@@ -67,10 +68,10 @@ class Backtester:
 
         test_strat.add_entry(long1)
         test_strat.add_entry(short1)
+        test_strat.add_close(long1_close)
+        test_strat.add_close(short1_close)
+
         
-
-        print(test_strat.df)
-
         position = None
         opening_price = None
         closing_price = None
@@ -80,14 +81,14 @@ class Backtester:
             # If long position is possible and no position is open, open long position
             if row['long1'] == 1 and position is None:
                 position = 'long'
-                opening_price = row['Close']
+                opening_price = row['close']
             # If short position is possible and no position is open, open short position
             elif row['short1'] == 1 and position is None:
                 position = 'short'
-                opening_price = row['Close']
+                opening_price = row['close']
             # If long position is open and long_close is 1, close long position and calculate profit
-            elif position == 'long' and row['long_close'] == 1:
-                closing_price = row['Close']
+            elif position == 'long' and row['long1_close'] == 1:
+                closing_price = row['close']
                 profit = closing_price - opening_price
                 positions.append({
                     'Open Time': test_strat.df.iloc[i-1].name,
@@ -101,8 +102,8 @@ class Backtester:
                 opening_price = None
                 closing_price = None
             # If short position is open and short_close is 1, close short position and calculate profit
-            elif position == 'short' and row['short_close'] == 1:
-                closing_price = row['Close']
+            elif position == 'short' and row['short1_close'] == 1:
+                closing_price = row['close']
                 profit = opening_price - closing_price
                 positions.append({
                     'Open Time': test_strat.df.iloc[i-1].name,
