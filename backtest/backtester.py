@@ -1,7 +1,7 @@
 # Imports
 import pandas as pd
 import pandas_ta as ta
-
+from datetime import datetime
 
 # Local Imports
 from lib.api.binance.interface import Binance
@@ -38,9 +38,8 @@ test_settings_list = [
     settings("8below21", "below", {'series_a':'EMA_8','series_b':'EMA_21'}),
     settings("144above233", "above", {'series_a':'EMA_144','series_b':'EMA_233'}),
     settings("144below233", "below", {'series_a':'EMA_144','series_b':'EMA_233'}),
-    settings("stochrsi", "cross", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5', 'above':True}),
-    settings("stochrsi", "cross", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5', 'above':False}),
-    settings("atr", "atr", {'length':21}, verbose=False)
+    settings("stochrsi_bull", "cross", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5', 'above':True}),
+    settings("stochrsi_bear", "cross", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5', 'above':False}),
 ]
 
 # TODO - Change to cross
@@ -60,13 +59,19 @@ class Backtester:
 
     def test_strat(self):
         start = 1640995200
-        end = 1672531200
+        end = 1672531200 # 1672531200 # 1680609600
         self.create_db('ETHUSDT', '15m', start, end)
         test_strat = strategy("test_strat", self.db, False)
         capital = 5000
         # test_strat.init_df(self.db)
+        for x in test_settings_list:
+            print(x.data)
+        # print(test_settings_list)
+        # exit()
 
         for _indicator_settings in test_settings_list:
+            # print(_indicator_settings.data['name'])
+            # print(indicator(_indicator_settings).print_settings())
             test_strat.add_indicator(indicator(_indicator_settings))
 
         test_strat.add_entry(long1)
@@ -105,8 +110,8 @@ class Backtester:
                 capital += profit
                 
                 positions.append({
-                    'Open Time': test_strat.df.iloc[i-1].name,
-                    'Close Time': row.name,
+                    'Open Time': test_strat.df['time'].iloc[i-1],
+                    'Close Time': row['time'],
                     'Type': 'long',
                     'Opening Price': opening_price,
                     'Closing Price': closing_price,
@@ -126,8 +131,8 @@ class Backtester:
                 capital += profit
 
                 positions.append({
-                    'Open Time': test_strat.df.iloc[i-1].name,
-                    'Close Time': row.name,
+                    'Open Time': test_strat.df['time'].iloc[i-1],
+                    'Close Time': row['time'],
                     'Type': 'short',
                     'Opening Price': opening_price,
                     'Closing Price': closing_price,
@@ -142,7 +147,141 @@ class Backtester:
         # Create positions dataframe
         positions_df = pd.DataFrame(positions, columns=['Open Time', 'Close Time', 'Type', 'Opening Price', 'Closing Price', 'Profit'])
         print(positions_df)
-        print(positions_df['Profit'].sum(axis=0))
+
+        wins = (positions_df['Profit'] > 0).sum()
+        losses = (positions_df['Profit'] < 0).sum()
+
+        print(f"NET PROFIT: {positions_df['Profit'].sum(axis=0)}")
+        
+        print(f"GROSS PROFIT: {positions_df.loc[positions_df['Profit'] > 0, 'Profit'].sum()}")
+        print(f"GROSS LOSS: {positions_df.loc[positions_df['Profit'] < 0, 'Profit'].sum()}")
+
+        print(f'WINS: {wins}')
+        print(f'LOSSES: {losses}')
+        print(f"WIN RATE: {round((wins / (losses + wins)) * 100, 3)}%")
+
+        avg_win = positions_df.loc[positions_df['Profit'] > 0, 'Profit'].mean()
+        avg_loss = positions_df.loc[positions_df['Profit'] < 0, 'Profit'].mean()
+
+        print(f"AVG WIN: {round(avg_win, 3)}")
+        print(f"AVG LOSS: {round(avg_loss, 3)}")
+        print(f"AVG R/R: {round(avg_win/abs(avg_loss),3)}")
+
+    def init_test_strat(self):
+        start = 1640995200
+        end = 1672531200 # 1672531200 # 1680609600
+        self.create_db('ETHUSDT', '15m', start, end)
+        test_strat = strategy("test_strat", self.db, False)
+        capital = 5000
+        # test_strat.init_df(self.db)
+        for x in test_settings_list:
+            print(x.data)
+        # print(test_settings_list)
+        # exit()
+
+        for _indicator_settings in test_settings_list:
+            # print(_indicator_settings.data['name'])
+            # print(indicator(_indicator_settings).print_settings())
+            test_strat.add_indicator(indicator(_indicator_settings))
+
+        test_strat.add_entry(long1)
+        test_strat.add_entry(short1)
+        test_strat.add_close(long1_close)
+        test_strat.add_close(short1_close)
+        
+        return test_strat
+
+    def test_run(self, test_strat:strategy):\
+        # To update
+        capital = 5000
+
+        
+        position = None
+        opening_price = None
+        closing_price = None
+        positions = []
+        position_size = 0
+        # Loop through rows
+        for i, row in test_strat.df.iterrows():
+            
+            # If long position is possible and no position is open, open long position
+            if row['long1'] == 1 and position is None:
+                position = 'long'
+                opening_price = row['close']
+
+                position_size = capital / opening_price
+
+            # If short position is possible and no position is open, open short position
+            elif row['short1'] == 1 and position is None:
+                position = 'short'
+                opening_price = row['close']
+
+                position_size = capital / opening_price
+
+            # If long position is open and long_close is 1, close long position and calculate profit
+            elif position == 'long' and row['long1_close'] == 1:
+                closing_price = row['close']
+
+                profit = position_size * (closing_price - opening_price)
+                capital += profit
+                
+                positions.append({
+                    'Open Time': test_strat.df['time'].iloc[i-1],
+                    'Close Time': row['time'],
+                    'Type': 'long',
+                    'Opening Price': opening_price,
+                    'Closing Price': closing_price,
+                    'Profit': profit,
+                    'Capital': capital
+                })
+                
+                position = None
+                opening_price = None
+                closing_price = None
+                position_size = 0
+            # If short position is open and short_close is 1, close short position and calculate profit
+            elif position == 'short' and row['short1_close'] == 1:
+                closing_price = row['close']
+
+                profit = position_size * (opening_price - closing_price)
+                capital += profit
+
+                positions.append({
+                    'Open Time': test_strat.df['time'].iloc[i-1],
+                    'Close Time': row['time'],
+                    'Type': 'short',
+                    'Opening Price': opening_price,
+                    'Closing Price': closing_price,
+                    'Profit': profit,
+                    'Capital': capital
+                })
+                position = None
+                opening_price = None
+                closing_price = None
+                position_size = 0
+
+        # Create positions dataframe
+        positions_df = pd.DataFrame(positions, columns=['Open Time', 'Close Time', 'Type', 'Opening Price', 'Closing Price', 'Profit'])
+        print(positions_df)
+
+        wins = (positions_df['Profit'] > 0).sum()
+        losses = (positions_df['Profit'] < 0).sum()
+
+        print(f"NET PROFIT: {positions_df['Profit'].sum(axis=0)}")
+        
+        print(f"GROSS PROFIT: {positions_df.loc[positions_df['Profit'] > 0, 'Profit'].sum()}")
+        print(f"GROSS LOSS: {positions_df.loc[positions_df['Profit'] < 0, 'Profit'].sum()}")
+        
+        print(f'WINS: {wins}')
+        print(f'LOSSES: {losses}')
+        print(f"WIN RATE: {round((wins / (losses + wins)) * 100, 3)}%")
+
+        avg_win = positions_df.loc[positions_df['Profit'] > 0, 'Profit'].mean()
+        avg_loss = positions_df.loc[positions_df['Profit'] < 0, 'Profit'].mean()
+
+        print(f"AVG WIN: {round(avg_win, 3)}")
+        print(f"AVG LOSS: {round(avg_loss, 3)}")
+        print(f"AVG R/R: {round(avg_win/abs(avg_loss),3)}")
 
 
     def start_test(self, initial_capital:int):

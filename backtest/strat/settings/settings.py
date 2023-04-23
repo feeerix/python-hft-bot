@@ -37,8 +37,8 @@ class settings:
             "arguments": arguments
         }
 
-        utility = ['above', 'above_value', 'below', 'below_value', 'cross']
-        if self.data['func_name'] in utility:
+        _utility = ['above', 'above_value', 'below', 'below_value', 'cross']
+        if self.data['func_name'] in _utility:
             self.utility = True
         else:
             self.utility = False

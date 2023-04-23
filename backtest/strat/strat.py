@@ -140,7 +140,12 @@ class strategy:
 
         self.indicator_settings_list = get_json(f"{strat_folder}{self.name}/indicator_settings.json")
         self.position_condition_settings = get_json(f"{strat_folder}{self.name}/position_settings.json")
-        print(self.position_condition_settings)
+        
+        if self.verbose:
+            print("Position Settings")
+            print(self.position_condition_settings)
+            print("Indicator Settings")
+            print(self.indicator_settings_list)
 
 
     def add_hardstop(self):

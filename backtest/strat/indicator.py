@@ -71,10 +71,13 @@ class indicator:
         if type(ret_data) == pd.DataFrame:
             self.settings.data['columns'] = ret_data.columns.tolist()
             return ret_data
-        else:
+        elif type(ret_data) == pd.Series:
             self.settings.data['columns'] = [ret_data.name]
             return pd.DataFrame(ret_data, columns=self.settings.data['columns'])
-
+        else:
+            print("SOMETHING WENT WRONG")
+            print(type(ret_data))
+            exit()
         
         
     
