@@ -6,10 +6,10 @@ from dateutil.relativedelta import relativedelta
 
 # Local Imports
 from lib.api.binance.local import filename
+from lib.cli.printer import line
 
 class database:
     def __init__(self, verbose:bool=False):
-        self.df = None
         self.verbose = verbose
 
     def kline_df(self, symbol:str, interval:str, starttime:int, endtime:int) -> pd.DataFrame:
@@ -20,8 +20,12 @@ class database:
         dt_start = datetime.fromtimestamp(starttime)
         dt_end = datetime.fromtimestamp(endtime)
 
+        distance = endtime - starttime
+
         # Verbose print
         if self.verbose:
+            print(line)
+            print("CREATING DATABASE")
             print(f"start: {datetime.fromtimestamp(starttime)}")
             print(f"end: {datetime.fromtimestamp(endtime)}")
         
@@ -44,6 +48,8 @@ class database:
         
         # build loop
         while dt_start < dt_end:
+            if self.verbose:
+                print(f"{round(((int(dt_start.timestamp()) - starttime) / distance) * 100, 3)}% COMPLETE")
             
             # Get filename
             fn = filename(symbol, interval, f"{dt_start.year}", f"{dt_start.month:02d}")
@@ -52,17 +58,20 @@ class database:
             ret_data = pd.concat([ret_data, pd.read_csv(f'{filepath}{fn}')], axis=0, ignore_index=True)
             
             # TODO - See if we can speed this up a bit
-            if dt_start.timestamp() > (ret_data.iloc[0]['time']/1000):
-                ret_data = ret_data.loc[ret_data['time'] > dt_start.timestamp()]
-                first = False
+            if dt_start.timestamp() > (int(ret_data.iloc[0]['time']/1000)):
+                ret_data = ret_data.loc[ret_data['time']/1000 >= dt_start.timestamp()]
+                # first = False
 
             if dt_end.timestamp() < (ret_data.iloc[-1]['time']/1000):
-                ret_data = ret_data.loc[ret_data['time'] < dt_end.timestamp()]
+                ret_data = ret_data.loc[ret_data['time']/1000 <= dt_end.timestamp()]
 
             # Go to next month
             dt_start += relativedelta(months=1)
 
-        self.df = ret_data
+        # self.df = ret_data
+        if self.verbose:
+            print(ret_data)
+
         # Return data
         return ret_data
     
