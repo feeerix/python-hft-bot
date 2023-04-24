@@ -1,13 +1,12 @@
 # Imports
 import pandas as pd
-import pytz
 import pandas_ta as ta
 import plotly.graph_objects as go
 import plotly.express as px
 import inspect
 import numpy as np
 import warnings
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Loca Imports
 from db.db import database
@@ -33,5 +32,5 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 start = 1641998800
 end = 1662526700
 df = database(verbose=True).kline_df('ETHUSDT','15m',start,end)
-print(f"FIRST VALUE: {df['time'].iloc[0]} // {datetime.fromtimestamp(int(df['time'].iloc[0]/1000), tz=pytz.UTC)}")
-print(f"LAST VALUE: {df['time'].iloc[-1]} // {datetime.fromtimestamp(int(df['time'].iloc[-1]/1000), tz=pytz.UTC)}")
+print(f"FIRST VALUE: {df['time'].iloc[0]} // {datetime.fromtimestamp(int(df['time'].iloc[0]/1000), tz=timezone.utc)}")
+print(f"LAST VALUE: {df['time'].iloc[-1]} // {datetime.fromtimestamp(int(df['time'].iloc[-1]/1000), tz=timezone.utc)}")

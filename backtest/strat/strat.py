@@ -30,13 +30,15 @@ class strategy:
         
         self.init_df(df)
         if retreive:
+            # Get the settings from JSON based on name
             self.get_settings()
 
-        
+            # Add the indicators based on settings        
             for indicator_setting in self.indicator_settings_list:
                 new_setting = import_setting(indicator_setting)
                 self.add_indicator(indicator(new_setting), recording=False)
 
+            # Add he position requirements based on settings
             for position_type in self.position_condition_settings.keys():
                 
                 for position_setting in self.position_condition_settings[position_type]:
@@ -47,10 +49,9 @@ class strategy:
         # ------------------
 
     def init_df(self, df:pd.DataFrame):
+        # Set up the dataframe
         self.df = df
         self.df['in_position'] = 0
-        self.df['1'] = 1
-        self.df['0'] = 0
 
     def add_indicator(self, _indicator:indicator, recording:bool=True):
         if self.verbose:
@@ -82,7 +83,10 @@ class strategy:
                     self.position_condition_settings[pos_type].append(
                         _settings.data
                     )
-        
+            # print(_settings.data['arguments']['open'][True])
+            # print(self.df.columns.to_list())
+            # print(self.df[_settings.data['arguments']['open'][True]])
+            # exit()
             self.df[_settings.data['name']] = np.where((
                     (self.df[_settings.data['arguments']['open'][True]].all(axis=1)) &
                     (self.df[_settings.data['arguments']['open'][False]].sum(axis=1) == 0)
@@ -146,7 +150,6 @@ class strategy:
             print(self.position_condition_settings)
             print("Indicator Settings")
             print(self.indicator_settings_list)
-
 
     def add_hardstop(self):
         # Make sure the bot doesn't get you liquidated and lose all your money
