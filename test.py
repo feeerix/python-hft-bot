@@ -97,13 +97,3 @@ test_strat.add_close(short1_close)
 print(test_strat.df)
 print('---'*32)
 exit()
-# exit()
-test_strat.write_settings()
-
-new_test = strategy("test", df, retreive=True)
-
-print(new_test.indicator_settings_list)
-print(new_test.position_condition_settings)
-# print(long_count)
-# print(short_count)
-exit()

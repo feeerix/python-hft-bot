@@ -1,7 +1,7 @@
 # Imports
 import pandas as pd
 import pandas_ta as ta
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Local Imports
 from lib.api.binance.interface import Binance
@@ -194,9 +194,8 @@ class Backtester:
         
         return test_strat
 
-    def test_run(self, test_strat:strategy):\
+    def test_run(self, test_strat:strategy, capital:float):
         # To update
-        capital = 5000
         init_capital = capital
 
         
@@ -290,9 +289,15 @@ class Backtester:
 
         wins = (positions_df['Profit'] > 0).sum()
         losses = (positions_df['Profit'] < 0).sum()
+        start = datetime.fromtimestamp(test_strat.df['time'].iloc[0]/1000, tz=timezone.utc)
+        end = datetime.fromtimestamp(test_strat.df['time'].iloc[-1]/1000, tz=timezone.utc)
+        print(f"START TIME: {start.strftime('%D/%M/%Y %H:%M:%S')}")
+        print(f"END TIME: {end.strftime('%D/%M/%Y %H:%M:%S')}")
+
+        print(f"DURATION: {divmod((end-start).total_seconds(), 86400)[0]} DAYS")
 
         print(f"NET PROFIT: {positions_df['Profit'].sum(axis=0)}")
-        print(f"PCT RETURN: {round(((positions_df['Capital'].iloc[-1] - positions_df['Capital'].iloc[0])/positions_df['Capital'].iloc[0])*100, 3)}")
+        print(f"PCT RETURN: {round(((positions_df['Capital'].iloc[-1] - init_capital)/init_capital)*100, 3)}")
         
         print(f"GROSS PROFIT: {positions_df.loc[positions_df['Profit'] > 0, 'Profit'].sum()}")
         print(f"GROSS LOSS: {positions_df.loc[positions_df['Profit'] < 0, 'Profit'].sum()}")

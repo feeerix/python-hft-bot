@@ -48,11 +48,20 @@ class strategy:
 
         # ------------------
 
+    def __str__(self) -> str:
+        for indicator_setting in self.indicator_settings_list:
+            pass
+        for position_type in self.position_condition_settings.keys():
+            for position_setting in self.position_condition_settings[position_type]:
+                pass
+
+    # Initialise DF
     def init_df(self, df:pd.DataFrame):
         # Set up the dataframe
         self.df = df
         self.df['in_position'] = 0
 
+    # Add indicator to self.df
     def add_indicator(self, _indicator:indicator, recording:bool=True):
         if self.verbose:
             print(_indicator.settings.data)
@@ -71,6 +80,7 @@ class strategy:
             # ignore_index=True # -> removed index
         )
 
+    # Add entry conditions
     def add_entry(self, _settings:settings, recording:bool=True):
         # Test print
         if self.verbose:
@@ -97,6 +107,7 @@ class strategy:
                     (self.df[_settings.data['arguments']['open']['false']].sum(axis=1) == 0)
             ), 1, 0)
 
+    # Add close conditions
     def add_close(self, _settings:settings, recording:bool=True):    
         # Test print
         if self.verbose:
@@ -121,7 +132,8 @@ class strategy:
                     (self.df[_settings.data['arguments']['close']['true']].all(axis=1)) &
                     (self.df[_settings.data['arguments']['close']['false']].sum(axis=1) == 0)
             ), 1, 0)
-            
+    
+    # Write Settings to file
     def write_settings(self):
         strat_folder = f'db/strategies/settings/'
         if not folder_exists(self.name, strat_folder):
@@ -139,6 +151,7 @@ class strategy:
             strat_folder+self.name+'/'
         )
 
+    # Get settings from file via name
     def get_settings(self):
         strat_folder = f'db/strategies/settings/'
 
@@ -151,6 +164,7 @@ class strategy:
             print("Indicator Settings")
             print(self.indicator_settings_list)
 
+    # Hardstop to STOP all trading
     def add_hardstop(self):
         # Make sure the bot doesn't get you liquidated and lose all your money
         pass
