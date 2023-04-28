@@ -45,7 +45,7 @@ function CandleChart({ data }: Props) {
     const chart = createChart(chartRef.current, { width: 1600, height: 800 });
     const candlestickSeries = chart.addCandlestickSeries();
 
-    candlestickSeries.setData(data);
+    // candlestickSeries.setData(data);
 
     return () => {
       chart.remove();
