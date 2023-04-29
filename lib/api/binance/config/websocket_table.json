@@ -1,0 +1,18 @@
+{
+    "type": {
+        "kline": "0",
+        "aggTrade": "1",
+        "trade": "2",
+        "miniTicker": "3",
+        "ticker": "4",
+        "depth": "5"
+    },
+    "symbol": {
+        "ethusdt": "11",
+        "btcusdt": "22",
+        "bnbusdt": "33"
+    },
+    "interval": {
+        "1m": "1"
+    }
+}

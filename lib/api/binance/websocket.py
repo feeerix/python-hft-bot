@@ -1,23 +1,11 @@
 # IMPORTS
 import websocket
 import json
+from datetime import datetime, timezone
 
 # LOCAL IMPORTS
 from ..ws_gopher import ws_gopher
-
-def on_message(ws, message):
-    data = json.loads(message)
-    print(data)
-    # process the data
-
-def on_error(ws, error):
-    print(error)
-
-def on_close(ws):
-    print("Connection closed")
-
-def on_open(ws):
-    print("Connection opened")
+from lib.tools.interval import Interval
 
 ws_urls = [
     "wss://data-stream.binance.com:9443/ws",
@@ -25,22 +13,52 @@ ws_urls = [
     "wss://stream.binance.com:9443/ws"
 ]
 
-ws = websocket.WebSocket()
-ws_url = "wss://data-stream.binance.com:9443/ws"
-headers = []
+def parse_kline(kline:dict) -> dict:
+    pass
+    # return kline[]
 
+
+
+def payload(method:str, stream_type:str, symbol:str, interval:str):
+    
+    return {
+        "method": method,
+        "params": []
+    }
 
 class ws_agent(ws_gopher):
     def __init__(self): 
         super().__init__('binance')
+        self.last_ping = 0
 
     def connect(self, option:int):
         super().connect(ws_urls[option])
+        self.last_ping = datetime.now(tz=timezone.utc)
     
-    def subscribe(self, stream_type:str):
-        pass
+    def subscribe(self, params:list, id:int):
+        super().send(
+            {
+                "method": "SUBSCRIBE",
+                "params": params,
+                "id": id
+            }
+        )
 
+    def unsubscribe(self, params:list, id:int):
+        super().send(
+            {
+                "method": "UNSUBSCRIBE",
+                "params": params,
+                "id": id
+            }
+        )
     
+    def ping(self):
+        super().ws.ping()
+
+    def parse(self):
+        response = super().receive()
+
 
     def send(self, method:str, params:list):
         self.ws.send(
@@ -54,24 +72,26 @@ class ws_agent(ws_gopher):
         )
 
     def connect(self):
-        ws = websocket.create_connection(ws_url)
+        pass
+        # ws = websocket.create_connection(ws_url)
         
-        ws.send(
-            json.dumps(
-                {
-                "method": "SUBSCRIBE",
-                "params":
-                [
-                    "ethusdt@kline_1m"
-                ],
-                "id": 1
-                }
-            )
-        )
-        counter = 0
-        while True:
-            response = ws.recv()
-            print(f"RESPONSE: {response}")
-            counter += 1
-            if counter > 10:
-                exit()
+        # ws.send(
+        #     json.dumps(
+        #         {
+        #         "method": "SUBSCRIBE",
+        #         "params":
+        #         [
+        #             "ethusdt@kline_1m"
+        #         ],
+        #         "id": 1
+        #         }
+        #     )
+        # )
+        # counter = 0
+        # while True:
+        #     response = ws.recv()
+        #     print(f"RESPONSE: {response}")
+        #     counter += 1
+        #     if counter > 5:
+        #         ws.close(1)
+        #         break
