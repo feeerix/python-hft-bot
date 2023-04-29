@@ -65,4 +65,4 @@ df = database(verbose=True).kline_df('BTCUSDT', '15m', start, end)
 bt = Backtester(verbose=True)
 
 # bt.test_run(bt.init_test_strat())
-bt.test_run(strategy("test_meanreversion",df,retreive=True), 5000)
+bt.test_run(strategy("test",df,retreive=True), 5000)

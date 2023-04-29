@@ -207,6 +207,8 @@ class Backtester:
 
         distance = len(test_strat.df.index)
         if distance > 500000:
+            resolution = 10000
+        elif distance > 100000:
             resolution = 1000
         else:
             resolution = 100
@@ -320,7 +322,7 @@ class Backtester:
 
         print(f"BUY AND HOLD RETURN: {(test_strat.df['close'].iloc[-1] - test_strat.df['open'].iloc[0]) / test_strat.df['open'].iloc[0]}")
 
-        # print(f"SHARPE RATIO: {ta.sharpe_ratio()}")
+        print(f"SHARPE RATIO: {ta.sharpe_ratio(positions_df['Capital'], period=365)}")
         # print(f"SORTINO RATIO: {ta.sortino_ratio()}")
         print(line)
 

@@ -26,7 +26,12 @@ warnings.simplefilter(action='ignore',category=FutureWarning)
 start = 1609502400
 end = 1672531200
 df = database(verbose=True).kline_df('ETHUSDT', '1h', start, end)
+
+# Create method to create strategies easily
 test_strat = strategy("test_00", df, retreive=False)
+
+# First we add the indicators that we want to have as columns in our df
+test_strat.add_indicator
 
 # ---
 # FIND A WAY TO CREATE STRATEGIES
@@ -34,6 +39,8 @@ test_strat = strategy("test_00", df, retreive=False)
 
 
 bt = Backtester(verbose=True)
+
+
 
 # bt.test_run(bt.init_test_strat())
 test_strat.write_settings()

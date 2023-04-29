@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 # LOCAL IMPORTS
 from ..ws_gopher import ws_gopher
 from lib.tools.interval import Interval
+from lib.file.reader import get_json
 
 ws_urls = [
     "wss://data-stream.binance.com:9443/ws",
