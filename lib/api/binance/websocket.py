@@ -2,9 +2,11 @@
 import websocket
 import json
 from datetime import datetime, timezone
+import pandas as pd
 
 # LOCAL IMPORTS
 from ..ws_gopher import ws_gopher
+from lib.api.binance.interface import process_kline
 from lib.tools.interval import Interval
 from lib.file.reader import get_json
 
@@ -14,29 +16,56 @@ ws_urls = [
     "wss://stream.binance.com:9443/ws"
 ]
 
-def parse_kline(kline:dict) -> dict:
-    pass
-    # return kline[]
+def parse_kline(kline:dict, verbose:bool = False) -> dict:
+    # ret_kline = kline['k']
+    # time,open,high,low,close,volume,close_time,quote_volume,trade_number,taker_buy_volume,taker_quote_volume,na
+    kline_list = [
+                kline['k']['t'], # time
+                kline['k']['o'], # open
+                kline['k']['h'], # high
+                kline['k']['l'], # low
+                kline['k']['c'], # close
+                kline['k']['v'], # volume
+                kline['k']['T'], # close_time
+                kline['k']['q'], # quote_volume
+                kline['k']['n'], # trade_number
+                kline['k']['V'], # taker_buy_volume
+                kline['k']['Q'], # taker_quote_volume
+                kline['k']['B'], # na
+    ]
+    ret_data = process_kline(kline_list)
 
+    # Test print
+    if verbose:
+        print(ret_data)
+
+    return ret_data
 
 
 def payload(method:str, stream_type:str, symbol:str, interval:str):
-    
+    param_list = []
+
     return {
         "method": method,
-        "params": []
+        "params": [
+
+        ]
     }
 
 class ws_agent(ws_gopher):
-    def __init__(self): 
-        super().__init__('binance')
+    def __init__(self, verbose:bool=False): 
+        super().__init__('binance', verbose=verbose)
         self.last_ping = 0
 
-    def connect(self, option:int):
+    def create_connection(self, option:int):
         super().connect(ws_urls[option])
         self.last_ping = datetime.now(tz=timezone.utc)
     
     def subscribe(self, params:list, id:int):
+        if self.verbose:
+            for x in params:
+                print(f"SUBSCRIBING TO: {x} // ID: {id}")
+                
         super().send(
             {
                 "method": "SUBSCRIBE",
@@ -44,6 +73,12 @@ class ws_agent(ws_gopher):
                 "id": id
             }
         )
+        
+        response = json.loads(super().receive())
+        
+        if self.verbose:
+            if response['result'] == None:
+                print(f"SUBSCRIBE TO: {response['id']} -> Success!")
 
     def unsubscribe(self, params:list, id:int):
         super().send(
@@ -57,9 +92,12 @@ class ws_agent(ws_gopher):
     def ping(self):
         super().ws.ping()
 
-    def parse(self):
-        response = super().receive()
+    def receive_data(self):
+        response = json.loads(super().receive())
 
+        print(response)
+        print(type(response))
+        return response
 
     def send(self, method:str, params:list):
         self.ws.send(

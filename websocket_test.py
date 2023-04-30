@@ -1,8 +1,9 @@
-# # Imports
-
+# Imports
+import json
 
 # Local Imports
-from lib.api.binance.websocket import *
+from lib.api.binance.websocket import ws_agent
+
 
 # # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -21,12 +22,6 @@ from lib.api.binance.websocket import *
 # ws_url = "wss://stream.binance.com:9443/ws/ETHUSDT@kline_1m/"
 # ws.connect(ws_url)
 
-# data = ws.recv()
-import websocket
-import json
-import time
-
-from lib.api.binance.websocket import ws_agent
 
 def on_message(ws, message):
     data = json.loads(message)
@@ -43,7 +38,25 @@ def on_open(ws):
     print("Connection opened")
 
 
-ws_agent().connect()
+
+
+
+websocket_agent = ws_agent(verbose=True)
+websocket_agent.create_connection(0)
+websocket_agent.subscribe(
+    [
+        "ethusdt@kline_1m"
+    ],
+    1111
+)
+
+counter = 0
+while True:
+    websocket_agent.receive_data()
+    counter += 1
+    if counter > 10:
+        websocket_agent.close_connection()
+        break
 
 # ws = websocket.WebSocket()
 # ws_url = "wss://data-stream.binance.com:9443/ws"

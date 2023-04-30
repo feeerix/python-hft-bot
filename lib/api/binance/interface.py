@@ -14,7 +14,7 @@ from lib.api.api import API
 from lib.file.finder import *
 from lib.tools.interval import Interval
 
-def process_kline(input_kline:list) -> dict:
+def process_kline(input_kline:list) -> pd.DataFrame:
     # Remember to remove unused 
     ret_data = pd.DataFrame(input_kline, columns=[
         'time',

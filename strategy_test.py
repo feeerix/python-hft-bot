@@ -9,6 +9,8 @@ from backtest.strat.strat import strategy
 from backtest.strat.settings.settings import settings
 from backtest.strat.indicator import indicator
 from backtest.backtester import Backtester
+from lib.cli.printer import *
+from lib.cli.listener import *
 
 # pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)

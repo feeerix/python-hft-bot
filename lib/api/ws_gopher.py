@@ -21,10 +21,10 @@ class ws_gopher:
             )
         )
     
-    def close(self):
+    def close_connection(self):
         self.ws.close(
             1 # Arbitrary value
         )
         
     def receive(self):
-        return self.ws.recv
+        return self.ws.recv()
