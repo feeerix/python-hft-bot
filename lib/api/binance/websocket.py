@@ -23,7 +23,7 @@ STREAM ID GOES LIKE THIS:
 
 SYMBOL - 2 DIGITS
 TYPE - 1 DIGIT
-INTERVAL - 1 DIGIT
+INTERVAL - 1 DIGIT // LEVEL - 1 DIGIT
 
 """
 
@@ -32,12 +32,18 @@ def parse_stream_id(id_config:dict, stream_id:str) -> dict:
     pass
 
 def return_stream_id(id_config:dict, **kwargs) -> int:
-    return int(
-        str(id_config['symbol'][kwargs['symbol']]) +
-        str(id_config['stream_type'][kwargs['stream_type']]) +
-        str(id_config['interval'][kwargs['interval']])
-    )
-
+    if kwargs['stream_type'] == 'kline':
+        return int(
+            str(id_config['symbol'][kwargs['symbol']]) +
+            str(id_config['stream_type'][kwargs['stream_type']]) +
+            str(id_config['interval'][kwargs['interval']])
+        )
+    elif kwargs['stream_type'] == 'depth':
+        return int(
+            str(id_config['symbol'][kwargs['symbol']]) +
+            str(id_config['stream_type'][kwargs['stream_type']]) +
+            str(id_config['level'][kwargs['level']])
+        )
 
 def parse_kline(kline:dict, verbose:bool = False) -> dict:
     
@@ -82,8 +88,7 @@ def payload(method:str, stream_type:str, symbol:str="", interval:str="", level:i
         "method": method,
         "params": [
             stream_type(stream_type, symbol, interval, level)
-        ],
-
+        ]
     }
 
 class ws_agent(ws_gopher):
@@ -98,9 +103,6 @@ class ws_agent(ws_gopher):
 
         # Make sure to ping immediately
         self.ping()
-
-        # update the last ping
-        self.last_ping = datetime.now(tz=timezone.utc)
 
         # Test print
         if self.verbose:
@@ -145,6 +147,9 @@ class ws_agent(ws_gopher):
 
         self.ws.ping()
 
+        # update the last ping
+        self.last_ping = int(datetime.now(tz=timezone.utc).timestamp())
+
     def receive_data(self):
         # Compute response
         response = json.loads(super().receive())
@@ -156,6 +161,11 @@ class ws_agent(ws_gopher):
             # Test print
             if self.verbose:
                 print(response)
+            
+            return {
+                'e': 'depth',
+                'data': response 
+            }
 
         # if kline
         elif response['e'] == 'kline':
@@ -166,8 +176,10 @@ class ws_agent(ws_gopher):
             if self.verbose:
                 print(f"{line}")
                 print(f"PARSED: {response} -> {type(ret_data)}")
-        elif response['e'] == 'trade':
+        elif response['e'] == 'depth':
             pass
         
-
+        if (int(datetime.now(tz=timezone.utc).timestamp()) - self.last_ping) > 170:
+            self.ping()
+        
         return ret_data

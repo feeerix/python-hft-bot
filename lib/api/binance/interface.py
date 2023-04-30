@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 
 # Local Import
 from .endpoints import ping, server_status, exchange_info, fetch_kline, bulk, bulk_url
-from .endpoints import server_time as binance_time
+from .endpoints import server_time as binance_time, endpoint_functions
 from lib.file.writer import *
 from lib.file.reader import file_exists
 
@@ -71,12 +71,12 @@ def write_db(input_db:pd.DataFrame, exchange:str, symbol:str, interval:str, date
 # Each exchange class is unique but is expected to follow some standards
 class Binance(API):
     
-    def __init__(self, url_index:int=0, verbosity:bool=True) -> None:
+    def __init__(self, url_index:int=0, verbose:bool=True) -> None:
         # Initiates the API Class with name
         super().__init__("binance")
 
         # Verbose
-        self.verbose = verbosity
+        self.verbose = verbose
 
         # Get base URL
         self.base_url = super().base_url(url_index)
@@ -310,3 +310,10 @@ class Binance(API):
             symbol,
             interval
         )
+
+    # Make request
+    def api_request(self, request_type:str, params:dict):
+        response = endpoint_functions[request_type](self.base_url, self.verbose, params)
+        if response.status_code == 200:
+            return json.loads(response.text)
+        

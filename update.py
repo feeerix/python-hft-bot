@@ -1,6 +1,7 @@
-from lib.api.updater import update
+
 
 # Local Imports
+from lib.api.updater import update
 from tests.battery import *
 from lib.tools.interval import *
 

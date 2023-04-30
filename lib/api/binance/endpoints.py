@@ -3,6 +3,7 @@ import requests as req
 from datetime import datetime
 import pandas as pd
 import os
+import json
 
 # Local Import
 from ..gopher import get_data
@@ -14,7 +15,8 @@ endpoints = {
     'server_time': '/api/v3/time',
     'server_status': '/sapi/v1/system/status',
     'exchange_info': '/api/v3/exchangeInfo', # spot
-    'klines': '/api/v3/klines'
+    'klines': '/api/v3/klines',
+    'depth': '/api/v3/depth'
 }
 
 def ping(base_url:str, verbose:bool) -> int:
@@ -37,6 +39,18 @@ def fetch_kline(base_url:str, verbose:bool, params:dict):
         
     return req.get(
         f"{base_url}{endpoints['klines']}",
+        params=params
+    )
+
+def depth(base_url:str, verbose:bool, params:dict): 
+    if verbose:
+        print(f"Params: {params}")
+    # print(base_url)
+    # print(endpoints['depth'])
+    # print(params)
+    # exit()
+    return req.get(
+        f"{base_url}{endpoints['depth']}",
         params=params
     )
 
@@ -112,4 +126,11 @@ def bulk(base_url:str, verbose:bool, params:dict):
     os.remove(filepath+og_filename)
     os.remove(filepath+filename+".zip")
 
-    
+endpoint_functions = {
+    'ping': ping,
+    'server_time': server_time,
+    'server_status': server_status,
+    'exchange_info': exchange_info, # spot
+    'klines': fetch_kline,
+    'depth': depth
+}
