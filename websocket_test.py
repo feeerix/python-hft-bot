@@ -2,8 +2,8 @@
 import json
 
 # Local Imports
-from lib.api.binance.websocket import ws_agent
-
+from lib.api.binance.websocket import ws_agent, return_stream_id, stream_type
+from lib.file.reader import get_json
 
 # # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -44,10 +44,15 @@ def on_open(ws):
 websocket_agent = ws_agent(verbose=True)
 websocket_agent.create_connection(0)
 websocket_agent.subscribe(
-    [
-        "ethusdt@kline_1m"
-    ],
-    1111
+    {
+        "stream_type": "kline",
+        "symbol": "ethusdt",
+        "interval": "1m"
+    }
+    # [
+    #     "ethusdt@kline_1m"
+    #     stream_type('kline', 'ethusdt', '1m')
+    # ]
 )
 
 counter = 0

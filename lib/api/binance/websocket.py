@@ -7,6 +7,7 @@ import pandas as pd
 # LOCAL IMPORTS
 from ..ws_gopher import ws_gopher
 from lib.api.binance.interface import process_kline
+from lib.cli.printer import line
 from lib.tools.interval import Interval
 from lib.file.reader import get_json
 
@@ -16,8 +17,30 @@ ws_urls = [
     "wss://stream.binance.com:9443/ws"
 ]
 
+
+"""
+STREAM ID GOES LIKE THIS:
+
+SYMBOL - 2 DIGITS
+TYPE - 1 DIGIT
+INTERVAL - 1 DIGIT
+
+"""
+
+
+def parse_stream_id(id_config:dict, stream_id:str) -> dict:
+    pass
+
+def return_stream_id(id_config:dict, **kwargs) -> int:
+    return int(
+        str(id_config['symbol'][kwargs['symbol']]) +
+        str(id_config['stream_type'][kwargs['stream_type']]) +
+        str(id_config['interval'][kwargs['interval']])
+    )
+
+
 def parse_kline(kline:dict, verbose:bool = False) -> dict:
-    # ret_kline = kline['k']
+    
     # time,open,high,low,close,volume,close_time,quote_volume,trade_number,taker_buy_volume,taker_quote_volume,na
     kline_list = [
                 kline['k']['t'], # time
@@ -33,6 +56,8 @@ def parse_kline(kline:dict, verbose:bool = False) -> dict:
                 kline['k']['Q'], # taker_quote_volume
                 kline['k']['B'], # na
     ]
+    
+    # Return data and process into dataframe
     ret_data = process_kline(kline_list)
 
     # Test print
@@ -41,35 +66,60 @@ def parse_kline(kline:dict, verbose:bool = False) -> dict:
 
     return ret_data
 
+# Dirty way to get the stream name
+def stream_type(stream_type:str, symbol:str="", interval:str="", level:int=0):
+    if stream_type == 'kline':
+        return f'{symbol}@kline_{interval}'
+    elif stream_type == 'depth':
+        return f'{symbol}@depth{level}'
+    else:
+        return f'{symbol}@{stream_type}'
 
-def payload(method:str, stream_type:str, symbol:str, interval:str):
-    param_list = []
-
+# Dirty way to get payload
+def payload(method:str, stream_type:str, symbol:str="", interval:str="", level:int=0, **kwargs):
+    # TODO - integrate update-time to both of the above functions
     return {
         "method": method,
         "params": [
+            stream_type(stream_type, symbol, interval, level)
+        ],
 
-        ]
     }
 
 class ws_agent(ws_gopher):
     def __init__(self, verbose:bool=False): 
         super().__init__('binance', verbose=verbose)
         self.last_ping = 0
+        self.ws_table = get_json('lib/api/binance/config/websocket_table.json')
 
     def create_connection(self, option:int):
+        # create connection
         super().connect(ws_urls[option])
+
+        # Make sure to ping immediately
+        self.ping()
+
+        # update the last ping
         self.last_ping = datetime.now(tz=timezone.utc)
-    
-    def subscribe(self, params:list, id:int):
+
+        # Test print
         if self.verbose:
-            for x in params:
-                print(f"SUBSCRIBING TO: {x} // ID: {id}")
+            print(f"LAST PING: {self.last_ping}")
+    
+    def subscribe(self, params:dict):
+
+        stream_name = stream_type(**params)
+        id = return_stream_id(self.ws_table, **params)
+
+        # Test print
+        if self.verbose:
+            print(line)
+            print(f"SUBSCRIBING TO: {stream_name} // ID: {id}")
                 
         super().send(
             {
                 "method": "SUBSCRIBE",
-                "params": params,
+                "params": [stream_name],
                 "id": id
             }
         )
@@ -90,47 +140,34 @@ class ws_agent(ws_gopher):
         )
     
     def ping(self):
-        super().ws.ping()
+        if self.verbose:
+            print("Sending Ping!")
+
+        self.ws.ping()
 
     def receive_data(self):
+        # Compute response
         response = json.loads(super().receive())
 
-        print(response)
-        print(type(response))
-        return response
+        ret_data = None
 
-    def send(self, method:str, params:list):
-        self.ws.send(
-            json.dumps(
-                {
-                    "method": method,
-                    "params": params,
-                    "id": 1
-                }
-            )
-        )
+        # Dirty way to get partial depth
+        if 'e' not in response.keys():
+            # Test print
+            if self.verbose:
+                print(response)
 
-    def connect(self):
-        pass
-        # ws = websocket.create_connection(ws_url)
+        # if kline
+        elif response['e'] == 'kline':
+            # parse kline
+            ret_data = parse_kline(response)
+
+            # test print
+            if self.verbose:
+                print(f"{line}")
+                print(f"PARSED: {response} -> {type(ret_data)}")
+        elif response['e'] == 'trade':
+            pass
         
-        # ws.send(
-        #     json.dumps(
-        #         {
-        #         "method": "SUBSCRIBE",
-        #         "params":
-        #         [
-        #             "ethusdt@kline_1m"
-        #         ],
-        #         "id": 1
-        #         }
-        #     )
-        # )
-        # counter = 0
-        # while True:
-        #     response = ws.recv()
-        #     print(f"RESPONSE: {response}")
-        #     counter += 1
-        #     if counter > 5:
-        #         ws.close(1)
-        #         break
+
+        return ret_data

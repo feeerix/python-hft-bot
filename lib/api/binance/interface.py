@@ -16,7 +16,7 @@ from lib.tools.interval import Interval
 
 def process_kline(input_kline:list) -> pd.DataFrame:
     # Remember to remove unused 
-    ret_data = pd.DataFrame(input_kline, columns=[
+    ret_data = pd.DataFrame([input_kline], columns=[
         'time',
         'open',
         'high',
