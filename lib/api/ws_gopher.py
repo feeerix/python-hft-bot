@@ -27,9 +27,4 @@ class ws_gopher:
         )
         
     def receive(self):
-        response = self.ws.recv()
-
-        if self.verbose:
-            print(f"RAW RESPONSE: {response}")
-
-        return response
+        return self.ws.recv()

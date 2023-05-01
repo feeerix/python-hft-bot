@@ -4,8 +4,7 @@ import { createTheme, NextUIProvider, useTheme, changeTheme, Button  } from '@ne
 
 import React from 'react';
 
-
-export default function Home() {
+const Home: React.FC = ({}) => {
 
   return (
     <>
@@ -14,8 +13,10 @@ export default function Home() {
 
       </Head>
       <main>
-        {/* <CandleChart /> */}
+        test
       </main>
     </>
   )
 }
+
+export default Home

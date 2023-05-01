@@ -155,6 +155,11 @@ class ws_agent(ws_gopher):
         ret_data = None
 
         if 'result'in response.keys():
+                if self.verbose:
+                    if response['result'] == None:
+                        print(f"RESPONSE > {response['id']} -> SUCCESS")
+                    else:
+                        print(f"RESPONSE > {response['id']} -> UNSUCCESSFUL")
                 return response
         
         # Dirty way to get partial depth

@@ -11,8 +11,8 @@ from lib.cli.printer import line
 
 # # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
-# # pd.set_option('display.width', None)
-# # pd.set_option('display.max_colwidth', None)
+# pd.set_option('display.width', None)
+# pd.set_option('display.max_colwidth', None)
 # pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
 # # -------------------
@@ -22,21 +22,27 @@ from lib.cli.printer import line
 # # Ignoring future warning initially
 # warnings.simplefilter(action='ignore',category=FutureWarning)
 
-# ws = websocket.WebSocket()
-# ws_url = "wss://stream.binance.com:9443/ws/ETHUSDT@kline_1m/"
-# ws.connect(ws_url)
+websocket_agent = ws_agent(verbose=True)
+websocket_agent.create_connection(0)
 
-# Pair
-pair_list = ['ETHUSDT']
+websocket_agent.subscribe(
+    {
+        "stream_type": "kline",
+        "symbol": "ethusdt",
+        "interval": "1m"
+    }
+)
 
-# Intervals
-interval_list = ['1m']
-# update('Binance', pair_list, interval_list)
+counter = 0
+while True:
+    response = websocket_agent.receive_data()
+    print(response)
 
-# Manually get depth snapshot?
-
-
-
+    if counter > 30:
+        websocket_agent.close_connection()
+        break
+exit()
+# --------------------------------------------------------------------------------------------
 websocket_agent = ws_agent(verbose=True)
 websocket_agent.create_connection(0)
 
