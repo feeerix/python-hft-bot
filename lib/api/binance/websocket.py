@@ -73,11 +73,17 @@ def parse_kline(kline:dict, verbose:bool = False) -> dict:
     return ret_data
 
 # Dirty way to get the stream name
-def stream_type(stream_type:str, symbol:str="", interval:str="", level:int=0):
+def stream_type(stream_type:str, symbol:str="", interval:str="", level:str=""):
+    
+    # print("---")
+    # print(symbol)
+    # print(level)
+    # exit()
     if stream_type == 'kline':
         return f'{symbol}@kline_{interval}'
     elif stream_type == 'depth':
-        return f'{symbol}@depth{level}'
+        
+        return f'{symbol}@depth{level}@100ms'
     else:
         return f'{symbol}@{stream_type}'
 
