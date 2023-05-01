@@ -22,26 +22,27 @@ from lib.cli.printer import line
 # # Ignoring future warning initially
 # warnings.simplefilter(action='ignore',category=FutureWarning)
 
-websocket_agent = ws_agent(verbose=True)
-websocket_agent.create_connection(0)
+# websocket_agent = ws_agent(verbose=True)
+# websocket_agent.create_connection(0)
 
-websocket_agent.subscribe(
-    {
-        "stream_type": "kline",
-        "symbol": "ethusdt",
-        "interval": "1m"
-    }
-)
+# --------------------------------------------------------------------------------------------
+# websocket_agent.subscribe(
+#     {
+#         "stream_type": "kline",
+#         "symbol": "ethusdt",
+#         "interval": "1m"
+#     }
+# )
 
-counter = 0
-while True:
-    response = websocket_agent.receive_data()
-    print(response)
+# counter = 0
+# while True:
+#     response = websocket_agent.receive_data()
+#     print(response)
 
-    if counter > 30:
-        websocket_agent.close_connection()
-        break
-exit()
+#     if counter > 30:
+#         websocket_agent.close_connection()
+#         break
+# exit()
 # --------------------------------------------------------------------------------------------
 websocket_agent = ws_agent(verbose=True)
 websocket_agent.create_connection(0)

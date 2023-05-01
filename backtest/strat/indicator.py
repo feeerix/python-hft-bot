@@ -35,38 +35,32 @@ class indicator:
         # Get the required parameters (OHLCV)
         req_params = get_required_params(self.settings.data['func_name'])
         
-        if self.settings.utility:
-            ind_settings.update({'series_a': df[self.settings.data['arguments']['series_a']]})
-            ind_settings.update({'series_b': df[self.settings.data['arguments']['series_b']]})
-            # TODO - Putting in for cross function for now - to update to be dynamic
-            if 'above' in self.settings.data['arguments'].keys():
-                ind_settings.update({'above': self.settings.data['arguments']['above']})
+        if verbose:
+            print(f"PARAMS TO ADD: {self.settings.data['arguments']}")
+        
+        # OHLCV
+        for argument in req_params.keys():
+            
+            if req_params[argument]:
+                
+                if argument.startswith('series_'):
+                    ind_settings.update({argument: df[self.settings.data['arguments'][argument]]})
+                
+                elif (argument not in df.columns.to_list()) and type(self.settings.data['arguments'][argument]) != str:
+                    ind_settings.update({argument: self.settings.data['arguments'][argument]})
 
-        else:
-            # initialise ohlcv
-            ohlcv = ['open', 'high', 'low', 'close', 'volume']
+                else: # OHLCV
+                    ind_settings.update({argument: df[argument]})
 
-            # For for the list
-            for val in ohlcv:
-                # check if args include open high low close or volume
-                if val in req_params:
-                    ind_settings.update({val: df[val]})
+            elif argument in self.settings.data['arguments'].keys():
+                ind_settings.update({argument: self.settings.data['arguments'][argument]})
+        
+        ret_data = self.ind_func(**ind_settings)
 
         # Verbosity prints
         if verbose:
             print(ind_settings)
-            exit()
         
-        # Return
-        if self.settings.utility:
-            ret_data = self.ind_func(**ind_settings)
-        else:
-            # Add settings to indicator settings
-            ind_settings.update(self.settings.data['arguments'])
-
-            # call ta function
-            ret_data = self.ind_func(**ind_settings)
-
         # --------------------------------------------------------------
         if type(ret_data) == pd.DataFrame:
             self.settings.data['columns'] = ret_data.columns.tolist()

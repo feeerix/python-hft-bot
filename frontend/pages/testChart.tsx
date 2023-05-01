@@ -21,10 +21,7 @@ function TestChart() {
           let csvdata = loadCsvData();
           
           const chart = createChart(container, { width: 1600, height: 800 });
-          // isUTCTimestamp(true)
-          // const ohlcSeries = chart.addCandlestickSeries();
-          // ohlcSeries.setData(csvdata);
-            
+                    
           const lineSeries = chart.addLineSeries();
           lineSeries.setData([
               { time: '2019-04-11', value: 80.01 },

@@ -27,13 +27,84 @@ warnings.simplefilter(action='ignore',category=FutureWarning)
 
 start = 1609502400
 end = 1672531200
-df = database(verbose=True).kline_df('ETHUSDT', '1h', start, end)
+df = database(verbose=True).kline_df('ETHUSDT', '1m', start, end)
 
 # Create method to create strategies easily
 test_strat = strategy("test_00", df, retreive=False)
 
-# First we add the indicators that we want to have as columns in our df
-test_strat.add_indicator
+# MAIN COLUMNS
+# ------------------------------------------------------------
+# EMA
+ema8_setting = settings("ema8", "ema", {'length': 8})
+ema21_setting = settings("ema21", "ema", {'length': 21})
+ema144_setting = settings("ema144", "ema", {'length': 144})
+ema233_setting = settings("ema233", "ema", {'length': 233})
+
+test_strat.add_indicator(indicator(ema8_setting))
+test_strat.add_indicator(indicator(ema21_setting))
+test_strat.add_indicator(indicator(ema144_setting))
+test_strat.add_indicator(indicator(ema233_setting))
+
+stochrsi_setting = settings("stochrsi", "stochrsi", {"length": 21, "rsi_length": 21, "k": 5, "d": 5})
+test_strat.add_indicator(indicator(stochrsi_setting))
+
+atr_setting = settings("atr", "atr", {"length": 21, "mamode": "ema"})
+test_strat.add_indicator(indicator(atr_setting))
+
+# ------------------------------------------------------------
+# CONDITIONAL COLUMNS
+
+"""
+First Bullish position:
+EMA 144 > EMA 233 -> Bullish overall trend
+EMA8 < EMA 21 -> Small reversion
+
+Stochastic RSI (k & d) < 20 -> Oversold short term
+Stochastic RSI bullish cross ->  Trigger
+
+Stochastic RSI (k & d) > 80 -> Overbought short term
+Stochastic RSI bearish cross ->  Trigger
+
+TP -> 3 x ATR
+SL -> 1 x ATR 
+
+Opposite for bearish
+"""
+
+bullish_ema144_ema233 = settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"})
+revert_ema8_below_ema21 = settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"})
+
+test_strat.add_indicator(indicator(bullish_ema144_ema233))
+test_strat.add_indicator(indicator(revert_ema8_below_ema21))
+
+stochrsi_oversold_k = settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}, verbose=True)
+stochrsi_oversold_d = settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0})
+stochrsi_overbought_k = settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0})
+stochrsi_overbought_d = settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0})
+
+test_strat.add_indicator(indicator(stochrsi_oversold_k))
+test_strat.add_indicator(indicator(stochrsi_oversold_d))
+test_strat.add_indicator(indicator(stochrsi_overbought_k))
+test_strat.add_indicator(indicator(stochrsi_overbought_d))
+
+stochrsi_bullish_trigger = settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"})
+stochrsi_bearish_trigger = settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "above": False})
+
+test_strat.add_indicator(indicator(stochrsi_bullish_trigger))
+test_strat.add_indicator(indicator(stochrsi_bearish_trigger))
+
+
+long1 = settings("long1","long",{"open": {True: ["EMA_144_A_EMA_233", "EMA_8_B_EMA_21", "STOCHRSIk_21_21_5_5_B_20_0", "STOCHRSId_21_21_5_5_B_20_0", "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5"],False:[]}, "close":{True:[],False:[]}})
+short1 = settings("short1","short",{"open":{True:["STOCHRSIk_21_21_5_5_A_80_0", "STOCHRSId_21_21_5_5_A_80_0", "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5"],False:["EMA_144_A_EMA_233", "EMA_8_B_EMA_21"]}, "close":{True:[],False:[]}})
+
+long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:[],False:["EMA_8_B_EMA_21"]}})
+short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["EMA_8_B_EMA_21"],False:[]}})
+
+test_strat.add_entry(long1)
+test_strat.add_entry(short1)
+test_strat.add_close(long1_close)
+test_strat.add_close(short1_close)
+
 
 # ---
 # FIND A WAY TO CREATE STRATEGIES
