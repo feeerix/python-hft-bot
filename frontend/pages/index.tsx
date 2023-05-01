@@ -1,10 +1,40 @@
-import Head from 'next/head'
-import { createTheme, NextUIProvider, useTheme, changeTheme, Button  } from '@nextui-org/react';
-// import styles from '@/styles/Home.module.css'
+// React Import
+import React, { useState, useEffect } from 'react';
 
-import React from 'react';
+import Head from 'next/head'
+import { NextUIProvider, createTheme, useTheme, changeTheme } from '@nextui-org/react';
+import TopNavbar from './components/TopNavbar';
+
+
+const link_list = [
+  { href: "/", label: "Home" },
+  { href: "/price", label: "Price" },
+  { href: "/Backtest", label: "Backtest" },
+]
 
 const Home: React.FC = ({}) => {
+      // Themes
+      const lightTheme = createTheme({
+        type: 'dark',
+        theme: {
+        colors: {}, // optional
+        }
+    })
+
+    const darkTheme = createTheme({
+        type: 'dark',
+        theme: {
+        colors: {}, // optional
+        }
+    })
+
+    const theme = useTheme();
+    const [isDarkMode, setIsDarkMode] = useState(true);
+    
+    const handleToggleDarkMode = () => {
+        setIsDarkMode(!isDarkMode);
+        changeTheme(isDarkMode ? 'light' : 'dark');
+    };
 
   return (
     <>
@@ -13,7 +43,13 @@ const Home: React.FC = ({}) => {
 
       </Head>
       <main>
-        test
+        
+        <TopNavbar 
+          links={link_list}
+          isDarkMode={isDarkMode}
+          handleToggleDarkMode={handleToggleDarkMode}
+        />
+      
       </main>
     </>
   )
