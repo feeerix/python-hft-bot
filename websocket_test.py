@@ -37,8 +37,9 @@ interval_list = ['1m']
 
 
 
-websocket_agent = ws_agent(verbose=False)
+websocket_agent = ws_agent(verbose=True)
 websocket_agent.create_connection(0)
+
 websocket_agent.subscribe(
     {
         "stream_type": "depth",
@@ -48,30 +49,41 @@ websocket_agent.subscribe(
 )
 
 counter = 0
-
+time.sleep(0.1)
 api_response = Binance().api_request('depth', {"symbol": "ETHUSDT", "limit":100})
 
+print(api_response)
+
+print(line)
 print(f"LAST UPDATED: {api_response['lastUpdateId']}")
+
 print(line)
 
 ws_data = []
+matched = False
 while True:
     response = websocket_agent.receive_data()
     # print(f"Last update id: {response['data']['lastUpdateId']}")
     
-    if response:
-        ws_data.append(response)
-        print(f"last update id: {response['data']['lastUpdateId']} - from WS")
-        print(f"last update id: {api_response['lastUpdateId']} - from API")
-
-        if api_response['lastUpdateId'] <= response['data']['lastUpdateId']:
-            print(f"MATCHED - {response['data']['lastUpdateId']}")
-            websocket_agent.close_connection()
-            break
     counter += 1
-    
-    
-    if counter >= 10:
+
+    if response:
+        if 'u' in response:
+            ws_data.append(response)
+            # print(f"last update id: {response['u']} - from WS")
+            # print(f"last update id: {api_response['lastUpdateId']} - from API")
+
+            if response['u'] <= api_response['lastUpdateId']:
+                print(f"DROPPED")
+            elif matched is False:
+                if response['U'] <= (api_response['lastUpdateId'] + 1) and response['u'] >= (api_response['lastUpdateId'] + 1):
+                    print(f"MATCHED - {response['u']}")
+                    matched = True
+                    print(line)
+        else:
+            print(response)
+
+    if counter >= 100:
         print(line)
         print(f"COUNTER LIMIT HIT")
         websocket_agent.close_connection()

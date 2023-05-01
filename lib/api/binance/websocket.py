@@ -74,16 +74,13 @@ def parse_kline(kline:dict, verbose:bool = False) -> dict:
 
 # Dirty way to get the stream name
 def stream_type(stream_type:str, symbol:str="", interval:str="", level:str=""):
-    
-    # print("---")
-    # print(symbol)
-    # print(level)
-    # exit()
     if stream_type == 'kline':
         return f'{symbol}@kline_{interval}'
     elif stream_type == 'depth':
-        
-        return f'{symbol}@depth{level}@100ms'
+        if level == "0":
+            return f'{symbol}@depth@100ms'
+        else:
+            return f'{symbol}@depth{level}@100ms'
     else:
         return f'{symbol}@{stream_type}'
 
@@ -118,12 +115,12 @@ class ws_agent(ws_gopher):
 
         stream_name = stream_type(**params)
         id = return_stream_id(self.ws_table, **params)
-
+        
         # Test print
         if self.verbose:
             print(line)
             print(f"SUBSCRIBING TO: {stream_name} // ID: {id}")
-                
+        
         super().send(
             {
                 "method": "SUBSCRIBE",
@@ -132,11 +129,7 @@ class ws_agent(ws_gopher):
             }
         )
         
-        response = json.loads(super().receive())
-        
-        if self.verbose:
-            if response['result'] == None:
-                print(f"SUBSCRIBE TO: {response['id']} -> Success!")
+
 
     def unsubscribe(self, params:list, id:int):
         super().send(
@@ -159,15 +152,19 @@ class ws_agent(ws_gopher):
     def receive_data(self):
         # Compute response
         response = json.loads(super().receive())
-
         ret_data = None
 
+        if 'result'in response.keys():
+                return response
+        
         # Dirty way to get partial depth
-        if 'e' not in response.keys():
+        elif 'e' not in response.keys():
             # Test print
             if self.verbose:
+                print("-- RESPONSE -- ")
                 print(response)
             
+            # TODO - potentially need to update this part
             return {
                 'e': 'depth',
                 'data': response 
@@ -182,8 +179,13 @@ class ws_agent(ws_gopher):
             if self.verbose:
                 print(f"{line}")
                 print(f"PARSED: {response} -> {type(ret_data)}")
-        elif response['e'] == 'depth':
-            pass
+        
+        elif response['e'] == 'depthUpdate':
+            if self.verbose:
+                print("Depth Update")
+                print(f"{response}")
+            
+            return response
         
         if (int(datetime.now(tz=timezone.utc).timestamp()) - self.last_ping) > 170:
             self.ping()
