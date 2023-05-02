@@ -27,7 +27,7 @@ warnings.simplefilter(action='ignore',category=FutureWarning)
 
 start = 1609502400
 end = 1672531200
-df = database(verbose=True).kline_df('ETHUSDT', '5m', start, end)
+df = database(verbose=True).kline_df('ETHUSDT', '1m', start, end)
 
 # Create method to create strategies easily
 test_strat = strategy("test_00", df, retreive=False)
@@ -48,7 +48,7 @@ test_strat.add_indicator(indicator(ema233_setting))
 stochrsi_setting = settings("stochrsi", "stochrsi", {"length": 21, "rsi_length": 21, "k": 5, "d": 5})
 test_strat.add_indicator(indicator(stochrsi_setting))
 
-atr_setting = settings("atr", "atr", {"length": 21, "mamode": "ema"})
+atr_setting = settings("atr", "atr", {"length": 21, "mamode": "ema"}, transform={"band": 2})
 test_strat.add_indicator(indicator(atr_setting))
 
 # ------------------------------------------------------------
@@ -66,7 +66,7 @@ Stochastic RSI (k & d) > 80 -> Overbought short term
 Stochastic RSI bearish cross ->  Trigger
 
 TP -> 3 x ATR
-SL -> 1 x ATR 
+SL -> 2 x ATR 
 
 Opposite for bearish
 """
@@ -97,8 +97,8 @@ test_strat.add_indicator(indicator(stochrsi_bearish_trigger))
 long1 = settings("long1","long",{"open": {True: ["EMA_144_A_EMA_233", "EMA_8_B_EMA_21", "STOCHRSIk_21_21_5_5_B_20_0", "STOCHRSId_21_21_5_5_B_20_0", "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5"],False:[]}, "close":{True:[],False:[]}})
 short1 = settings("short1","short",{"open":{True:["STOCHRSIk_21_21_5_5_A_80_0", "STOCHRSId_21_21_5_5_A_80_0", "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5"],False:["EMA_144_A_EMA_233", "EMA_8_B_EMA_21"]}, "close":{True:[],False:[]}})
 
-long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:[],False:["EMA_8_B_EMA_21"]}})
-short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["EMA_8_B_EMA_21"],False:[]}})
+long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:["STOCHRSIk_21_21_5_5_B_20_0", "STOCHRSId_21_21_5_5_B_20_0"],False:["EMA_144_A_EMA_233"]}})
+short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["STOCHRSIk_21_21_5_5_A_80_0", "STOCHRSId_21_21_5_5_A_80_0", "EMA_144_A_EMA_233"],False:[]}})
 
 test_strat.add_entry(long1)
 test_strat.add_entry(short1)
@@ -117,5 +117,8 @@ bt = Backtester(verbose=True)
 
 # bt.test_run(bt.init_test_strat())
 test_strat.write_settings()
+print(line)
+print(test_strat.df.columns.to_list())
+
 bt.test_run(test_strat, 5000)
 exit()

@@ -60,6 +60,8 @@ class strategy:
         # Set up the dataframe
         self.df = df
         self.df['in_position'] = 0
+        self.df['take_profit'] = None
+        self.df['stop_loss'] = None
 
     # Add indicator to self.df
     def add_indicator(self, _indicator:indicator, recording:bool=True):

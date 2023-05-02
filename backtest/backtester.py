@@ -195,6 +195,7 @@ class Backtester:
         return test_strat
 
     def test_run(self, test_strat:strategy, capital:float):
+        ohlc = ['open', 'high', 'low', 'close']
         # To update
         init_capital = capital
 
@@ -227,7 +228,8 @@ class Backtester:
                 opening_price = row['close']
 
                 position_size = capital / opening_price
-
+                take_profit = opening_price + test_strat.df.loc[i, 'ATRe_21'] * 1
+                stop_loss = opening_price - test_strat.df.loc[i, 'ATRe_21'] * 1
 
             # If short position is possible and no position is open, open short position
             elif row['short1'] == 1 and position is None:
@@ -235,50 +237,87 @@ class Backtester:
                 opening_price = row['close']
 
                 position_size = capital / opening_price
+                take_profit = opening_price - test_strat.df.loc[i, 'ATRe_21'] * 1
+                stop_loss = opening_price + test_strat.df.loc[i, 'ATRe_21'] * 1
+                
 
+        
 
+            # elif position == 'long' and any(test_strat.df.loc[i, price] < stop_loss for price in ohlc):
+            #         # STOP LOSS HIT
+            #         closing_price = stop_loss
+
+            #         profit = position_size * (closing_price - opening_price)
+            #         capital += profit
+            # elif position == 'long' and any(test_strat.df.loc[i, price] > take_profit for price in ohlc):
+            #         # TAKE PROFIT HIT
+            #         closing_price = take_profit
+
+            #         profit = position_size * (closing_price - opening_price)
+            #         capital += profit
+            
             # If long position is open and long_close is 1, close long position and calculate profit
-            elif position == 'long' and row['long1_close'] == 1:
-                closing_price = row['close']
+            elif position == 'long':
+                if row['long1_close'] == 1 or any(test_strat.df.loc[i, price] < stop_loss for price in ohlc) or any(test_strat.df.loc[i, price] > take_profit for price in ohlc):
+                    closing_price = row['close']
 
-                profit = position_size * (closing_price - opening_price)
-                capital += profit
-                
-                positions.append({
-                    'Open Time': test_strat.df['time'].iloc[i-1],
-                    'Close Time': row['time'],
-                    'Type': 'long',
-                    'Opening Price': opening_price,
-                    'Closing Price': closing_price,
-                    'Profit': profit,
-                    'Capital': capital
-                })
-                
-                position = None
-                opening_price = None
-                closing_price = None
-                position_size = 0
+                    profit = position_size * (closing_price - opening_price)
+                    capital += profit
+                    
+                    positions.append({
+                        'Open Time': test_strat.df['time'].iloc[i-1],
+                        'Close Time': row['time'],
+                        'Type': 'long',
+                        'Opening Price': opening_price,
+                        'Closing Price': closing_price,
+                        'Take Profit': take_profit,
+                        'Stop Loss': stop_loss,
+                        'Profit': profit,
+                        'Capital': capital
+                    })
+                    
+                    position = None
+                    opening_price = None
+                    closing_price = None
+                    position_size = 0
+
+            # elif position == 'short' and any(test_strat.df.loc[i, price] > stop_loss for price in ohlc):
+            #         # STOP LOSS HIT
+            #         closing_price = stop_loss
+
+            #         profit = position_size * (closing_price - opening_price)
+            #         capital += profit
+
+            # elif position == 'short' and any(test_strat.df.loc[i, price] < take_profit for price in ohlc):
+            #         # TAKE PROFIT HIT
+            #         closing_price = take_profit
+
+            #         profit = position_size * (closing_price - opening_price)
+            #         capital += profit
 
             # If short position is open and short_close is 1, close short position and calculate profit
-            elif position == 'short' and row['short1_close'] == 1:
-                closing_price = row['close']
+            elif position == 'short':
+                if row['short1_close'] == 1 or any(test_strat.df.loc[i, price] < take_profit for price in ohlc) or any(test_strat.df.loc[i, price] > stop_loss for price in ohlc):
+                    closing_price = row['close']
 
-                profit = position_size * (opening_price - closing_price)
-                capital += profit
+                    profit = position_size * (opening_price - closing_price)
+                    capital += profit
 
-                positions.append({
-                    'Open Time': test_strat.df['time'].iloc[i-1],
-                    'Close Time': row['time'],
-                    'Type': 'short',
-                    'Opening Price': opening_price,
-                    'Closing Price': closing_price,
-                    'Profit': profit,
-                    'Capital': capital
-                })
-                position = None
-                opening_price = None
-                closing_price = None
-                position_size = 0
+                    positions.append({
+                        'Open Time': test_strat.df['time'].iloc[i-1],
+                        'Close Time': row['time'],
+                        'Type': 'short',
+                        'Opening Price': opening_price,
+                        'Closing Price': closing_price,
+                        'Take Profit': take_profit,
+                        'Stop Loss': stop_loss,
+                        'Profit': profit,
+                        'Capital': capital
+                    })
+                    position = None
+                    opening_price = None
+                    closing_price = None
+                    position_size = 0
 
 
         # Create positions dataframe
