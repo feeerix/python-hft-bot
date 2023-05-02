@@ -1,7 +1,7 @@
 # Import
 import json
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 
 # Local Import
@@ -15,8 +15,9 @@ from lib.file.finder import *
 from lib.tools.interval import Interval
 
 def process_kline(input_kline:list) -> pd.DataFrame:
+
     # Remember to remove unused 
-    ret_data = pd.DataFrame([input_kline], columns=[
+    ret_data = pd.DataFrame(input_kline, columns=[
         'time',
         'open',
         'high',
@@ -156,6 +157,7 @@ class Binance(API):
             # If file does not exist
             filepath = f"db/klines/{symbol.lower()}/{interval.str_rep()}/binance-{symbol}-{interval.str_rep()}-{dt_starttime.year}-{dt_starttime.month:02d}.csv"
             if not file_exists(filepath):
+            
                 # Download kline data
                 bulk(
                     'klines',
@@ -166,8 +168,8 @@ class Binance(API):
                         'timestamp': dt_starttime.timestamp()
                     }
                 )
+            
             else:
-                print(f'Already exists: {filepath}')
                 break
 
             # Get the next time
@@ -193,7 +195,7 @@ class Binance(API):
 
     # Current function being created
     def update_klines(self, symbol:str, interval:Interval):
-        
+          
         # Pre-check
         pre_check(symbol.lower(), interval.str_rep())
 
@@ -305,6 +307,11 @@ class Binance(API):
             float_format='%.0f'
         )
 
+        # Then update klines via bulk
+        self.update_bulk_klines(
+            symbol,
+            interval
+        )
         # Then update klines via bulk
         self.update_bulk_klines(
             symbol,

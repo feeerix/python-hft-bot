@@ -64,7 +64,7 @@ def parse_kline(kline:dict, verbose:bool = False) -> dict:
     ]
     
     # Return data and process into dataframe
-    ret_data = process_kline(kline_list)
+    ret_data = process_kline([kline_list])
 
     # Test print
     if verbose:

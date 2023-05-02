@@ -27,7 +27,7 @@ warnings.simplefilter(action='ignore',category=FutureWarning)
 
 start = 1609502400
 end = 1672531200
-df = database(verbose=True).kline_df('ETHUSDT', '1m', start, end)
+df = database(verbose=True).kline_df('ETHUSDT', '5m', start, end)
 
 # Create method to create strategies easily
 test_strat = strategy("test_00", df, retreive=False)
