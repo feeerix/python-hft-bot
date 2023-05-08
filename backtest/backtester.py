@@ -228,8 +228,8 @@ class Backtester:
                 opening_price = row['close']
 
                 position_size = capital / opening_price
-                take_profit = opening_price + test_strat.df.loc[i, 'ATRe_21'] * 1
-                stop_loss = opening_price - test_strat.df.loc[i, 'ATRe_21'] * 1
+                take_profit = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 7)
+                stop_loss = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 3)
 
             # If short position is possible and no position is open, open short position
             elif row['short1'] == 1 and position is None:
@@ -237,8 +237,8 @@ class Backtester:
                 opening_price = row['close']
 
                 position_size = capital / opening_price
-                take_profit = opening_price - test_strat.df.loc[i, 'ATRe_21'] * 1
-                stop_loss = opening_price + test_strat.df.loc[i, 'ATRe_21'] * 1
+                take_profit = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 7)
+                stop_loss = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 3)
                 
 
         
@@ -332,6 +332,7 @@ class Backtester:
         losses = (positions_df['Profit'] < 0).sum()
         start = datetime.fromtimestamp(test_strat.df['time'].iloc[0]/1000, tz=timezone.utc)
         end = datetime.fromtimestamp(test_strat.df['time'].iloc[-1]/1000, tz=timezone.utc)
+
         print(f"START TIME: {start.strftime('%D/%M/%Y %H:%M:%S')}")
         print(f"END TIME: {end.strftime('%D/%M/%Y %H:%M:%S')}")
 
@@ -350,8 +351,12 @@ class Backtester:
         avg_win = positions_df.loc[positions_df['Profit'] > 0, 'Profit'].mean()
         avg_loss = positions_df.loc[positions_df['Profit'] < 0, 'Profit'].mean()
 
-        print(f"AVG WIN: {round(avg_win, 3)}")
-        print(f"AVG LOSS: {round(avg_loss, 3)}")
+        print(f"MEAN WIN: {round(avg_win, 3)}")
+        print(f"MEDIAN WIN: {round(positions_df.loc[positions_df['Profit'] > 0, 'Profit'].median(), 3)}")
+        
+        print(f"MEAN LOSS: {round(avg_loss, 3)}")
+        print(f"MEDIAN LOSS: {round(positions_df.loc[positions_df['Profit'] < 0, 'Profit'].median(), 3)}")
+
         print(f"AVG R/R: {round(avg_win/abs(avg_loss),3)}")
 
         print(f"MAX WIN: {positions_df.loc[positions_df['Profit'] > 0, 'Profit'].max()}")
@@ -362,7 +367,10 @@ class Backtester:
         print(f"BUY AND HOLD RETURN: {(test_strat.df['close'].iloc[-1] - test_strat.df['open'].iloc[0]) / test_strat.df['open'].iloc[0]}")
 
         print(f"SHARPE RATIO: {ta.sharpe_ratio(positions_df['Capital'], period=365)}")
-        # print(f"SORTINO RATIO: {ta.sortino_ratio()}")
+        # print(f"SORTINO RATIO: {ta.sortino_ratio(positions_df['Capital'])}")
+        positions_df['Returns PCT'] = positions_df['Capital'].pct_change()
+        print(f"AVERAGE RETURN: {positions_df['Returns PCT'].mean()}")
+        print(f"RETURNS STD DEV: {positions_df['Returns PCT'].std()}")
         print(line)
 
     def start_test(self, initial_capital:int):

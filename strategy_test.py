@@ -24,13 +24,14 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
 # Ignoring future warning initially
 warnings.simplefilter(action='ignore',category=FutureWarning)
-
-start = 1609502400
+start = 1546300800
+# start = 1609502400
 end = 1672531200
-df = database(verbose=True).kline_df('ETHUSDT', '1m', start, end)
+# end = 1672531200
+df = database(verbose=True).kline_df('ETHUSDT', '5m', start, end)
 
 # Create method to create strategies easily
-test_strat = strategy("test_00", df, retreive=False)
+test_strat = strategy("default", df, retreive=False)
 
 # MAIN COLUMNS
 # ------------------------------------------------------------
@@ -77,7 +78,7 @@ revert_ema8_below_ema21 = settings("ema8below_ema21", "below", {"series_a": "EMA
 test_strat.add_indicator(indicator(bullish_ema144_ema233))
 test_strat.add_indicator(indicator(revert_ema8_below_ema21))
 
-stochrsi_oversold_k = settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}, verbose=True)
+stochrsi_oversold_k = settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0})
 stochrsi_oversold_d = settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0})
 stochrsi_overbought_k = settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0})
 stochrsi_overbought_d = settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0})
@@ -120,5 +121,5 @@ test_strat.write_settings()
 print(line)
 print(test_strat.df.columns.to_list())
 
-bt.test_run(test_strat, 5000)
+bt.test_run(test_strat, 1000)
 exit()

@@ -17,7 +17,7 @@ def import_setting(settings_data:dict, verbose:bool=False):
 
 class settings:
     # The main reason we create this class is so that we can load settings from the coresponding folders
-    def __init__(self, name:str, func_name:str, arguments:dict=None, transform:dict=None, verbose:bool=False) -> None:
+    def __init__(self, name:str, func_name:str, arguments:dict=None, transform:dict=None, verbose:bool=True) -> None:
         # Add the setting details based on what's added
 
         # settings = {
