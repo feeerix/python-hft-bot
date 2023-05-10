@@ -1,3 +1,6 @@
+# IMPORTS
+import pandas as pd
+
 # LOCAL IMPORTS
 from settings.settings import settings
 
@@ -9,13 +12,31 @@ CREATING A STATE MACHINE TO MODEL THE MARKET
 """
 # ---------------------------------------------------------------
 
+class Position:
+    def __init__(self, _settings:settings, verbose:bool = False) -> None:
+        pass
+
+    def increase_size(self, time:int, size:int, entry:int) -> None:
+        pass
+
+    def close(self, time:int) -> None:
+        pass
+
 class State:
-    def __init__(self, _settings:settings) -> None:
+    def __init__(self, _settings:settings, verbose:bool = False) -> None:
         self.settings = _settings
-        self.change_conditions = []
+        self.state_change = [
+
+        ]
+        self.verbose=verbose
+
 
     def __str__(self):
         return self.settings['name']
+    
+    def check_state(self, time:int, verbose:bool=False) -> bool:
+        for state in self.state_change:
+            state.check_change
 
 class Statechange:
     def __init__(self, from_state:State, to_state:State, condition_settings:settings, verbose:bool = True) -> None:
@@ -28,7 +49,7 @@ class Statechange:
         return f"STATECHANGE FROM: {self.from_state} -> TO: {self.to_state} - NAME: {self.settings['name']}"
 
 
-    def check_change(self) -> bool:
+    def check_change(self, df:pd.DataFrame) -> bool:
         ret_data = self.settings['func_name']
 
 class Agent:
@@ -40,3 +61,5 @@ class Agent:
     
     def add_state(self, _state:State):
         self.states[_state.settings['name']] = _state
+
+

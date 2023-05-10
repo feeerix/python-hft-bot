@@ -206,6 +206,7 @@ class Backtester:
         positions = []
         position_size = 0
 
+        # To define resolution for bar
         distance = len(test_strat.df.index)
         if distance > 500000:
             resolution = 10000

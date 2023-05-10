@@ -47,7 +47,9 @@ class settings:
         self.verbose = verbose
         if self.verbose:
             print(self.data)
-
+    
+    def __str__(self) -> str:
+        return self.data
 
     def validate_settings(self): 
         required_params = get_required_params(self.data['func_name'])
