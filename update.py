@@ -7,11 +7,11 @@ from lib.tools.interval import *
 
 
 # Pair
-# pair_list = ['BTCUSDT', 'ETHUSDT']
-pair_list = ['ETHUSDT']
+pair_list = ['BTCUSDT', 'ETHUSDT', 'ETHBTC']
+
 
 # Intervals
-# interval_list = ['1m', '5m', '15m', '1h', '4h']
-interval_list = ['5m']
+interval_list = ['1m', '5m', '15m', '1h', '4h']
+# interval_list = ['5m']
 
 update('Binance', pair_list, interval_list)

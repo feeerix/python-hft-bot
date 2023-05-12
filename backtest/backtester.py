@@ -2,6 +2,7 @@
 import pandas as pd
 import pandas_ta as ta
 from datetime import datetime, timezone
+import hashlib
 
 # Local Imports
 from lib.api.binance.interface import Binance
@@ -30,25 +31,25 @@ from lib.cli.printer import line
 
 
 # For testing
-test_settings_list = [
-    settings("stochrsi", "stochrsi", {'length':21,'rsi_length':21,'k':5,'d':5}, verbose=False),
-    settings("ema8", "ema", {'length': 8}, verbose=False),
-    settings("ema21", "ema", {'length': 21}, verbose=False),
-    settings("ema144", "ema", {'length': 144}, verbose=False),
-    settings("ema233", "ema", {'length': 233}, verbose=False),
-    settings("8above21", "above", {'series_a':'EMA_8','series_b':'EMA_21'}),
-    settings("8below21", "below", {'series_a':'EMA_8','series_b':'EMA_21'}),
-    settings("144above233", "above", {'series_a':'EMA_144','series_b':'EMA_233'}),
-    settings("144below233", "below", {'series_a':'EMA_144','series_b':'EMA_233'}),
-    settings("stochrsi_bull", "cross", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5', 'above':True}),
-    settings("stochrsi_bear", "cross", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5', 'above':False}),
-]
+# test_settings_list = [
+#     settings("stochrsi", "stochrsi", {'length':21,'rsi_length':21,'k':5,'d':5}, verbose=False),
+#     settings("ema8", "ema", {'length': 8}, verbose=False),
+#     settings("ema21", "ema", {'length': 21}, verbose=False),
+#     settings("ema144", "ema", {'length': 144}, verbose=False),
+#     settings("ema233", "ema", {'length': 233}, verbose=False),
+#     settings("8above21", "above", {'series_a':'EMA_8','series_b':'EMA_21'}),
+#     settings("8below21", "below", {'series_a':'EMA_8','series_b':'EMA_21'}),
+#     settings("144above233", "above", {'series_a':'EMA_144','series_b':'EMA_233'}),
+#     settings("144below233", "below", {'series_a':'EMA_144','series_b':'EMA_233'}),
+#     settings("stochrsi_bull", "cross", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5', 'above':True}),
+#     settings("stochrsi_bear", "cross", {'series_a':'STOCHRSIk_21_21_5_5','series_b':'STOCHRSId_21_21_5_5', 'above':False}),
+# ]
 
 # TODO - Change to cross
-long1 = settings("long1","long",{"open": {True: ["EMA_8_B_EMA_21", "EMA_144_A_EMA_233", "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5"],False:[]}, "close":{True:[],False:[]}})
-short1 = settings("short1","short",{"open":{True:["EMA_8_A_EMA_21", "EMA_144_B_EMA_233", "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5"],False:[]}, "close":{True:[],False:[]}})
-long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:[],False:["EMA_8_B_EMA_21", "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5"]}})
-short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:[],False:["EMA_8_A_EMA_21", "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5"]}})
+# long1 = settings("long1","long",{"open": {True: ["EMA_8_B_EMA_21", "EMA_144_A_EMA_233", "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5"],False:[]}, "close":{True:[],False:[]}})
+# short1 = settings("short1","short",{"open":{True:["EMA_8_A_EMA_21", "EMA_144_B_EMA_233", "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5"],False:[]}, "close":{True:[],False:[]}})
+# long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:[],False:["EMA_8_B_EMA_21", "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5"]}})
+# short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["EMA_8_A_EMA_21"],False:["STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5"]}})
 
 class Backtester:
     def __init__(self, verbose:bool=False):
@@ -229,8 +230,8 @@ class Backtester:
                 opening_price = row['close']
 
                 position_size = capital / opening_price
-                take_profit = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 7)
-                stop_loss = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 3)
+                take_profit = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 4.5)
+                stop_loss = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 2)
 
             # If short position is possible and no position is open, open short position
             elif row['short1'] == 1 and position is None:
@@ -238,8 +239,8 @@ class Backtester:
                 opening_price = row['close']
 
                 position_size = capital / opening_price
-                take_profit = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 7)
-                stop_loss = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 3)
+                take_profit = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 4.5)
+                stop_loss = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 2)
                 
 
         

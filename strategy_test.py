@@ -28,7 +28,7 @@ start = 1546300800
 # start = 1609502400
 end = 1672531200
 # end = 1672531200
-df = database(verbose=True).kline_df('ETHUSDT', '5m', start, end)
+df = database(verbose=True).kline_df('BTCUSDT', '1h', start, end)
 
 # Create method to create strategies easily
 test_strat = strategy("default", df, retreive=False)
@@ -94,12 +94,11 @@ stochrsi_bearish_trigger = settings("stochrsi_bullcross", "cross", {"series_a": 
 test_strat.add_indicator(indicator(stochrsi_bullish_trigger))
 test_strat.add_indicator(indicator(stochrsi_bearish_trigger))
 
-
 long1 = settings("long1","long",{"open": {True: ["EMA_144_A_EMA_233", "EMA_8_B_EMA_21", "STOCHRSIk_21_21_5_5_B_20_0", "STOCHRSId_21_21_5_5_B_20_0", "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5"],False:[]}, "close":{True:[],False:[]}})
 short1 = settings("short1","short",{"open":{True:["STOCHRSIk_21_21_5_5_A_80_0", "STOCHRSId_21_21_5_5_A_80_0", "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5"],False:["EMA_144_A_EMA_233", "EMA_8_B_EMA_21"]}, "close":{True:[],False:[]}})
 
-long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:["STOCHRSIk_21_21_5_5_B_20_0", "STOCHRSId_21_21_5_5_B_20_0"],False:["EMA_144_A_EMA_233"]}})
-short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["STOCHRSIk_21_21_5_5_A_80_0", "STOCHRSId_21_21_5_5_A_80_0", "EMA_144_A_EMA_233"],False:[]}})
+long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:["EMA_8_B_EMA_21", "STOCHRSIk_21_21_5_5_B_20_0", "STOCHRSId_21_21_5_5_B_20_0", "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5"],False:["EMA_144_A_EMA_233"]}})
+short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["STOCHRSIk_21_21_5_5_A_80_0", "STOCHRSId_21_21_5_5_A_80_0", "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5", "EMA_144_A_EMA_233"],False:["EMA_8_B_EMA_21"]}})
 
 test_strat.add_entry(long1)
 test_strat.add_entry(short1)

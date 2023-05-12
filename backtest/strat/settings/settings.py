@@ -1,5 +1,6 @@
 # Imports
 import pandas_ta as ta
+import hashlib
 
 # Local Imports
 from lib.file.writer import *
@@ -50,6 +51,9 @@ class settings:
     
     def __str__(self) -> str:
         return self.data
+    
+    def hash(self) -> str:
+        return hashlib.md5(bytes(repr(sorted(self.data.items())), "utf-8")).hexdigest()
 
     def validate_settings(self): 
         required_params = get_required_params(self.data['func_name'])

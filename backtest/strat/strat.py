@@ -48,13 +48,6 @@ class strategy:
 
         # ------------------
 
-    def __str__(self) -> str:
-        for indicator_setting in self.indicator_settings_list:
-            pass
-        for position_type in self.position_condition_settings.keys():
-            for position_setting in self.position_condition_settings[position_type]:
-                pass
-
     # Initialise DF
     def init_df(self, df:pd.DataFrame):
         # Set up the dataframe
