@@ -230,8 +230,8 @@ class Backtester:
                 opening_price = row['close']
 
                 position_size = capital / opening_price
-                take_profit = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 4.5)
-                stop_loss = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 2)
+                take_profit = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 4)
+                stop_loss = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 0.25)
 
             # If short position is possible and no position is open, open short position
             elif row['short1'] == 1 and position is None:
@@ -239,8 +239,8 @@ class Backtester:
                 opening_price = row['close']
 
                 position_size = capital / opening_price
-                take_profit = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 4.5)
-                stop_loss = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 2)
+                take_profit = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 4)
+                stop_loss = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 0.25)
                 
 
         
@@ -260,8 +260,18 @@ class Backtester:
             
             # If long position is open and long_close is 1, close long position and calculate profit
             elif position == 'long':
-                if row['long1_close'] == 1 or any(test_strat.df.loc[i, price] < stop_loss for price in ohlc) or any(test_strat.df.loc[i, price] > take_profit for price in ohlc):
-                    closing_price = row['close']
+                if any(test_strat.df.loc[i, price] > opening_price for price in ['close']):
+                    stop_loss = opening_price
+
+                if row['long1_close'] == 1:
+                    if any(test_strat.df.loc[i, price] < stop_loss for price in ohlc):
+                        closing_price = stop_loss
+
+                    elif  any(test_strat.df.loc[i, price] > take_profit for price in ohlc):
+                        closing_price = take_profit
+
+                    else:
+                        closing_price = row['close']
 
                     profit = position_size * (closing_price - opening_price)
                     capital += profit
@@ -299,8 +309,18 @@ class Backtester:
 
             # If short position is open and short_close is 1, close short position and calculate profit
             elif position == 'short':
-                if row['short1_close'] == 1 or any(test_strat.df.loc[i, price] < take_profit for price in ohlc) or any(test_strat.df.loc[i, price] > stop_loss for price in ohlc):
-                    closing_price = row['close']
+                if any(test_strat.df.loc[i, price] < opening_price for price in ['close']):
+                    stop_loss = opening_price
+
+                if row['short1_close'] == 1:
+                    if any(test_strat.df.loc[i, price] > stop_loss for price in ohlc):
+                        closing_price = stop_loss
+
+                    elif  any(test_strat.df.loc[i, price] < take_profit for price in ohlc):
+                        closing_price = take_profit
+
+                    else:
+                        closing_price = row['close']
 
                     profit = position_size * (opening_price - closing_price)
                     capital += profit
@@ -335,8 +355,8 @@ class Backtester:
         start = datetime.fromtimestamp(test_strat.df['time'].iloc[0]/1000, tz=timezone.utc)
         end = datetime.fromtimestamp(test_strat.df['time'].iloc[-1]/1000, tz=timezone.utc)
 
-        print(f"START TIME: {start.strftime('%D/%M/%Y %H:%M:%S')}")
-        print(f"END TIME: {end.strftime('%D/%M/%Y %H:%M:%S')}")
+        print(f"START TIME: {start.strftime('%DD/%MM/%YYYY %H:%M:%S')}")
+        print(f"END TIME: {end.strftime('%DD/%MM/%YYYY %H:%M:%S')}")
 
         print(f"DURATION: {divmod((end-start).total_seconds(), 86400)[0]} DAYS")
 
