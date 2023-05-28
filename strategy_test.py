@@ -28,7 +28,7 @@ start = 1546300800
 # start = 1609502400
 end = 1672531200
 # end = 1672531200
-df = database(verbose=True).kline_df('ETHUSDT', '5m', start, end)
+df = database(verbose=True).kline_df('ETHUSDT', '4h', start, end)
 
 # Create method to create strategies easily
 test_strat = strategy("default", df, retreive=False)
