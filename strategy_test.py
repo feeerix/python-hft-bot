@@ -24,11 +24,15 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
 # Ignoring future warning initially
 warnings.simplefilter(action='ignore',category=FutureWarning)
-start = 1546300800
+# start = 1546300800
+start = 1569888000 # ETH / BTC
+# start = 1568880000
+
+# start = 1527480000 # XRP BUSD
 # start = 1609502400
 end = 1672531200
 # end = 1672531200
-df = database(verbose=True).kline_df('ETHUSDT', '4h', start, end)
+df = database(verbose=True).kline_df('BNBUSDT', '1m', start, end)
 
 # Create method to create strategies easily
 test_strat = strategy("default", df, retreive=False)
@@ -123,6 +127,6 @@ bt = Backtester(verbose=True)
 test_strat.write_settings()
 print(line)
 # print(test_strat.df.columns.to_list())
-bt.test_run(test_strat, 1000)
+bt.test_runv0(test_strat, 1000)
 print(test_strat.df.columns.to_list())
 exit()
