@@ -12,6 +12,8 @@ from backtest.backtester import Backtester
 from lib.cli.printer import *
 from lib.cli.listener import *
 
+from backtest.strat.agent import *
+
 # pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 # pd.set_option('display.width', None)
@@ -35,11 +37,7 @@ test_strat = strategy("default", [df], retreive=False)
 
 bt = Backtester(verbose=True)
 
-
-
 print(line)
 
-
-bt.test_run(test_strat, 1000)
 print(test_strat.df.columns.to_list())
 exit()

@@ -239,36 +239,39 @@ class Backtester:
         else:
             resolution = 100
 
+        length = len(test_strat.df)
         # Loop through rows
-        for i, row in test_strat.df.iterrows():
-
+        for row in test_strat.df.itertuples():
+            
+            i = row.Index
+            
             if self.verbose:
                 if (i % resolution) == 0:
                     print(f"{round((i/distance)*100, 3)}% COMPLETE")
 
             
             # If long position is possible and no position is open, open long position
-            if row['long1'] == 1 and position is None:
+            if row.long1 and row.long1 == 1 and position is None:
                 position = 'long'
-                opening_price = row['close']
-                open_time = row['close_time']
+                opening_price = row.close
+                open_time = row.close_time
 
                 position_size = capital / opening_price
                 
                 fee += position_size * (0.1 / 100)
 
-                take_profit = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 6.5)
-                trailing_trigger = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 3.4)
-                trailing_stop = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 3.3)
+                take_profit = opening_price + (row.ATRe_21 * 6.5)
+                trailing_trigger = opening_price + (row.ATRe_21 * 3.4)
+                trailing_stop = opening_price + (row.ATRe_21 * 3.3)
 
 
-                trailing_trigger1 = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 2.2)
-                trailing_stop1 = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 2.1)
+                trailing_trigger1 = opening_price + (row.ATRe_21 * 2.2)
+                trailing_stop1 = opening_price + (row.ATRe_21 * 2.1)
 
-                trailing_trigger2 = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 1.4)
-                trailing_stop2 = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 1.3)
+                trailing_trigger2 = opening_price + (row.ATRe_21 * 1.4)
+                trailing_stop2 = opening_price + (row.ATRe_21 * 1.3)
 
-                stop_loss = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 0.4)
+                stop_loss = opening_price - (row.ATRe_21 * 0.4)
 
                 _triggers = [
                     trailing_trigger,
@@ -283,26 +286,26 @@ class Backtester:
                 ]
 
             # If short position is possible and no position is open, open short position
-            elif row['short1'] == 1 and position is None:
+            elif row.short1 and row.short1 == 1 and position is None:
                 position = 'short'
-                opening_price = row['close']
-                open_time = row['close_time']
+                opening_price = row.close
+                open_time = row.close_time
 
                 position_size = capital / opening_price
 
                 fee += position_size * (0.1 / 100)
 
-                take_profit = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 6.5)
-                trailing_trigger = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 3.4)
-                trailing_stop = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 3.3)
+                take_profit = opening_price - (row.ATRe_21 * 6.5)
+                trailing_trigger = opening_price - (row.ATRe_21 * 3.4)
+                trailing_stop = opening_price - (row.ATRe_21 * 3.3)
 
-                trailing_trigger1 = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 2.2)
-                trailing_stop1 = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 2.1)
+                trailing_trigger1 = opening_price - (row.ATRe_21 * 2.2)
+                trailing_stop1 = opening_price - (row.ATRe_21 * 2.1)
 
-                trailing_trigger2 = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 1.4)
-                trailing_stop2 = opening_price - (test_strat.df.loc[i, 'ATRe_21'] * 1.3)
+                trailing_trigger2 = opening_price - (row.ATRe_21* 1.4)
+                trailing_stop2 = opening_price - (row.ATRe_21 * 1.3)
 
-                stop_loss = opening_price + (test_strat.df.loc[i, 'ATRe_21'] * 0.4)
+                stop_loss = opening_price + (row.ATRe_21 * 0.075)
 
                 _triggers = [
                     trailing_trigger,
@@ -317,9 +320,9 @@ class Backtester:
             
             # If long position is open and long_close is 1, close long position and calculate profit
             elif position == 'long':
-
-                if any(test_strat.df.loc[i, price] < stop_loss for price in ohlc):
-                    closing_time = test_strat.df.loc[i, 'close_time']
+                
+                if any(price < stop_loss for price in [row.open, row.high, row.low, row.close]):
+                    closing_time = row.close_time
                     closing_price = stop_loss
                     fee += position_size * (0.1 / 100)
                     
@@ -347,7 +350,7 @@ class Backtester:
                     position_size = 0
                     fee = 0
 
-                elif  any(test_strat.df.loc[i, price] > take_profit for price in ohlc):
+                elif  any(price > take_profit for price in [row.open, row.high, row.low, row.close]):
                     
                     closing_time = test_strat.df.loc[i, 'close_time']
                     closing_price = take_profit
@@ -386,7 +389,7 @@ class Backtester:
             # If short position is open and short_close is 1, close short position and calculate profit
             elif position == 'short':
 
-                if any(test_strat.df.loc[i, price] > stop_loss for price in ohlc):
+                if any(price > stop_loss for price in [row.open, row.high, row.low, row.close]):
                     closing_time = test_strat.df.loc[i, 'close_time']
                     closing_price = stop_loss
 
@@ -417,7 +420,7 @@ class Backtester:
                     fee = 0
                     _triggers = []
 
-                elif any(test_strat.df.loc[i, price] < take_profit for price in ohlc):
+                elif any(price < take_profit for price in [row.open, row.high, row.low, row.close]):
                     closing_time = test_strat.df.loc[i, 'close_time']
                     closing_price = take_profit
 
@@ -514,6 +517,5 @@ class Backtester:
         print(f"RETURNS STD DEV: {positions_df['Returns PCT'].std()}")
         print(line)
 
-
-    def start_test(self, initial_capital:int):
+    def start_test(self, test_strat:strategy, capital:float):
         pass

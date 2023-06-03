@@ -32,7 +32,7 @@ start = 1569888000 # ETH / BTC
 # start = 1609502400
 end = 1672531200
 # end = 1672531200
-df = database(verbose=True).kline_df('BNBUSDT', '1m', start, end)
+df = database(verbose=True).kline_df('ETHUSDT', '1m', start, end)
 
 # Create method to create strategies easily
 test_strat = strategy("default", df, retreive=False)
@@ -55,6 +55,13 @@ test_strat.add_indicator(indicator(stochrsi_setting))
 
 atr_setting = settings("atr", "atr", {"length": 21, "mamode": "ema"}, transform={"band": 2})
 test_strat.add_indicator(indicator(atr_setting))
+
+"""
+To Effectively "build" strategies, I will need to better abstract and automate the process, such that I could do it from the command line.
+
+"""
+
+
 
 # ------------------------------------------------------------
 # CONDITIONAL COLUMNS
@@ -114,6 +121,7 @@ test_strat.add_close(long1_close)
 test_strat.add_close(short1_close)
 
 
+
 # ---
 # FIND A WAY TO CREATE STRATEGIES
 # ---
@@ -124,9 +132,15 @@ bt = Backtester(verbose=True)
 
 
 # bt.test_run(bt.init_test_strat())
-test_strat.write_settings()
+# test_strat.write_settings()
 print(line)
 # print(test_strat.df.columns.to_list())
 bt.test_runv0(test_strat, 1000)
 print(test_strat.df.columns.to_list())
+
+"""
+Get List of indicators
+
+"""
+
 exit()

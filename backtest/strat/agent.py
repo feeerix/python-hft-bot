@@ -59,7 +59,7 @@ class Statechange:
 
     def check_change(self, df:pd.DataFrame) -> bool:
         
-
+        
         return self.settings['func_name'](**self.settings['arguments'])
 
 class Agent:
@@ -70,7 +70,7 @@ class Agent:
         self.verbose = verbose
         self.current_state = None
     
-    def add_state(self, _state:State, ):
+    def add_state(self, _state:State):
         self.states[_state.settings['name']] = _state
 
     def setState(self):
