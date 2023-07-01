@@ -2,7 +2,8 @@
 import pandas as pd
 import pandas_ta as ta
 from datetime import datetime, timezone
-import hashlib
+from hashlib import sha256
+import time
 
 # Local Imports
 from lib.api.binance.interface import Binance
@@ -239,9 +240,12 @@ class Backtester:
         else:
             resolution = 100
 
-        length = len(test_strat.df)
+
+
         # Loop through rows
         for row in test_strat.df.itertuples():
+
+            # print(row)
             
             i = row.Index
             
@@ -252,6 +256,7 @@ class Backtester:
             
             # If long position is possible and no position is open, open long position
             if row.long1 and row.long1 == 1 and position is None:
+                
                 position = 'long'
                 opening_price = row.close
                 open_time = row.close_time
@@ -260,29 +265,37 @@ class Backtester:
                 
                 fee += position_size * (0.1 / 100)
 
-                take_profit = opening_price + (row.ATRe_21 * 6.5)
-                trailing_trigger = opening_price + (row.ATRe_21 * 3.4)
-                trailing_stop = opening_price + (row.ATRe_21 * 3.3)
+                take_profit = opening_price + (row.ATRe_21 * 2)
+                trailing_trigger = opening_price + (row.ATRe_21 * 1.6)
+                trailing_stop = opening_price + (row.ATRe_21 * 1.4)
 
 
-                trailing_trigger1 = opening_price + (row.ATRe_21 * 2.2)
-                trailing_stop1 = opening_price + (row.ATRe_21 * 2.1)
+                trailing_trigger1 = opening_price + (row.ATRe_21 * 1.4)
+                trailing_stop1 = opening_price + (row.ATRe_21 * 1.3)
 
-                trailing_trigger2 = opening_price + (row.ATRe_21 * 1.4)
-                trailing_stop2 = opening_price + (row.ATRe_21 * 1.3)
+                trailing_trigger2 = opening_price + (row.ATRe_21 * 1.3)
+                trailing_stop2 = opening_price + (row.ATRe_21 * 1.1)
 
-                stop_loss = opening_price - (row.ATRe_21 * 0.4)
+                trailing_trigger3 = opening_price + (row.ATRe_21 * 1)
+                trailing_stop3 = opening_price + (row.ATRe_21 * 0.5)
+
+
+                stop_loss = opening_price - (row.ATRe_21 * 0.2)
 
                 _triggers = [
                     trailing_trigger,
                     trailing_trigger1,
                     trailing_trigger2,
+                    trailing_trigger3,
+                    # trailing_trigger4
                 ]
 
                 _stops = [
                     trailing_stop,
                     trailing_stop1,
-                    trailing_stop2
+                    trailing_stop2,
+                    trailing_stop3,
+                    # trailing_stop4
                 ]
 
             # If short position is possible and no position is open, open short position
@@ -295,27 +308,34 @@ class Backtester:
 
                 fee += position_size * (0.1 / 100)
 
-                take_profit = opening_price - (row.ATRe_21 * 6.5)
-                trailing_trigger = opening_price - (row.ATRe_21 * 3.4)
-                trailing_stop = opening_price - (row.ATRe_21 * 3.3)
+                take_profit = opening_price - (row.ATRe_21 * 2)
+                trailing_trigger = opening_price - (row.ATRe_21 * 1.6)
+                trailing_stop = opening_price - (row.ATRe_21 * 1.4)
 
-                trailing_trigger1 = opening_price - (row.ATRe_21 * 2.2)
-                trailing_stop1 = opening_price - (row.ATRe_21 * 2.1)
+                trailing_trigger1 = opening_price - (row.ATRe_21 * 1.4)
+                trailing_stop1 = opening_price - (row.ATRe_21 * 1.3)
 
-                trailing_trigger2 = opening_price - (row.ATRe_21* 1.4)
-                trailing_stop2 = opening_price - (row.ATRe_21 * 1.3)
+                trailing_trigger2 = opening_price - (row.ATRe_21* 1.3)
+                trailing_stop2 = opening_price - (row.ATRe_21 * 1.1)
 
-                stop_loss = opening_price + (row.ATRe_21 * 0.075)
+                trailing_trigger3 = opening_price - (row.ATRe_21 * 0.9)
+                trailing_stop3 = opening_price - (row.ATRe_21 * 0.8)
+
+                stop_loss = opening_price + (row.ATRe_21 * 0.2)
 
                 _triggers = [
                     trailing_trigger,
                     trailing_trigger1,
                     trailing_trigger2,
+                    trailing_trigger3,
+                    # trailing_trigger4
                 ]
                 _stops = [
                     trailing_stop,
                     trailing_stop1,
-                    trailing_stop2
+                    trailing_stop2,
+                    trailing_stop3,
+                    # trailing_stop4
                 ]
             
             # If long position is open and long_close is 1, close long position and calculate profit
@@ -465,57 +485,60 @@ class Backtester:
         positions_df['Duration'] = (positions_df['Close Time'] - positions_df['Open Time']) / (60 * 1000)
 
         print(positions_df)
+        position_hash = sha256(str(positions_df).encode()).hexdigest()
+        print(position_hash)
+        
+        """
+
+        We now try to create all the data that we look for and add that into a hashed header to be added into a JSON
+        
+        """
+
         # exit()
         wins = (positions_df['Profit'] > 0).sum()
         losses = (positions_df['Profit'] < 0).sum()
         start = datetime.fromtimestamp(test_strat.df['time'].iloc[0]/1000, tz=timezone.utc)
         end = datetime.fromtimestamp(test_strat.df['time'].iloc[-1]/1000, tz=timezone.utc)
-
-        print(f"START TIME: {start.strftime('%DD/%MM/%YYYY %H:%M:%S')}")
-        print(f"END TIME: {end.strftime('%DD/%MM/%YYYY %H:%M:%S')}")
-
-        print(f"DURATION: {divmod((end-start).total_seconds(), 86400)[0]} DAYS")
-
-        print(f"NET PROFIT: {positions_df['Profit'].sum(axis=0)}")
-        print(f"PCT RETURN: {round(((positions_df['Capital'].iloc[-1] - init_capital)/init_capital)*100, 3)}")
-        
-        print(f"GROSS PROFIT: {positions_df.loc[positions_df['Profit'] > 0, 'Profit'].sum()}")
-        print(f"GROSS LOSS: {positions_df.loc[positions_df['Profit'] < 0, 'Profit'].sum()}")
-        
-        print(f'WINS: {wins}')
-        print(f'LOSSES: {losses}')
-        print(f"WIN RATE: {round((wins / (losses + wins)) * 100, 3)}%")
-
+        positions_df['Returns PCT'] = positions_df['Capital'].pct_change()
         avg_win = positions_df.loc[positions_df['Profit'] > 0, 'Profit'].mean()
         avg_loss = positions_df.loc[positions_df['Profit'] < 0, 'Profit'].mean()
+        lastupdate = int(time.time())
 
-        print(f"MEAN WIN: {round(avg_win, 3)}")
-        print(f"MEDIAN WIN: {round(positions_df.loc[positions_df['Profit'] > 0, 'Profit'].median(), 3)}")
+        result = {
+            "lastupdate": lastupdate,
+            "starttime": start.strftime('%DD/%MM/%YYYY %H:%M:%S'),
+            "endtime": end.strftime('%DD/%MM/%YYYY %H:%M:%S'),
+            "days": divmod((end-start).total_seconds(), 86400)[0],
+            "netprofit": positions_df['Profit'].sum(axis=0),
+            "return_pct": round(((positions_df['Capital'].iloc[-1] - init_capital)/init_capital)*100, 3),
+            "grossprofit": positions_df.loc[positions_df['Profit'] > 0, 'Profit'].sum(),
+            "grossloss": positions_df.loc[positions_df['Profit'] < 0, 'Profit'].sum(),
+            "wins": wins,
+            "losses": losses,
+            "winrate": round((wins / (losses + wins)) * 100, 3),
+            "meanwin": positions_df.loc[positions_df['Profit'] > 0, 'Profit'].mean(),
+            "medianwin": round(positions_df.loc[positions_df['Profit'] > 0, 'Profit'].median(), 3),
+            "meanholdingtime": (positions_df['Duration']).mean(),
+            "meanwinholdingtime": (positions_df.loc[positions_df['Profit'] > 0, 'Duration']).mean(),
+            "meanlossholdingtime": (positions_df.loc[positions_df['Profit'] < 0, 'Duration']).mean(),
+            "averagerr": round(avg_win/abs(avg_loss),3),
+            "maxwin": positions_df.loc[positions_df['Profit'] > 0, 'Profit'].max(),
+            "maxloss": positions_df.loc[positions_df['Profit'] < 0, 'Profit'].max(),
+            "maxdrawdown_pct": ta.drawdown(positions_df['Capital'])['DD_PCT'].max(),
+            "hodlreturn": (test_strat.df['close'].iloc[-1] - test_strat.df['open'].iloc[0]) / test_strat.df['open'].iloc[0],
+            "sharpe": ta.sharpe_ratio(positions_df['Capital'], period=365),
+            "meanreturn": positions_df['Returns PCT'].mean(),
+            "return_stdev": positions_df['Returns PCT'].std()
+        }
+
+        filepath = f'db/strategies/results/'
+
+        if not folder_exists(position_hash, filepath):
+            create_folder(position_hash, filepath)
+
+ 
         
-        print(f"MEAN LOSS: {round(avg_loss, 3)}")
-        print(f"MEDIAN LOSS: {round(positions_df.loc[positions_df['Profit'] < 0, 'Profit'].median(), 3)}")
 
-        print(f"AVERAGE HOLDING TIME: {(positions_df['Duration']).mean()} minutes")
-        print(f"AVERAGE HOLDING TIME FOR WINS: {(positions_df.loc[positions_df['Profit'] > 0, 'Duration']).mean()} minutes")
-        print(f"AVERAGE HOLDING TIME FOR LOSSES: {(positions_df.loc[positions_df['Profit'] < 0, 'Duration']).mean()} minutes")
-
-        # print(f"AVERAGER HOLDING TIME: {round(((positions_df['Close Time'] - positions_df['Open Time']).mean() / 60), 3)} minutes")
-
-        print(f"AVG R/R: {round(avg_win/abs(avg_loss),3)}")
-
-        print(f"MAX WIN: {positions_df.loc[positions_df['Profit'] > 0, 'Profit'].max()}")
-        print(f"MAX LOSS: {positions_df.loc[positions_df['Profit'] < 0, 'Profit'].min()}")
         
-        print(f"MAX DRAWDOWN PERCENT: {ta.drawdown(positions_df['Capital'])['DD_PCT'].max()}")
-
-        print(f"BUY AND HOLD RETURN: {(test_strat.df['close'].iloc[-1] - test_strat.df['open'].iloc[0]) / test_strat.df['open'].iloc[0]}")
-
-        print(f"SHARPE RATIO: {ta.sharpe_ratio(positions_df['Capital'], period=365)}")
-        # print(f"SORTINO RATIO: {ta.sortino_ratio(positions_df['Capital'])}")
-        positions_df['Returns PCT'] = positions_df['Capital'].pct_change()
-        print(f"AVERAGE RETURN: {positions_df['Returns PCT'].mean()}")
-        print(f"RETURNS STD DEV: {positions_df['Returns PCT'].std()}")
-        print(line)
-
     def start_test(self, test_strat:strategy, capital:float):
         pass

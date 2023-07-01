@@ -50,7 +50,7 @@ test_strat.add_indicator(indicator(ema21_setting))
 test_strat.add_indicator(indicator(ema144_setting))
 test_strat.add_indicator(indicator(ema233_setting))
 
-stochrsi_setting = settings("stochrsi", "stochrsi", {"length": 21, "rsi_length": 21, "k": 5, "d": 5})
+stochrsi_setting = settings("stochrsi", "stochrsi", {"length": 34, "rsi_length": 34, "k": 8, "d": 8})
 test_strat.add_indicator(indicator(stochrsi_setting))
 
 atr_setting = settings("atr", "atr", {"length": 21, "mamode": "ema"}, transform={"band": 2})
@@ -93,27 +93,27 @@ test_strat.add_indicator(indicator(bearish_ema144_ema233))
 test_strat.add_indicator(indicator(bullish_ema8_ema21))
 test_strat.add_indicator(indicator(bearish_ema8_ema21))
 
-stochrsi_oversold_k = settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0})
-stochrsi_oversold_d = settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0})
-stochrsi_overbought_k = settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0})
-stochrsi_overbought_d = settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0})
+stochrsi_oversold_k = settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 20.0})
+stochrsi_oversold_d = settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 20.0})
+stochrsi_overbought_k = settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 80.0})
+stochrsi_overbought_d = settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 80.0})
 
 test_strat.add_indicator(indicator(stochrsi_oversold_k))
 test_strat.add_indicator(indicator(stochrsi_oversold_d))
 test_strat.add_indicator(indicator(stochrsi_overbought_k))
 test_strat.add_indicator(indicator(stochrsi_overbought_d))
 
-stochrsi_bullish_trigger = settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"})
-stochrsi_bearish_trigger = settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "above": False})
+stochrsi_bullish_trigger = settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8"})
+stochrsi_bearish_trigger = settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8", "above": False})
 
 test_strat.add_indicator(indicator(stochrsi_bullish_trigger))
 test_strat.add_indicator(indicator(stochrsi_bearish_trigger))
 
-long1 = settings("long1","long",{"open": {True: ["EMA_144_A_EMA_233", "EMA_8_B_EMA_21", "STOCHRSIk_21_21_5_5_B_20_0", "STOCHRSId_21_21_5_5_B_20_0", "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5"],False:[]}, "close":{True:[],False:[]}})
-short1 = settings("short1","short",{"open":{True:["STOCHRSIk_21_21_5_5_A_80_0", "STOCHRSId_21_21_5_5_A_80_0", "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5", "EMA_144_B_EMA_233", "EMA_8_B_EMA_21"],False:[]}, "close":{True:[],False:[]}})
+long1 = settings("long1","long",{"open": {True: ["EMA_144_A_EMA_233", "EMA_8_B_EMA_21", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0", "STOCHRSIk_34_34_8_8_XA_STOCHRSId_34_34_8_8"],False:[]}, "close":{True:[],False:[]}})
+short1 = settings("short1","short",{"open":{True:["STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0", "STOCHRSIk_34_34_8_8_XB_STOCHRSId_34_34_8_8", "EMA_144_B_EMA_233", "EMA_8_B_EMA_21"],False:[]}, "close":{True:[],False:[]}})
 
-long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:["EMA_144_B_EMA_233", "EMA_8_B_EMA_21", "STOCHRSIk_21_21_5_5_B_20_0", "STOCHRSId_21_21_5_5_B_20_0"],False:[]}})
-short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["EMA_144_A_EMA_233", "EMA_8_A_EMA_21", "STOCHRSIk_21_21_5_5_A_80_0", "STOCHRSId_21_21_5_5_A_80_0"],False:[]}})
+long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:["EMA_144_B_EMA_233", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0"],False:[]}})
+short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["EMA_144_A_EMA_233", "STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0"],False:[]}})
 
 test_strat.add_entry(long1)
 test_strat.add_entry(short1)
@@ -132,7 +132,7 @@ bt = Backtester(verbose=True)
 
 
 # bt.test_run(bt.init_test_strat())
-# test_strat.write_settings()
+test_strat.write_settings()
 print(line)
 # print(test_strat.df.columns.to_list())
 bt.test_runv0(test_strat, 1000)

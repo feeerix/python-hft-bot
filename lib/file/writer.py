@@ -32,3 +32,4 @@ def write_json(file_data:dict, filename:str, folder_path:str):
     
     with open(f"{folder_path}{filename}", "r+") as outjson:
         json.dump(file_data, outjson)
+

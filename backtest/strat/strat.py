@@ -2,6 +2,8 @@
 import pandas as pd
 import pandas_ta as ta
 import numpy as np
+from hashlib import sha256
+import time
 
 # Local Imports
 from backtest.strat.indicator import indicator
@@ -10,10 +12,11 @@ from lib.file.writer import folder_exists, create_folder, file_exists, write_jso
 from lib.file.reader import get_json
 
 class strategy:
-    def __init__(self, name:str, df:pd.DataFrame, verbose:bool=False, retreive:bool=False): 
+    def __init__(self, name:str, df:pd.DataFrame, verbose:bool=False, retreive:bool=False, higher_df:list=None): 
         self.name = name
         self.verbose = verbose
         self.df = None
+        self.h_df = higher_df
 
         # ------------------
         # indicator_example = [
@@ -56,6 +59,12 @@ class strategy:
         self.df['take_profit'] = None
         self.df['stop_loss'] = None
 
+        # if timeframe:
+        #     for timeframe in self.h_df:
+        #         timeframe['in_position'] = 0
+        #         timeframe['take_profit'] = None
+        #         timeframe['stop_loss'] = None
+
     # Add indicator to self.df
     def add_indicator(self, _indicator:indicator, recording:bool=True):
         if self.verbose:
@@ -74,6 +83,16 @@ class strategy:
             axis=1, 
             # ignore_index=True # -> removed index
         )
+
+        # for tf in self.h_df:
+        #     tf = pd.concat(
+        #         [
+        #             self.df, # Existing DF
+        #             _indicator.ret_indicator(tf, self.verbose)
+        #         ], # New DF
+        #         axis=1, 
+        #         # ignore_index=True # -> removed index
+        #     )
 
     # Add entry conditions
     def add_entry(self, _settings:settings, recording:bool=True):
@@ -134,6 +153,32 @@ class strategy:
         if not folder_exists(self.name, strat_folder):
             create_folder(self.name, strat_folder)
         
+        """
+        Hashing the settings
+
+        We hash the indicator and the position seperately and add our own prefix to it.
+
+        We check if this has been completed already.
+
+        """
+        indicator_hash = "indi-"+sha256(str(self.indicator_settings_list).encode()).hexdigest()
+        position_hash = "posi-"+sha256(str(self.position_condition_settings).encode()).hexdigest()
+        
+        # lastupdate = 
+        lastupdate = int(time.time())
+
+        write_json(
+            {
+                "indicator_hash": indicator_hash,
+                "position_hash": position_hash,
+                "lastupdate": lastupdate,
+                'result_headers': []
+            },
+            'headers.json',
+            strat_folder+self.name+'/'
+        )
+        
+
         write_json(
             self.indicator_settings_list,
             'indicator_settings.json',
