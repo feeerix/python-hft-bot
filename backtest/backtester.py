@@ -4,6 +4,7 @@ import pandas_ta as ta
 from datetime import datetime, timezone
 from hashlib import sha256
 import time
+import numpy as np
 
 # Local Imports
 from lib.api.binance.interface import Binance
@@ -533,10 +534,22 @@ class Backtester:
 
         filepath = f'db/strategies/results/'
 
+        # Create folder if it doesn't exist
         if not folder_exists(position_hash, filepath):
             create_folder(position_hash, filepath)
 
- 
+
+        # Quick hack to convert floats
+        for x in result.keys():
+            result[x] = str(result[x])
+        
+        # Write the results in this folder
+        
+        write_json(
+            result,
+            "results.json",
+            filepath+position_hash+"/"
+        )
         
 
         
