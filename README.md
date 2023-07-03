@@ -1,7 +1,18 @@
 # HFT Bot
 
 I'm a bit of an idiot, but I wanted a way to download large amounts of kline data.
-Through implementing this I'm hoping to larn more about building large python projects.
+It's turned out into quite a large project that it seems I basically want to do everything with.
+
+## Current Focus Points
+
+- Currently I am hashing the positions df, where I should be hashing the settings, and also checking the results. This will potentially reduce the required compute depending on what I'm looking to do.
+
+## Next Goals
+
+- To Effectively "build" strategies, I will need to better abstract and automate the process, such that I could do it from the command line. I will need to build a better system to build the strategies.
+- I currently am not able to perform the strategies across multiple assets, including tracking the whole portfolio as well as arbitrage between multiple assets. Implementation of this should also be considered as well.
+- Implementing this with websockets, and then allow this to be run 24/7 will then allow the data to be collected whenever the script is running, and dynamically add it to the db as opposed to manually running the command.
+- Start to integrate multiple exchanges and add to the database of klines. We will hopefully start to integrate the other exchange details, like funding rate and orderbook information.
 
 ## Potential Roadmap
 
@@ -20,12 +31,6 @@ Depending on what the bot is doing at the time, and the strategy that has been c
 I'd love to monetise this buy implementing a model similar to the 2 and 20 model from a hedge fund, but instead set it at something like 1 and 5.
 
 I also eventually want to run a local orderbook for all of these exchanges.
-
-I have found this implementation:
-[https://github.com/kmanley/orderbook]
-
-Which is an implementation of this quant cup winner apparently
-[https://web.archive.org/web/20141222151051/https://dl.dropboxusercontent.com/u/3001534/engine.c]
 
 Hopefully, I wish to generalise this as much as possible, so that we can spread this out across 2-3 centralised exchanges.
 Once this is done, I hope I can set up some way to check the prices for decentralised exchanges.

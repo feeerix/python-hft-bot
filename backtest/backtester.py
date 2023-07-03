@@ -218,6 +218,18 @@ class Backtester:
         positions_df = pd.DataFrame(positions, columns=['Open Time', 'Close Time', 'Type', 'Opening Price', 'Closing Price', 'Profit', 'Capital'])
         
     def test_runv0(self, test_strat:strategy, capital:float):
+        settings_string = str(test_strat.indicator_settings_list)
+        settings_hash = sha256(settings_string.encode()).hexdigest()
+        
+        filepath = f'db/strategies/results/'
+
+        # Create folder if it doesn't exist
+        if not folder_exists(settings_hash, filepath):
+            create_folder(settings_hash, filepath)
+        else:
+            return None
+
+
         ohlc = ['open', 'high', 'low', 'close']
         # To update
         init_capital = capital
@@ -484,10 +496,6 @@ class Backtester:
         print(line)
         print("RESULTS DATA")
         positions_df['Duration'] = (positions_df['Close Time'] - positions_df['Open Time']) / (60 * 1000)
-
-        print(positions_df)
-        position_hash = sha256(str(positions_df).encode()).hexdigest()
-        print(position_hash)
         
         """
 
@@ -532,23 +540,17 @@ class Backtester:
             "return_stdev": positions_df['Returns PCT'].std()
         }
 
-        filepath = f'db/strategies/results/'
-
-        # Create folder if it doesn't exist
-        if not folder_exists(position_hash, filepath):
-            create_folder(position_hash, filepath)
-
-
+        
         # Quick hack to convert floats
         for x in result.keys():
             result[x] = str(result[x])
+
         
         # Write the results in this folder
-        
         write_json(
             result,
             "results.json",
-            filepath+position_hash+"/"
+            filepath+settings_hash+"/"
         )
         
 
