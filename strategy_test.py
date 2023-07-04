@@ -132,7 +132,7 @@ bt = Backtester(verbose=True)
 
 
 # bt.test_run(bt.init_test_strat())
-test_strat.write_settings()
+# test_strat.write_settings()
 print(line)
 # print(test_strat.df.columns.to_list())
 bt.test_runv0(test_strat, 1000)
