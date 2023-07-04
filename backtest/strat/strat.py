@@ -59,12 +59,6 @@ class strategy:
         self.df['take_profit'] = None
         self.df['stop_loss'] = None
 
-        # if timeframe:
-        #     for timeframe in self.h_df:
-        #         timeframe['in_position'] = 0
-        #         timeframe['take_profit'] = None
-        #         timeframe['stop_loss'] = None
-
     # Add indicator to self.df
     def add_indicator(self, _indicator:indicator, recording:bool=True):
         if self.verbose:
@@ -206,7 +200,9 @@ class strategy:
 
     # Hardstop to STOP all trading
     def add_hardstop(self):
-        # Make sure the bot doesn't get you liquidated and lose all your money
+        """
+        This is a function that will look take a settings class and look for scenarios where we will perform a hardstop (and potentially restart)
+        """
         pass
 
     

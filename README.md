@@ -5,7 +5,7 @@ It's turned out into quite a large project that it seems I basically want to do 
 
 ## Current Focus Points
 
-- Currently I am hashing the positions df, where I should be hashing the settings, and also checking the results. This will potentially reduce the required compute depending on what I'm looking to do.
+- Hashing seems to come quite far into the backtesting process, might be more prudent to check the hash at an earlier time (early as possible) to minimise compute required.
 
 ## Next Goals
 

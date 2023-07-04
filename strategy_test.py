@@ -120,8 +120,6 @@ test_strat.add_entry(short1)
 test_strat.add_close(long1_close)
 test_strat.add_close(short1_close)
 
-
-
 # ---
 # FIND A WAY TO CREATE STRATEGIES
 # ---
