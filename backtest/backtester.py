@@ -403,6 +403,11 @@ class Backtester:
         else:
             resolution = 100
 
+
+        """
+        
+        """
+
         # Loop through rows
         for row in test_strat.df.itertuples():
             i = row.Index
@@ -411,7 +416,26 @@ class Backtester:
                 if (i % resolution) == 0:
                     print(f"{round((i/distance)*100, 3)}% COMPLETE")
             
-            # If long position is possible and no position is open, open long position
+            """
+            If long position is possible and no position is open, open long position.
+            At the moment, we're currently looking via the row.long1
+
+            We will want to call the rows in a different way.
+            """
+            # print(row[1])
+            # print(getattr(row, "time"))
+            # exit()
+            # print(test_strat.indicator_settings_list)
+            # Get a list of unique 'func_name' values
+            print(test_strat.position_condition_settings)
+            exit()
+            func_names = list(set(entry['func_name'] for entry in test_strat.position_condition_settings))
+            print(func_names)
+            # exit()
+            for pos_type in ['long', 'short']:
+                for cond_idx in range(len(test_strat.position_condition_settings[pos_type])):
+                    print(test_strat.position_condition_settings[pos_type])
+            exit()
             if row.long1 and row.long1 == 1 and position is None:
                 
                 position = 'long'

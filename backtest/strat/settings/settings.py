@@ -36,7 +36,8 @@ class settings:
             "func_name": func_name,
             "columns": [], # Programatically get column names
             "arguments": arguments,
-            "transform": transform
+            "transform": transform,
+            # "open": arguments.pop('open_close')
         }
 
         _utility = ['above', 'above_value', 'below', 'below_value', 'cross']
