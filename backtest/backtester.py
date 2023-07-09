@@ -217,23 +217,28 @@ class Backtester:
         # Create positions dataframe
         positions_df = pd.DataFrame(positions, columns=['Open Time', 'Close Time', 'Type', 'Opening Price', 'Closing Price', 'Profit', 'Capital'])
         
-    def test_runv0(self, test_strat:strategy, capital:float):
-        settings_string = str(test_strat.indicator_settings_list)
-        settings_hash = sha256(settings_string.encode()).hexdigest()
-        
+    def test_runv0(self, test_strat:strategy, capital:float, run_settings:settings=None, exchange_settings:settings=None, settings_write:bool=False):
         filepath = f'db/strategies/results/'
 
-        # Create folder if it doesn't exist
-        if not folder_exists(settings_hash, filepath):
-            create_folder(settings_hash, filepath)
-        else:
-            return None
+        if settings_write:
+            settings_string = str(test_strat.indicator_settings_list)
+            settings_hash = sha256(settings_string.encode()).hexdigest()
+
+            # Create folder if it doesn't exist
+            if not folder_exists(settings_hash, filepath):
+                create_folder(settings_hash, filepath)
+            else:
+                print(f"\'{settings_hash}\' folder exists.")
+
+                # Prints the previous results - NOTE it does not consider the timeframe and starttime/endtime of the backtest
+                test_json = get_json(f"{filepath}{settings_hash}/results.json")
+                print(test_json)
+                return None
 
 
         ohlc = ['open', 'high', 'low', 'close']
         # To update
         init_capital = capital
-
         
         position = None
         opening_price = None
@@ -253,13 +258,17 @@ class Backtester:
         else:
             resolution = 100
 
-
-
+        print("POSITION CONDITION SETTINGS")
+        print(test_strat.position_condition_settings)
+        
         # Loop through rows
         for row in test_strat.df.itertuples():
 
             # print(row)
-            
+            # for x in ohlc:
+            #     print(getattr(row, x))
+            # exit()
+
             i = row.Index
             
             if self.verbose:
@@ -267,228 +276,219 @@ class Backtester:
                     print(f"{round((i/distance)*100, 3)}% COMPLETE")
 
             
-            # If long position is possible and no position is open, open long position
-            if row.long1 and row.long1 == 1 and position is None:
-                
-                position = 'long'
-                opening_price = row.close
-                open_time = row.close_time
 
-                position_size = capital / opening_price
-                
-                fee += position_size * (0.1 / 100)
+            # exchange_settings.data['arguments']['maker_fee']
+            if position is None:
+                # Cycle every position type (long/short/arb) etc
+                for pos_type in test_strat.position_condition_settings.keys():
 
-                take_profit = opening_price + (row.ATRe_21 * 2)
-                trailing_trigger = opening_price + (row.ATRe_21 * 1.6)
-                trailing_stop = opening_price + (row.ATRe_21 * 1.4)
-
-
-                trailing_trigger1 = opening_price + (row.ATRe_21 * 1.4)
-                trailing_stop1 = opening_price + (row.ATRe_21 * 1.3)
-
-                trailing_trigger2 = opening_price + (row.ATRe_21 * 1.3)
-                trailing_stop2 = opening_price + (row.ATRe_21 * 1.1)
-
-                trailing_trigger3 = opening_price + (row.ATRe_21 * 1)
-                trailing_stop3 = opening_price + (row.ATRe_21 * 0.5)
-
-
-                stop_loss = opening_price - (row.ATRe_21 * 0.2)
-
-                _triggers = [
-                    trailing_trigger,
-                    trailing_trigger1,
-                    trailing_trigger2,
-                    trailing_trigger3,
-                    # trailing_trigger4
-                ]
-
-                _stops = [
-                    trailing_stop,
-                    trailing_stop1,
-                    trailing_stop2,
-                    trailing_stop3,
-                    # trailing_stop4
-                ]
-
-            # If short position is possible and no position is open, open short position
-            elif row.short1 and row.short1 == 1 and position is None:
-                position = 'short'
-                opening_price = row.close
-                open_time = row.close_time
-
-                position_size = capital / opening_price
-
-                fee += position_size * (0.1 / 100)
-
-                take_profit = opening_price - (row.ATRe_21 * 2)
-                trailing_trigger = opening_price - (row.ATRe_21 * 1.6)
-                trailing_stop = opening_price - (row.ATRe_21 * 1.4)
-
-                trailing_trigger1 = opening_price - (row.ATRe_21 * 1.4)
-                trailing_stop1 = opening_price - (row.ATRe_21 * 1.3)
-
-                trailing_trigger2 = opening_price - (row.ATRe_21* 1.3)
-                trailing_stop2 = opening_price - (row.ATRe_21 * 1.1)
-
-                trailing_trigger3 = opening_price - (row.ATRe_21 * 0.9)
-                trailing_stop3 = opening_price - (row.ATRe_21 * 0.8)
-
-                stop_loss = opening_price + (row.ATRe_21 * 0.2)
-
-                _triggers = [
-                    trailing_trigger,
-                    trailing_trigger1,
-                    trailing_trigger2,
-                    trailing_trigger3,
-                    # trailing_trigger4
-                ]
-                _stops = [
-                    trailing_stop,
-                    trailing_stop1,
-                    trailing_stop2,
-                    trailing_stop3,
-                    # trailing_stop4
-                ]
-            
-            # If long position is open and long_close is 1, close long position and calculate profit
-            elif position == 'long':
-                
-                if any(price < stop_loss for price in [row.open, row.high, row.low, row.close]):
-                    closing_time = row.close_time
-                    closing_price = stop_loss
-                    fee += position_size * (0.1 / 100)
-                    
-
-                    profit = position_size * (closing_price - opening_price) - fee
-                    capital += profit
-                    
-                    positions.append({
-                        'Open Time': open_time,
-                        'Close Time': closing_time,
-                        'Type': 'long',
-                        'Opening Price': opening_price,
-                        'Closing Price': closing_price,
-                        'Take Profit': take_profit,
-                        'Stop Loss': stop_loss,
-                        'Profit': profit,
-                        'Capital': capital
-                    })
-
-                    open_time = None
-                    closing_time = None
-                    position = None
-                    opening_price = None
-                    closing_price = None
-                    position_size = 0
-                    fee = 0
-
-                elif  any(price > take_profit for price in [row.open, row.high, row.low, row.close]):
-                    
-                    closing_time = test_strat.df.loc[i, 'close_time']
-                    closing_price = take_profit
-                    fee += position_size * (0.1 / 100)
-                    
-
-                    profit = position_size * (closing_price - opening_price) - fee
-                    capital += profit
-                                        
-                    positions.append({
-                        'Open Time': open_time,
-                        'Close Time': closing_time,
-                        'Type': 'long',
-                        'Opening Price': opening_price,
-                        'Closing Price': closing_price,
-                        'Take Profit': take_profit,
-                        'Stop Loss': stop_loss,
-                        'Profit': profit,
-                        'Capital': capital
-                    })
-
-                    open_time = None
-                    closing_time = None
-                    position = None
-                    opening_price = None
-                    closing_price = None
-                    position_size = 0
-                    fee = 0
-                    closing_price = take_profit
-
-                else:
-                    for _trigger_idx in range(len(_triggers)):
-                        if (test_strat.df.loc[i, "close"] > _triggers[_trigger_idx]):
-                            stop_loss = _stops[_trigger_idx]
+                    for idx in range(len(test_strat.position_condition_settings[pos_type])):
+                        pos_name = test_strat.position_condition_settings[pos_type][idx]['name']
+                        
+                        # if the position type exists:
+                        if getattr(row, pos_name) and (getattr(row, pos_name) == 1):
                             
-            # If short position is open and short_close is 1, close short position and calculate profit
-            elif position == 'short':
+                            if self.verbose:
+                                print(f"POS_TYPE: {pos_type}")
+                                print(f"CURRENT POSITION: {position}")
+                                print("CREATING POSITION")
+                                print(f"POS_NAME: {pos_name}")
 
-                if any(price > stop_loss for price in [row.open, row.high, row.low, row.close]):
-                    closing_time = test_strat.df.loc[i, 'close_time']
-                    closing_price = stop_loss
+                            if pos_type == 'short':
+                                short_inverse = -1
+                            else:
+                                short_inverse = 1
+                        
 
-                    fee += position_size * (0.1 / 100)
-                    capital -= fee
+                            # Get position type
+                            position = pos_type
 
-                    profit = position_size * (opening_price - closing_price) - fee
-                    capital += profit
+                            opening_price = row.close
+                            open_time = row.close_time
 
-                    positions.append({
-                        'Open Time': open_time,
-                        'Close Time': closing_time,
-                        'Type': 'short',
-                        'Opening Price': opening_price,
-                        'Closing Price': closing_price,
-                        'Take Profit': take_profit,
-                        'Stop Loss': stop_loss,
-                        'Profit': profit,
-                        'Capital': capital,
-                        'Fee': fee
-                    })
-                    open_time = None
-                    closing_time = None
-                    position = None
-                    opening_price = None
-                    closing_price = None
-                    position_size = 0
-                    fee = 0
-                    _triggers = []
+                            position_size = capital / opening_price
+                            
+                            fee += position_size * (0.1 / 100)
 
-                elif any(price < take_profit for price in [row.open, row.high, row.low, row.close]):
-                    closing_time = test_strat.df.loc[i, 'close_time']
-                    closing_price = take_profit
+                            take_profit = opening_price + (row.ATRe_21 * 2 * short_inverse)
+                            trailing_trigger = opening_price + (row.ATRe_21 * 1.6 * short_inverse)
+                            trailing_stop = opening_price + (row.ATRe_21 * 1.4 * short_inverse)
 
 
-                    fee += position_size * (0.1 / 100)
-                    capital -= fee
+                            trailing_trigger1 = opening_price + (row.ATRe_21 * 1.4 * short_inverse)
+                            trailing_stop1 = opening_price + (row.ATRe_21 * 1.3 * short_inverse)
 
-                    profit = position_size * (opening_price - closing_price) - fee
-                    capital += profit
+                            trailing_trigger2 = opening_price + (row.ATRe_21 * 1.3 * short_inverse)
+                            trailing_stop2 = opening_price + (row.ATRe_21 * 1.1 * short_inverse)
 
-                    positions.append({
-                        'Open Time': open_time,
-                        'Close Time': closing_time,
-                        'Type': 'short',
-                        'Opening Price': opening_price,
-                        'Closing Price': closing_price,
-                        'Take Profit': take_profit,
-                        'Stop Loss': stop_loss,
-                        'Profit': profit,
-                        'Capital': capital,
-                        'Fee': fee
-                    })
-                    open_time = None
-                    closing_time = None
-                    position = None
-                    opening_price = None
-                    closing_price = None
-                    position_size = 0
-                    fee = 0
-                    _triggers = []
+                            trailing_trigger3 = opening_price + (row.ATRe_21 * 1 * short_inverse)
+                            trailing_stop3 = opening_price + (row.ATRe_21 * 0.5 * short_inverse)
 
-                for _trigger_idx in range(len(_triggers)):
-                    if (test_strat.df.loc[i, "close"] < _triggers[_trigger_idx]):
-                        stop_loss = _stops[_trigger_idx]
 
+                            stop_loss = opening_price - (row.ATRe_21 * 0.25 * short_inverse)
+
+                            _triggers = [
+                                trailing_trigger,
+                                trailing_trigger1,
+                                trailing_trigger2,
+                                trailing_trigger3,
+                                # trailing_trigger4
+                            ]
+
+                            _stops = [
+                                trailing_stop,
+                                trailing_stop1,
+                                trailing_stop2,
+                                trailing_stop3,
+                                # trailing_stop4
+                            ]
+                            
+                  
+            else:
+                print(f"LONG/SHORT: {position}")
+                row_price =  [getattr(row, key) for key in ohlc]
+                if position == "long":
+                    if any(price < stop_loss for price in row_price):
+
+                        if self.verbose:
+                            print("-- STOPLOSS HIT! --")
+
+                        closing_time = row.close_time
+                        closing_price = stop_loss
+                        fee += position_size * (0.1 / 100)
+                        
+
+                        profit = position_size * (closing_price - opening_price) - fee
+                        capital += profit
+                        
+                        positions.append({
+                            'Open Time': open_time,
+                            'Close Time': closing_time,
+                            'Type': 'long',
+                            'Opening Price': opening_price,
+                            'Closing Price': closing_price,
+                            'Take Profit': take_profit,
+                            'Stop Loss': stop_loss,
+                            'Profit': profit,
+                            'Capital': capital
+                        })
+
+                        open_time = None
+                        closing_time = None
+                        position = None
+                        opening_price = None
+                        closing_price = None
+                        position_size = 0
+                        fee = 0
+
+                    elif  any(price > take_profit for price in row_price):
+                    
+                        closing_time = test_strat.df.loc[i, 'close_time']
+                        closing_price = take_profit
+                        fee += position_size * (0.1 / 100)
+                        
+
+                        profit = position_size * (closing_price - opening_price) - fee
+                        capital += profit
+                                            
+                        positions.append({
+                            'Open Time': open_time,
+                            'Close Time': closing_time,
+                            'Type': 'long',
+                            'Opening Price': opening_price,
+                            'Closing Price': closing_price,
+                            'Take Profit': take_profit,
+                            'Stop Loss': stop_loss,
+                            'Profit': profit,
+                            'Capital': capital
+                        })
+
+                        open_time = None
+                        closing_time = None
+                        position = None
+                        opening_price = None
+                        closing_price = None
+                        position_size = 0
+                        fee = 0
+                        closing_price = take_profit
+
+                    else:
+                        for _trigger_idx in range(len(_triggers)):
+                            if (test_strat.df.loc[i, "close"] > _triggers[_trigger_idx]):
+                                stop_loss = _stops[_trigger_idx]
+                elif position == "short":
+                    if any(price > stop_loss for price in [row.open, row.high, row.low, row.close]):
+                        
+                        if self.verbose:
+                            print("-- STOPLOSS HIT! --")
+
+                        closing_time = test_strat.df.loc[i, 'close_time']
+                        closing_price = stop_loss
+
+                        fee += position_size * (0.1 / 100)
+                        capital -= fee
+
+                        profit = position_size * (opening_price - closing_price) - fee
+                        capital += profit
+
+                        positions.append({
+                            'Open Time': open_time,
+                            'Close Time': closing_time,
+                            'Type': 'short',
+                            'Opening Price': opening_price,
+                            'Closing Price': closing_price,
+                            'Take Profit': take_profit,
+                            'Stop Loss': stop_loss,
+                            'Profit': profit,
+                            'Capital': capital,
+                            'Fee': fee
+                        })
+                        open_time = None
+                        closing_time = None
+                        position = None
+                        opening_price = None
+                        closing_price = None
+                        position_size = 0
+                        fee = 0
+                        _triggers = []
+
+                
+                    elif any(price < take_profit for price in [row.open, row.high, row.low, row.close]):
+                        closing_time = test_strat.df.loc[i, 'close_time']
+                        closing_price = take_profit
+
+
+                        fee += position_size * (0.1 / 100)
+                        capital -= fee
+
+                        profit = position_size * (opening_price - closing_price) - fee
+                        capital += profit
+
+                        positions.append({
+                            'Open Time': open_time,
+                            'Close Time': closing_time,
+                            'Type': 'short',
+                            'Opening Price': opening_price,
+                            'Closing Price': closing_price,
+                            'Take Profit': take_profit,
+                            'Stop Loss': stop_loss,
+                            'Profit': profit,
+                            'Capital': capital,
+                            'Fee': fee
+                        })
+                        open_time = None
+                        closing_time = None
+                        position = None
+                        opening_price = None
+                        closing_price = None
+                        position_size = 0
+                        fee = 0
+                        _triggers = []
+
+                    for _trigger_idx in range(len(_triggers)):
+                        if (test_strat.df.loc[i, "close"] < _triggers[_trigger_idx]):
+                            stop_loss = _stops[_trigger_idx]
+                    
         # Create positions dataframe
         positions_df = pd.DataFrame(positions, columns=['Open Time', 'Close Time', 'Type', 'Opening Price', 'Closing Price', 'Profit', 'Capital'])
 
@@ -503,7 +503,6 @@ class Backtester:
         
         """
 
-        # exit()
         wins = (positions_df['Profit'] > 0).sum()
         losses = (positions_df['Profit'] < 0).sum()
         start = datetime.fromtimestamp(test_strat.df['time'].iloc[0]/1000, tz=timezone.utc)
@@ -541,19 +540,19 @@ class Backtester:
         }
 
         
-        # Quick hack to convert floats
-        for x in result.keys():
-            result[x] = str(result[x])
+        print(result)
+        if settings_write:
+            # Quick hack to convert floats
+            for x in result.keys():
+                result[x] = str(result[x])
 
-        
-        # Write the results in this folder
-        write_json(
-            result,
-            "results.json",
-            filepath+settings_hash+"/"
-        )
-        
-
+            # Write the results in this folder
+            write_json(
+                result,
+                "results.json",
+                filepath+settings_hash+"/"
+            )
+        print("END")
         
     def start_test(self, test_strat:strategy, capital:float):
         pass

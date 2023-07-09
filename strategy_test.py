@@ -32,7 +32,7 @@ start = 1569888000 # ETH / BTC
 # start = 1609502400
 end = 1672531200
 # end = 1672531200
-df = database(verbose=True).kline_df('ETHUSDT', '1m', start, end)
+df = database(verbose=True).kline_df('ETHUSDT', '1h', start, end)
 
 # Create method to create strategies easily
 test_strat = strategy("default", df, retreive=False)
@@ -109,16 +109,34 @@ stochrsi_bearish_trigger = settings("stochrsi_bullcross", "cross", {"series_a": 
 test_strat.add_indicator(indicator(stochrsi_bullish_trigger))
 test_strat.add_indicator(indicator(stochrsi_bearish_trigger))
 
-long1 = settings("long1","long",{"open": {True: ["EMA_144_A_EMA_233", "EMA_8_B_EMA_21", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0", "STOCHRSIk_34_34_8_8_XA_STOCHRSId_34_34_8_8"],False:[]}, "close":{True:[],False:[]}})
-short1 = settings("short1","short",{"open":{True:["STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0", "STOCHRSIk_34_34_8_8_XB_STOCHRSId_34_34_8_8", "EMA_144_B_EMA_233", "EMA_8_B_EMA_21"],False:[]}, "close":{True:[],False:[]}})
+long1 = settings(
+    "long1",
+    "long",
+    {
+        "open": {True: ["EMA_144_A_EMA_233", "EMA_8_B_EMA_21", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0", "STOCHRSIk_34_34_8_8_XA_STOCHRSId_34_34_8_8"],False:[]}, 
+        "close":{True:["EMA_144_B_EMA_233", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0"],False:[]}
+    }
+)
 
-long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:["EMA_144_B_EMA_233", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0"],False:[]}})
-short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["EMA_144_A_EMA_233", "STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0"],False:[]}})
+short1 = settings(
+    "short1",
+    "short",
+    {
+        "open":{True:["STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0", "STOCHRSIk_34_34_8_8_XB_STOCHRSId_34_34_8_8", "EMA_144_B_EMA_233", "EMA_8_B_EMA_21"],False:[]}, 
+        "close":{True:["EMA_144_A_EMA_233", "STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0"],False:[]}
+    }
+)
 
+
+
+# long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:["EMA_144_B_EMA_233", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0"],False:[]}})
+# short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["EMA_144_A_EMA_233", "STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0"],False:[]}})
+
+# We are now adjusting how the settings
 test_strat.add_entry(long1)
 test_strat.add_entry(short1)
-test_strat.add_close(long1_close)
-test_strat.add_close(short1_close)
+# test_strat.add_close(long1_close)
+# test_strat.add_close(short1_close)
 
 # ---
 # FIND A WAY TO CREATE STRATEGIES
@@ -134,7 +152,7 @@ test_strat.write_settings()
 print(line)
 # print(test_strat.df.columns.to_list())
 bt.test_runv0(test_strat, 1000)
-print(test_strat.df.columns.to_list())
+# print(test_strat.df.columns.to_list())
 
 """
 Get List of indicators

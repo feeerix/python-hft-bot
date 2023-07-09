@@ -55,6 +55,7 @@ class settings:
     def hash(self) -> str:
         return hashlib.md5(bytes(repr(sorted(self.data.items())), "utf-8")).hexdigest()
 
+    # TODO - Make sure is still required and works correct
     def validate_settings(self): 
         required_params = get_required_params(self.data['func_name'])
         if self.utility:
@@ -77,10 +78,3 @@ class settings:
             # Correct
             return True
          
-
-    def write_settings(self):
-        pass
-
-    
-    def get_settings(self):
-        pass
