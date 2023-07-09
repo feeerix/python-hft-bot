@@ -133,16 +133,21 @@ short1 = settings(
     }
 )
 
+exchange_settings = settings(
+    "binance",
+    "binance",
+    {
+        "maker_fee": 0.1,
+        "taker_fee": 0.2
+    }
+)
 
 
-# long1_close = settings("long1_close","long",{"open":{True:[],False:[]}, "close":{True:["EMA_144_B_EMA_233", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0"],False:[]}})
-# short1_close = settings("short1_close","short",{"open":{True:[],False:[]}, "close":{True:["EMA_144_A_EMA_233", "STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0"],False:[]}})
 
 # We are now adjusting how the settings
 test_strat.add_entry(long1)
 test_strat.add_entry(short1)
-# test_strat.add_close(long1_close)
-# test_strat.add_close(short1_close)
+
 
 # ---
 # FIND A WAY TO CREATE STRATEGIES
@@ -156,14 +161,10 @@ bt = Backtester(verbose=True)
 # bt.test_run(bt.init_test_strat())
 # test_strat.write_settings()
 print(line)
+
+# def test_runv0(self, test_strat:strategy, capital:float, run_settings:settings=None, exchange_settings:settings=None, settings_write:bool=False):
+bt.test_runv0(test_strat, 1000, exchange_settings=exchange_settings)
 # print(test_strat.df.columns.to_list())
-# <<<<<<< HEAD
-bt.test_runv0(test_strat, 1000)
-# print(test_strat.df.columns.to_list())
-# =======
-# bt.test_runv1(test_strat, 1000)
-print(test_strat.df.columns.to_list())
-# >>>>>>> 352442bdff94838c27720307d1bee356e9f606a4
 
 """
 Get List of indicators

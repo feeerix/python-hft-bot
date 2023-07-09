@@ -220,6 +220,9 @@ class Backtester:
     def test_runv0(self, test_strat:strategy, capital:float, run_settings:settings=None, exchange_settings:settings=None, settings_write:bool=False):
         filepath = f'db/strategies/results/'
 
+        maker_fee = exchange_settings.data['arguments']['maker_fee']
+             
+
         if settings_write:
             settings_string = str(test_strat.indicator_settings_list)
             settings_hash = sha256(settings_string.encode()).hexdigest()
@@ -274,8 +277,6 @@ class Backtester:
             if self.verbose:
                 if (i % resolution) == 0:
                     print(f"{round((i/distance)*100, 3)}% COMPLETE")
-
-            
 
             # exchange_settings.data['arguments']['maker_fee']
             if position is None:
@@ -342,9 +343,9 @@ class Backtester:
                                 trailing_stop3,
                                 # trailing_stop4
                             ]
-                            
-                  
+                                 
             else:
+                
                 print(f"LONG/SHORT: {position}")
                 row_price =  [getattr(row, key) for key in ohlc]
                 if position == "long":
@@ -355,7 +356,7 @@ class Backtester:
 
                         closing_time = row.close_time
                         closing_price = stop_loss
-                        fee += position_size * (0.1 / 100)
+                        fee += position_size * (maker_fee / 100)
                         
 
                         profit = position_size * (closing_price - opening_price) - fee
@@ -381,13 +382,12 @@ class Backtester:
                         position_size = 0
                         fee = 0
 
-                    elif  any(price > take_profit for price in row_price):
+                    elif any(price > take_profit for price in row_price):
                     
                         closing_time = test_strat.df.loc[i, 'close_time']
                         closing_price = take_profit
-                        fee += position_size * (0.1 / 100)
+                        fee += position_size * (maker_fee / 100)
                         
-
                         profit = position_size * (closing_price - opening_price) - fee
                         capital += profit
                                             
@@ -416,8 +416,9 @@ class Backtester:
                         for _trigger_idx in range(len(_triggers)):
                             if (test_strat.df.loc[i, "close"] > _triggers[_trigger_idx]):
                                 stop_loss = _stops[_trigger_idx]
+                                
                 elif position == "short":
-                    if any(price > stop_loss for price in [row.open, row.high, row.low, row.close]):
+                    if any(price > stop_loss for price in row_price):
                         
                         if self.verbose:
                             print("-- STOPLOSS HIT! --")
@@ -425,7 +426,7 @@ class Backtester:
                         closing_time = test_strat.df.loc[i, 'close_time']
                         closing_price = stop_loss
 
-                        fee += position_size * (0.1 / 100)
+                        fee += position_size * (maker_fee / 100)
                         capital -= fee
 
                         profit = position_size * (opening_price - closing_price) - fee
@@ -453,12 +454,12 @@ class Backtester:
                         _triggers = []
 
                 
-                    elif any(price < take_profit for price in [row.open, row.high, row.low, row.close]):
+                    elif any(price < take_profit for price in row_price):
                         closing_time = test_strat.df.loc[i, 'close_time']
                         closing_price = take_profit
 
 
-                        fee += position_size * (0.1 / 100)
+                        fee += position_size * (maker_fee / 100)
                         capital -= fee
 
                         profit = position_size * (opening_price - closing_price) - fee
