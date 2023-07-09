@@ -109,14 +109,37 @@ stochrsi_bearish_trigger = settings("stochrsi_bullcross", "cross", {"series_a": 
 test_strat.add_indicator(indicator(stochrsi_bullish_trigger))
 test_strat.add_indicator(indicator(stochrsi_bearish_trigger))
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 352442bdff94838c27720307d1bee356e9f606a4
 long1 = settings(
     "long1",
     "long",
     {
+<<<<<<< HEAD
         "open": {True: ["EMA_144_A_EMA_233", "EMA_8_B_EMA_21", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0", "STOCHRSIk_34_34_8_8_XA_STOCHRSId_34_34_8_8"],False:[]}, 
         "close":{True:["EMA_144_B_EMA_233", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0"],False:[]}
     }
 )
+=======
+        "open": {
+            True: [
+                "EMA_144_A_EMA_233", 
+                "EMA_8_B_EMA_21", 
+                "STOCHRSIk_34_34_8_8_B_20_0", 
+                "STOCHRSId_34_34_8_8_B_20_0", 
+                "STOCHRSIk_34_34_8_8_XA_STOCHRSId_34_34_8_8"], 
+            False: []
+        },
+        "close": {
+            True: [],
+            False: []
+        }
+    }
+)
+short1 = settings("short1","short",{"open":{True:["STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0", "STOCHRSIk_34_34_8_8_XB_STOCHRSId_34_34_8_8", "EMA_144_B_EMA_233", "EMA_8_B_EMA_21"],False:[]}, "close":{True:[],False:[]}})
+>>>>>>> 352442bdff94838c27720307d1bee356e9f606a4
 
 short1 = settings(
     "short1",
@@ -148,11 +171,16 @@ bt = Backtester(verbose=True)
 
 
 # bt.test_run(bt.init_test_strat())
-test_strat.write_settings()
+# test_strat.write_settings()
 print(line)
 # print(test_strat.df.columns.to_list())
+<<<<<<< HEAD
 bt.test_runv0(test_strat, 1000)
 # print(test_strat.df.columns.to_list())
+=======
+bt.test_runv1(test_strat, 1000)
+print(test_strat.df.columns.to_list())
+>>>>>>> 352442bdff94838c27720307d1bee356e9f606a4
 
 """
 Get List of indicators

@@ -4,16 +4,15 @@ from lib.cli.listener import *
 from lib.cli.printer import *
 
 class Creator:
-    def __init__(self, empty_strategy:strategy) -> None:
-        self.strategy = empty_strategy
+    """
+    This is the creator class. We'll use this class to create strategies.
+    """
+    def __init__(self, _strategy:strategy) -> None:
+        self.strategy = strategy
 
-    def indicator_loop(self):
+
+    def check_strategy(self):
+        """
+        First we check that we have the conditions to open and subsequenlty close positions.
+        """
         pass
-
-    def entry_loop(self):
-        pass
-
-    def close_loop(self):
-        pass
-
-    
