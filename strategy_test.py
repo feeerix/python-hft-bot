@@ -160,7 +160,8 @@ bt = Backtester(verbose=True)
 print(line)
 
 # def test_runv0(self, test_strat:strategy, capital:float, run_settings:settings=None, exchange_settings:settings=None, settings_write:bool=False):
-bt.test_runv0(test_strat, 1000, exchange_settings=exchange_settings)
+# bt.test_runv0(test_strat, 1000, exchange_settings=exchange_settings)
+bt.test_runv0a(test_strat, 1000, exchange_settings=exchange_settings)
 # print(test_strat.df.columns.to_list())
 
 """

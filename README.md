@@ -5,6 +5,9 @@ It's turned out into quite a large project that it seems I basically want to do 
 
 ## Current Focus Points
 
+- Total revamp of following functions/classes
+  - test_runv0a (to eventually become the primary backtest function)
+  - dataframe that holds df data and is modified to include test_data
 - Double check that backtesting is indeed going correctly
 - Update to the latest blockchain data
 - Add the ability to check for the earliest and latest times in db
