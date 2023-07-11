@@ -77,9 +77,6 @@ Stochastic RSI bullish cross ->  Trigger
 Stochastic RSI (k & d) > 80 -> Overbought short term
 Stochastic RSI bearish cross ->  Trigger
 
-TP -> 3 x ATR
-SL -> 2 x ATR 
-
 Opposite for bearish
 """
 

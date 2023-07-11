@@ -5,7 +5,11 @@ It's turned out into quite a large project that it seems I basically want to do 
 
 ## Current Focus Points
 
-- Hashing seems to come quite far into the backtesting process, might be more prudent to check the hash at an earlier time (early as possible) to minimise compute required.
+- Double check that backtesting is indeed going correctly
+- Update to the latest blockchain data
+- Add the ability to check for the earliest and latest times in db
+- Integrate the websocket functionality into the model!
+- Allow live updates directly from websocket
 
 ## Next Goals
 

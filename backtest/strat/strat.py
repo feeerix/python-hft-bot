@@ -31,7 +31,9 @@ class strategy:
             "short": []
         }
         
+        # Initialise the DF
         self.init_df(df)
+
         if retreive:
             # Get the settings from JSON based on name
             self.get_settings()
@@ -186,7 +188,7 @@ class strategy:
         )
 
     # Get settings from file via name
-    def get_settings(self):
+    def get_settings(self, settings_id:str):
         strat_folder = f'db/strategies/settings/'
 
         self.indicator_settings_list = get_json(f"{strat_folder}{self.name}/indicator_settings.json")

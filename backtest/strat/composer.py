@@ -6,6 +6,14 @@ import inspect
 from lib.file.writer import *
 from lib.file.reader import *
 
+# TODO - create way for us to compose a strategy
+class Composer:
+    def __init__(self):
+        pass
+
+    def add_setting(self):
+        pass
+
 # Quick and dirty way to get the require params
 def get_params(verbosity:bool=False):
     # Get functions
