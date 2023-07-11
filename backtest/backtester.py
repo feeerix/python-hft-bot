@@ -17,6 +17,7 @@ from db.db import database
 from backtest.strat.indicator import indicator
 from backtest.strat.settings.settings import settings
 from backtest.strat.strat import strategy
+from backtest.position import *
 
 from lib.cli.printer import line
 
@@ -269,6 +270,7 @@ class Backtester:
         # Loop through all the rows
         for row in test_strat.df.itertuples():
             
+            # Row - index
             i = row.Index
 
             # Get a list of all OHLC
@@ -281,10 +283,10 @@ class Backtester:
 
             # If there is no existing position
             if position is None:
-
+                
                 # Cycle every position type (long/short/arb) etc
                 for pos_type in test_strat.position_condition_settings.keys():
-
+                    
                     # For every type of position that we're trying to open (could be high risk long or short term for example)
                     for idx in range(len(test_strat.position_condition_settings[pos_type])):
 
@@ -300,17 +302,14 @@ class Backtester:
                                 print(f"CURRENT POSITION: {position}")
                                 print("CREATING POSITION")
                                 print(f"POS_NAME: {pos_name}")
-                                # exit()
-
+                            
+                            short_inverse = 1
                             # If short we inverse
                             if pos_type == 'short':
                                 # We are short - inverse
+                                position_type = PositionType.SHORT
                                 short_inverse = -1
-                            else:
-                                # Do not inverse
-                                short_inverse = 1
-                        
-
+                            
                             # Get position type
                             position = pos_type
                             
@@ -387,6 +386,8 @@ class Backtester:
                             'Capital': capital
                         })
 
+                        print(position)
+
                         open_time = None
                         closing_time = None
                         position = None
@@ -394,6 +395,10 @@ class Backtester:
                         closing_price = None
                         position_size = 0
                         fee = 0
+
+
+
+                        exit()
 
                     elif any(price > take_profit for price in row_price):
                     
@@ -424,6 +429,8 @@ class Backtester:
                         position_size = 0
                         fee = 0
                         closing_price = take_profit
+
+                        exit()
 
                     else:
                         for _trigger_idx in range(len(_triggers)):
@@ -466,6 +473,8 @@ class Backtester:
                     fee = 0
                     _triggers = []
 
+                    exit()
+
             
                 elif any(price < take_profit for price in row_price):
                     closing_time = test_strat.df.loc[i, 'close_time']
@@ -498,6 +507,8 @@ class Backtester:
                     position_size = 0
                     fee = 0
                     _triggers = []
+
+                    exit()
 
                 for _trigger_idx in range(len(_triggers)):
                     if (test_strat.df.loc[i, "close"] < _triggers[_trigger_idx]):
