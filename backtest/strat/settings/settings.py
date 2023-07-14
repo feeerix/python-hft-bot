@@ -7,18 +7,19 @@ from lib.file.writer import *
 from backtest.strat.composer import get_required_params, write_required_params
 
 def import_setting(settings_data:dict, verbose:bool=False):
-    ret_data = settings(
+    ret_data = Settings(
         settings_data["name"], 
         settings_data["func_name"],
         arguments=settings_data["arguments"],
+        transform=settings_data["transform"],
         verbose=verbose
     )
     ret_data.data = settings_data
     return ret_data
 
-class settings:
+class Settings:
     # The main reason we create this class is so that we can load settings from the coresponding folders
-    def __init__(self, name:str, func_name:str, arguments:dict=None, transform:dict=None, verbose:bool=True) -> None:
+    def __init__(self, name:str, func_name:str, arguments:dict=None, transform:dict=None, verbose:bool=True, **kwargs) -> None:
         # Add the setting details based on what's added
 
         # settings = {
@@ -58,24 +59,5 @@ class settings:
 
     # TODO - Make sure is still required and works correct
     def validate_settings(self): 
-        required_params = get_required_params(self.data['func_name'])
-        if self.utility:
-            pass # TODO - set up validation
-        else:
-            ohlcv = ['open', 'high', 'low', 'close', 'volume']
-
-            for data_type in required_params.keys():
-
-                # Verbose print
-                if self.verbose:
-                    print(f"{data_type} // {required_params[data_type]}")
-                
-                # If data is required and the data is NOT within settings
-                if required_params[data_type] and data_type not in ohlcv:    
-                    if not data_type in self.data['arguments']:
-                        # INVALID - return false
-                        return False
-            
-            # Correct
-            return True
+        return True
          

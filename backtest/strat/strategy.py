@@ -11,7 +11,7 @@ from backtest.strat.settings.settings import import_setting, settings
 from lib.file.writer import folder_exists, create_folder, file_exists, write_json
 from lib.file.reader import get_json
 
-class strategy:
+class Strategy:
     def __init__(self, name:str, df:pd.DataFrame, verbose:bool=False, retreive:bool=False, higher_df:list=None): 
         self.name = name
         self.verbose = verbose

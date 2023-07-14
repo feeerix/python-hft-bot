@@ -4,8 +4,8 @@ import pandas_ta as ta
 import warnings
 
 # Loca Imports
-from db.db import database
-from backtest.strat.strat import strategy
+from db.database import database
+from backtest.strat.strategy import strategy
 from backtest.strat.settings.settings import settings
 from backtest.strat.indicator import indicator
 from backtest.backtester import Backtester

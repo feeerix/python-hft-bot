@@ -7,10 +7,17 @@ from dateutil.relativedelta import relativedelta
 from lib.api.binance.local import filename
 from lib.cli.printer import line
 
-class database:
+
+class Database:
+    """
+    Database class that we will use to create kline, trading signal and other dataframes.
+
+    """
     def __init__(self, verbose:bool=False):
         self.verbose = verbose
 
+
+    # Create a kline dataframe
     def kline_df(self, symbol:str, interval:str, starttime:int, endtime:int) -> pd.DataFrame:
         # Filepath based on inputs
         filepath = f"db/klines/{symbol.lower()}/{interval}/"

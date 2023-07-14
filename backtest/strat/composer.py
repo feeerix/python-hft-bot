@@ -72,7 +72,12 @@ def get_required_params(func_name:str, verbosity:bool=False) -> dict:
     return get_json("db/strategies/indicators/required_ta_params.json")[func_name]
 
 def write_settings(setting_name:str, verbosity:bool=False): # TODO - Make sure to add verbosity and return
+
+    # Get the parameters we want
     write_data = get_params()
+
+    if verbosity is True:
+        print(write_data)
 
     # Write to file
     write_json(

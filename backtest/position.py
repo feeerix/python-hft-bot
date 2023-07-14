@@ -43,7 +43,4 @@ class Position:
     def __init__(self, position_type:PositionType, trades:list):
         self.position_type = position_type
         self.trades = trades
-
-
-test_position = Position(PositionType.LONG, [])
     

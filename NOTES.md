@@ -17,4 +17,8 @@ So currently we'd want to:
 - In doing so, I can then use functions like: df_signals['EMA_8_A_EMA_21'] = df_market['EMA_8'] > df_market['EMA_21'] and df_signals['STOCHRSIk_34_34_8_8_XA_STOCHRSId_34_34_8_8'] = (df_market['STOCHRSIk_34_34_8_8'].shift(1) < df_market['STOCHRSId_34_34_8_8'].shift(1)) & (df_market['STOCHRSIk_34_34_8_8'] > df_market['STOCHRSId_34_34_8_8']) to create the df_signals dataframe.
 - Once doing so, we can start to rebuild the test_run function to take both of these into account.
 
+---
+
+I must remember that I may want to perform computation on a whole portfolio of assets, throughout time, for multiple data points. It would be a 4 dimensional matrix?
+
 Overall this will improve the computational efficiency as well as be easier to use.

@@ -9,7 +9,7 @@ from backtest.strat.settings import settings
 from backtest.strat.composer import get_required_params, write_required_params
 
 
-class indicator:
+class Indicator:
     def __init__(self, _settings:settings):
         # Add the func into the class
         self.ind_func = getattr(ta, _settings.data['func_name'])

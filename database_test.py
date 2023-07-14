@@ -9,7 +9,7 @@ import warnings
 from datetime import datetime, timezone
 
 # Loca Imports
-from db.db import database
+from db.database import database
 # from backtest.strat.strat import strategy
 # from backtest.strat.settings.settings import settings
 # from backtest.strat.indicator import indicator
