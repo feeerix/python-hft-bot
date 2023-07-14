@@ -6,8 +6,8 @@ from hashlib import sha256
 import time
 
 # Local Imports
-from backtest.strat.indicator import indicator
-from backtest.strat.settings.settings import import_setting, settings
+from backtest.strat.indicator import Indicator
+from backtest.strat.settings.settings import import_setting, Settings
 from lib.file.writer import folder_exists, create_folder, file_exists, write_json
 from lib.file.reader import get_json
 
@@ -41,7 +41,7 @@ class Strategy:
             # Add the indicators based on settings        
             for indicator_setting in self.indicator_settings_list:
                 new_setting = import_setting(indicator_setting)
-                self.add_indicator(indicator(new_setting), recording=False)
+                self.add_indicator(Indicator(new_setting), recording=False)
 
             # Add he position requirements based on settings
             for position_type in self.position_condition_settings.keys():
@@ -59,7 +59,7 @@ class Strategy:
         self.df = df
 
     # Add indicator to self.df
-    def add_indicator(self, _indicator:indicator, recording:bool=True):
+    def add_indicator(self, _indicator:Indicator, recording:bool=True):
         if self.verbose:
             print(_indicator.settings.data)
 
@@ -88,7 +88,7 @@ class Strategy:
         #     )
 
     # Add entry conditions
-    def add_entry(self, _settings:settings, recording:bool=True):
+    def add_entry(self, _settings:Settings, recording:bool=True):
         # Test print
         if self.verbose:
             print(_settings.data)
@@ -115,7 +115,7 @@ class Strategy:
             ), 1, 0)
 
     # Add close conditions
-    def add_close(self, _settings:settings, recording:bool=True):    
+    def add_close(self, _settings:Settings, recording:bool=True):    
         # Test print
         if self.verbose:
             print(_settings.data)

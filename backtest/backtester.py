@@ -12,11 +12,11 @@ from lib.api.binance.local import filename
 from lib.file.writer import *
 from lib.file.reader import *
 
-from db.db import database
+from db.database import Database
 
-from backtest.strat.indicator import indicator
-from backtest.strat.settings.settings import settings
-from backtest.strat.strat import strategy
+from backtest.strat.indicator import Indicator
+from backtest.strat.settings.settings import Settings
+from backtest.strat.strategy import Strategy
 from backtest.position import *
 
 from lib.cli.printer import line
@@ -29,11 +29,11 @@ class Backtester:
         self.verbose = verbose
 
     def create_db(self, symbol:str, interval:str, starttime:int, endtime:int):
-        self.db = database().kline_df(symbol, interval, starttime, endtime)
+        self.db = Database().kline_df(symbol, interval, starttime, endtime)
 
     
 
-    def test_run(self, test_strat:strategy, capital:float):
+    def test_run(self, test_strat:Strategy, capital:float):
         ohlc = ['open', 'high', 'low', 'close']
         # To update
         init_capital = capital
@@ -157,7 +157,7 @@ class Backtester:
         # Create positions dataframe
         positions_df = pd.DataFrame(positions, columns=['Open Time', 'Close Time', 'Type', 'Opening Price', 'Closing Price', 'Profit', 'Capital'])
         
-    def test_runv0(self, test_strat:strategy, capital:float, run_settings:settings=None, exchange_settings:settings=None, settings_write:bool=False):
+    def test_runv0(self, test_strat:Strategy, capital:float, run_settings:Settings=None, exchange_settings:Settings=None, settings_write:bool=False):
         # filepath to save strategies
         filepath = f'db/strategies/results/'
 
@@ -519,7 +519,7 @@ class Backtester:
             )
         print("END")
 
-    def test_runv0a(self, test_strat:strategy, capital:float, run_settings:settings=None, exchange_settings:settings=None, settings_write:bool=False):
+    def test_runv0a(self, test_strat:Strategy, capital:float, run_settings:Settings=None, exchange_settings:Settings=None, settings_write:bool=False):
         # filepath to save strategies
         filepath = f'db/strategies/results/'
 
@@ -638,5 +638,5 @@ class Backtester:
         # print("END")
     
 
-    def start_test(self, test_strat:strategy, capital:float):
+    def start_test(self, test_strat:Strategy, capital:float):
         pass
