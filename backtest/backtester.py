@@ -31,8 +31,6 @@ class Backtester:
     def create_db(self, symbol:str, interval:str, starttime:int, endtime:int):
         self.db = Database().kline_df(symbol, interval, starttime, endtime)
 
-    
-
     def test_run(self, test_strat:Strategy, capital:float):
         ohlc = ['open', 'high', 'low', 'close']
         # To update

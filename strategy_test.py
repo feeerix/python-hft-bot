@@ -30,8 +30,8 @@ start = 1569888000 # ETH / BTC
 
 # start = 1527480000 # XRP BUSD
 # start = 1609502400
-end = 1672531200
 # end = 1672531200
+end = 1685592000
 df = Database(verbose=True).kline_df('ETHUSDT', '1h', start, end)
 
 # Create method to create strategies easily

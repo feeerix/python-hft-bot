@@ -1,15 +1,9 @@
 # Imports
 import pandas as pd
-import pandas_ta as ta
-import plotly.graph_objects as go
-import plotly.express as px
-import inspect
-import numpy as np
-import warnings
 from datetime import datetime, timezone
 
 # Loca Imports
-from db.database import database
+from db.database import Database
 # from backtest.strat.strat import strategy
 # from backtest.strat.settings.settings import settings
 # from backtest.strat.indicator import indicator
@@ -20,17 +14,20 @@ from db.database import database
 # pd.set_option('display.max_columns', None)
 # pd.set_option('display.width', None)
 # pd.set_option('display.max_colwidth', None)
+
 pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
-# start = 1640995200
-# end = 1672531200
-# df = database(verbose=True).kline_df('ETHUSDT','15m',start,end)
-# print(f"FIRST VALUE: {df['time'].iloc[0]} // {datetime.fromtimestamp(int(df['time'].iloc[0]/1000), tz=pytz.UTC)}")
-# print(f"LAST VALUE: {df['time'].iloc[-1]} // {datetime.fromtimestamp(int(df['time'].iloc[-1]/1000), tz=pytz.UTC)}")
-# print(int(df['time'].iloc[-1]/1000))
+start = 1569888000
+end = 1685592000
 
-start = 1641998800
-end = 1662526700
-df = database(verbose=True).kline_df('ETHUSDT','15m',start,end)
+"""
+First we are looking to update the way we handle dataframes.
+Let's try to clean everything up and make everything more performant.
+
+"""
+
+df = Database(verbose=True).kline_df('ETHUSDT','1m',start,end)
+
+
 print(f"FIRST VALUE: {df['time'].iloc[0]} // {datetime.fromtimestamp(int(df['time'].iloc[0]/1000), tz=timezone.utc)}")
 print(f"LAST VALUE: {df['time'].iloc[-1]} // {datetime.fromtimestamp(int(df['time'].iloc[-1]/1000), tz=timezone.utc)}")

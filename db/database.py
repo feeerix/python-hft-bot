@@ -2,17 +2,27 @@
 import pandas as pd
 from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
+from enum import Enum
 
 # Local Imports
 from lib.api.binance.local import filename
 from lib.cli.printer import line
 
+class DatabaseType(Enum):
+    kline = "kline"
+    
 
+class _Database:
+    def __init__(self, symbol:str, interval:str, starttime:int, endtime:int, exchange:str, verbose:bool=False):
+        self.verbose = verbose
+        
+    
 class Database:
     """
     Database class that we will use to create kline, trading signal and other dataframes.
-
     """
+
+    # Initialises
     def __init__(self, verbose:bool=False):
         self.verbose = verbose
 

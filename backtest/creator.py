@@ -1,5 +1,5 @@
 # LOCAL IMPORTS
-from backtest.strat.strat import strategy
+from backtest.strat.strategy import strategy
 from lib.cli.listener import *
 from lib.cli.printer import *
 
