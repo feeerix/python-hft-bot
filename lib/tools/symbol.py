@@ -10,7 +10,7 @@ from lib.tools.exchange import Exchange
 Symbol class
 """
 
-class _Symbol:
+class Symbol:
     def __init__(self, symbol:str, assets:List[Asset], exchange:Exchange):
         self.symbol = symbol
         self.assets = assets

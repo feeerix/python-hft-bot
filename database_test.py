@@ -30,8 +30,9 @@ Let's also try to clean everything up and make everything more performant.
 
 """
 
-test_crawler = Crawler("db/klines/adabusd/4h/")
-test_crawler.verify()
+test_crawler = Crawler()
+test_crawler.verify_kline()
+
 # --------------------------------------------------------------------------------
 # df = Database(verbose=True).kline_df('ETHUSDT','1m',start,end)
 

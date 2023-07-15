@@ -13,3 +13,8 @@ def file_exists(path:str) -> bool:
     else:
         return False
     
+def list_folders(path:str) -> list:
+    return [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+
+def list_files(path:str) -> list:
+    return [name for name in os.listdir(path) if os.path.isfile(os.path.join(path, name))]

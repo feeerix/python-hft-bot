@@ -11,7 +11,7 @@ from lib.cli.printer import line
 from lib.tools.asset import Asset
 from lib.tools.exchange import Exchange
 from lib.tools.blockchain import Blockchain
-from lib.tools.symbol import _Symbol as Symbol
+from lib.tools.symbol import Symbol
 from lib.tools.interval import _Interval as Interval
 
 class DatabaseType(Enum):

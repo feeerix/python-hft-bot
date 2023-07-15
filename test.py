@@ -24,10 +24,6 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 # Trying to do everything manually
 # -------------------
 
-print(datetime.utcnow().timestamp())
-# print(int())
-# print(datetime.datetime.fromtimestamp(int(datetime.datetime.timestamp())))
-exit()
 
 exchange_info = get_json("./db/info/binance/exchange_info.json")
 
