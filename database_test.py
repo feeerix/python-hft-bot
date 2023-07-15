@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 from db.database import Database
 from db.database import _Database as DatabaseV2
 from lib.tools.internal.chunk import Chunk
+from lib.tools.internal.crawler import Crawler
+
 # from backtest.strat.strat import strategy
 # from backtest.strat.settings.settings import settings
 # from backtest.strat.indicator import indicator
@@ -24,12 +26,13 @@ end = 1685592000
 
 """
 First we are looking to update the way we handle dataframes.
-Let's try to clean everything up and make everything more performant.
+Let's also try to clean everything up and make everything more performant.
 
 """
 
-test_chunk = Chunk("db/klines/adabusd/4h", "binance-ADABUSD-4h-2019-11.csv")
-print(test_chunk.df)
+test_crawler = Crawler("db/klines/adabusd/4h/")
+test_crawler.verify()
+# --------------------------------------------------------------------------------
 # df = Database(verbose=True).kline_df('ETHUSDT','1m',start,end)
 
 

@@ -2,12 +2,13 @@
 import pandas as pd
 import pandas_ta as ta
 import warnings
+from datetime import datetime
 
 # Loca Imports
-from db.database import database
-from backtest.strat.strategy import strategy
-from backtest.strat.settings.settings import settings
-from backtest.strat.indicator import indicator
+from db.database import Database
+from backtest.strat.strategy import Strategy
+from backtest.strat.settings.settings import Settings
+from backtest.strat.indicator import Indicator
 from backtest.backtester import Backtester
 from lib.cli.printer import *
 from lib.cli.listener import *
@@ -22,6 +23,11 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 # -------------------
 # Trying to do everything manually
 # -------------------
+
+print(datetime.utcnow().timestamp())
+# print(int())
+# print(datetime.datetime.fromtimestamp(int(datetime.datetime.timestamp())))
+exit()
 
 exchange_info = get_json("./db/info/binance/exchange_info.json")
 
