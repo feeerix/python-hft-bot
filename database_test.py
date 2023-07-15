@@ -5,6 +5,9 @@ from datetime import datetime, timezone
 # Loca Imports
 from db.database import Database
 from db.database import _Database as DatabaseV2
+from db.database import DatabaseType
+from lib.tools.interval import _Interval as Interval
+from lib.tools.exchange import Exchange, ExchangeType
 from lib.tools.internal.chunk import Chunk
 from lib.tools.internal.crawler import Crawler
 
@@ -30,11 +33,14 @@ Let's also try to clean everything up and make everything more performant.
 
 """
 
-test_crawler = Crawler()
-test_crawler.verify_kline()
+# test_crawler = Crawler()
+# test_crawler.verify_kline()
+
+test_df = DatabaseV2(DatabaseType.kline,'ETHUSDT', Interval._1m, start, end, Exchange(ExchangeType.BINANCE),True)
+print(test_df)
 
 # --------------------------------------------------------------------------------
-# df = Database(verbose=True).kline_df('ETHUSDT','1m',start,end)
+df = Database(verbose=True).kline_df('ETHUSDT','1m',start,end)
 
 
 # print(f"FIRST VALUE: {df['time'].iloc[0]} // {datetime.fromtimestamp(int(df['time'].iloc[0]/1000), tz=timezone.utc)}")

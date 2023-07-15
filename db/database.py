@@ -21,7 +21,8 @@ class DatabaseType(Enum):
     info = 'info'
 
 class _Database:
-    
+    # @staticmethod
+    # def df()
 
     def __init__(self, database_type:DatabaseType, symbol:Symbol, interval:Interval, starttime:int, endtime:int, exchange:Exchange, verbose:bool=False):
         self.database_type = database_type

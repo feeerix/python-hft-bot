@@ -21,6 +21,4 @@ So currently we'd want to:
 
 I must remember that I may want to perform computation on a whole portfolio of assets, throughout time, for multiple data points. It would be a 4 dimensional matrix?
 
-Holy fuck I gotta redo the whole thing.
-
 Overall this will improve the computational efficiency as well as be easier to use.

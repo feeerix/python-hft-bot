@@ -34,7 +34,6 @@ class _Interval(Enum):
     def tc_rep(self) -> int:
         return self.value
     
-    
     def last_close(self) -> int:
         if self.ms:
             return get_last_closed_time(self.value) * 1000

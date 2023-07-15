@@ -3,6 +3,7 @@ from lib.api.updater import update
 from tests.battery import *
 from lib.tools.interval import *
 from lib.file.reader import *
+from lib.tools.internal.crawler import Crawler
 
 # Pair
 pair_list = ['BTCUSDT', 'ETHUSDT', 'ETHBTC']
