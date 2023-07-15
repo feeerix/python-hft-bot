@@ -37,66 +37,111 @@ class Crawler:
         
 
     def verify_kline(self, symbol:Symbol=None, interval:Interval=None):
+        """
+        It turns out that hashing very large files is quite computationally intensive!
+        """
         
         filepath = f"db/klines/"
 
+        # If we do not have a symbol 
         if not symbol:
             symbols = list_folders(filepath)
+            _hash_output = []
             for _symbol in symbols:
-                self.verify_kline(_symbol)
+                _hash_output.append(self.verify_kline(_symbol))
+            
+            # if self.verbose:
+            print(f"-- WRITING CHECK JSON TO: {filepath} --")
+
+            write_json(
+                _hash_output,
+                "check.json",
+                filepath
+            )
+            return None
+        
+        # Else add symbol
         else:
             filepath += symbol+"/"
 
+        # If we do not have interval but have symbol
         if not interval and symbol:
             intervals = list_folders(filepath)
+            _hash_output = []
             for _interval in intervals:
-                self.verify_kline(symbol, _interval)
-        else:
-            filepath += interval + "/"
+                _hash_output.append(self.verify_kline(symbol, _interval))
 
-        # filepath = f"db/klines/{symbol}/{interval}/"
-        print(f"FILEPATH: {filepath}")
-        all_data = []
-        all_hashes = []
+            print(f"-- WRITING CHECK JSON TO: {filepath} --")
+            # write json
+            write_json(
+                _hash_output,
+                "check.json",
+                filepath
+            )
 
-        # all filenames
-        filenames =  [f for f in os.listdir(filepath) 
-                      if os.path.isfile(os.path.join(filepath, f)) and f.endswith('.csv')]
+            return {
+                "hash": hashlib.sha256(str(_hash_output).encode()).hexdigest(),
+                "last_update": int(datetime.utcnow().timestamp()),
+                "symbol": symbol,
+                "folder": filepath
+            }
 
-        for filename in filenames:
-            chunk = Chunk(filepath, filename)
-            file_data = chunk.data()
-            file_hash = file_data['hash']
+        if symbol and interval:
+            filepath = f"db/klines/{symbol}/{interval}/"
             
-            # Check for duplicates
-            if file_hash in all_hashes:
-                print("duplicate found")
-                break
-        
-            # output
-            all_data.append(file_data)
-            all_hashes.append(file_hash)
+            all_data = []
+            all_hashes = []
 
-        
-        # Concatenate all hashes into a single string
-        concatenated_hashes = "".join(all_hashes)
-        # Compute the hash of the concatenated string
-        all_hashes_hash = hashlib.sha256(concatenated_hashes.encode()).hexdigest()
-        
-        output = {
-            "hash": all_hashes_hash,
-            "last_update": int(datetime.utcnow().timestamp()),
-            "data": all_data
-        }
+            # all filenames
+            filenames =  [f for f in os.listdir(filepath) 
+                        if os.path.isfile(os.path.join(filepath, f)) and f.endswith('.csv')]
+            
+            
+            for _filename in filenames:
 
-        # write json
-        write_json(
-            output,
-            "check.json",
-            filepath
-        )
+                chunk = Chunk(filepath, _filename)
+                file_data = chunk.data()
 
-        print(f"Verified folder: {filepath}")
+                print(f"Hashed: {file_data}")
+
+                file_hash = file_data['hash']
+                
+                # Check for duplicates
+                if file_hash in all_hashes:
+                    print("-- duplicate found --")
+                    break
+            
+                # output
+                all_data.append(file_data)
+                all_hashes.append(file_hash)
+
+            # Concatenate all hashes into a single string
+            concatenated_hashes = "".join(all_hashes)
+            # Compute the hash of the concatenated string
+            all_hashes_hash = hashlib.sha256(concatenated_hashes.encode()).hexdigest()
+            
+            output = {
+                "hash": all_hashes_hash,
+                "last_update": int(datetime.utcnow().timestamp()),
+                "data": all_data
+            }
+
+            print(f"-- FINAL WRITING CHECK JSON TO: {filepath} --")
+            # write json
+            write_json(
+                output,
+                "check.json",
+                filepath
+            )
+
+            print(f"Verified folder: {filepath} | {output['hash']}")
+
+            return {
+                "hash": all_hashes_hash,
+                "last_update": int(datetime.utcnow().timestamp()),
+                "interval": interval,
+                "folder": filepath
+            }
 
     def verify_signals(self):
         pass

@@ -1,6 +1,7 @@
 # IMPORT
 import pandas as pd
 import hashlib
+import io
 
 # LOCAL IMPORT
 from lib.file.reader import *
@@ -26,25 +27,37 @@ class Chunk:
     
     # Hash dataframe function
     def hash_dataframe(self):
-        chunk_size=10000
+        # chunk_size=100000
         # Define the hash object
         hash_object = hashlib.sha256()
+        
+        # Create a buffer
+        buffer = io.BytesIO()
 
-        # Determine the number of chunks
-        num_chunks = len(self.df) // chunk_size + 1
+        # Convert the dataframe to binary and write to buffer
+        self.df.to_pickle(buffer)
 
-        # Iterate over each chunk
-        for i in range(num_chunks):
-            # Select the chunk
-            chunk = self.df.iloc[i*chunk_size:(i+1)*chunk_size]
-
-            # Convert the chunk to a string and then to bytes
-            chunk_bytes = chunk.to_string(index=False).encode()
-
-            # Update the hash object with the bytes of the chunk
-            hash_object.update(chunk_bytes)
+        # Update the hash object with the binary data
+        hash_object.update(buffer.getvalue())
 
         # Get the hexadecimal representation of the hash
         hash_hex = hash_object.hexdigest()
+
+        # # Determine the number of chunks
+        # num_chunks = len(self.df) // chunk_size + 1
+
+        # # Iterate over each chunk
+        # for i in range(num_chunks):
+        #     # Select the chunk
+        #     chunk = self.df.iloc[i*chunk_size:(i+1)*chunk_size]
+
+        #     # Convert the chunk to a string and then to bytes
+        #     chunk_bytes = chunk.to_string(index=False).encode()
+
+        #     # Update the hash object with the bytes of the chunk
+        #     hash_object.update(chunk_bytes)
+
+        # # Get the hexadecimal representation of the hash
+        # hash_hex = hash_object.hexdigest()
 
         return hash_hex
