@@ -27,11 +27,16 @@ class Asset:
             ticker:str, 
             address:str, 
             asset_type:AssetType,
-            network:Network,
-
+            network:Network
             ):
         self.ticker = ticker
         self.asset = asset_type
         self.name = name
         self.address = address
         self.network = network
+
+    def __repr__(self):
+        return f"ASSET: {self.name} | {self.ticker} | {self.network}"
+    
+    def __str__(self):
+        return f"{self.name}"

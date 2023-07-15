@@ -1,4 +1,12 @@
+# IMPORT
 from enum import Enum
+
+# LOCAL IMPORT
+
+
+class NetworkType(Enum):
+    EVM = 'evm'
+    UTXO = 'utxo'
 
 class Network(Enum):
     BITCOIN = 'bitcoin'
@@ -12,4 +20,3 @@ class Network(Enum):
     AVALANCHEC = 'avalanche c-chain'
     GNOSIS = 'gnosis'
 
-    

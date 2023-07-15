@@ -8,13 +8,38 @@ from enum import Enum
 from lib.api.binance.local import filename
 from lib.cli.printer import line
 
+from lib.tools.asset import Asset
+from lib.tools.exchange import Exchange
+from lib.tools.blockchain import Blockchain
+from lib.tools.symbol import _Symbol as Symbol
+from lib.tools.interval import _Interval as Interval
+
 class DatabaseType(Enum):
-    kline = "kline"
-    
+    kline = 'klines'
+    signals = 'signals'
+    portfolio = 'portfolio'
+    info = 'info'
 
 class _Database:
-    def __init__(self, symbol:str, interval:str, starttime:int, endtime:int, exchange:str, verbose:bool=False):
+    
+
+    def __init__(self, database_type:DatabaseType, symbol:Symbol, interval:Interval, starttime:int, endtime:int, exchange:Exchange, verbose:bool=False):
+        self.database_type = database_type
+        self.symbol = symbol
+        self.interval = interval
+        self.exchange = exchange    
         self.verbose = verbose
+
+    def __str__(self) -> str:
+        return self.database_type.name
+
+    def verify(self):
+        # First go to the database file
+        filepath = f"db/{self.database_type.name}/{self.symbol}/{self.interval}/"
+        filename = f"{self.exchange.exchange_type.name}-{self.symbol.symbol}-{0}-{1}.csv"
+        print(filepath)
+        print(filename)
+
         
     
 class Database:
@@ -25,7 +50,6 @@ class Database:
     # Initialises
     def __init__(self, verbose:bool=False):
         self.verbose = verbose
-
 
     # Create a kline dataframe
     def kline_df(self, symbol:str, interval:str, starttime:int, endtime:int) -> pd.DataFrame:

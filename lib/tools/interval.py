@@ -28,11 +28,12 @@ class _Interval(Enum):
     def __init__(self, seconds):
         self.ms = False
 
+    def __str__(self) -> str:
+        return self.name[1:]
+
     def tc_rep(self) -> int:
         return self.value
     
-    def str_rep(self) -> str:
-        return self.name.replace("_", "")
     
     def last_close(self) -> int:
         if self.ms:

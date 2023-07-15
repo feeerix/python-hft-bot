@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 
 # Loca Imports
 from db.database import Database
+from db.database import _Database as DatabaseV2
+from lib.tools.internal.chunk import Chunk
 # from backtest.strat.strat import strategy
 # from backtest.strat.settings.settings import settings
 # from backtest.strat.indicator import indicator
@@ -26,8 +28,10 @@ Let's try to clean everything up and make everything more performant.
 
 """
 
-df = Database(verbose=True).kline_df('ETHUSDT','1m',start,end)
+test_chunk = Chunk("db/klines/adabusd/4h", "binance-ADABUSD-4h-2019-11.csv")
+print(test_chunk.df)
+# df = Database(verbose=True).kline_df('ETHUSDT','1m',start,end)
 
 
-print(f"FIRST VALUE: {df['time'].iloc[0]} // {datetime.fromtimestamp(int(df['time'].iloc[0]/1000), tz=timezone.utc)}")
-print(f"LAST VALUE: {df['time'].iloc[-1]} // {datetime.fromtimestamp(int(df['time'].iloc[-1]/1000), tz=timezone.utc)}")
+# print(f"FIRST VALUE: {df['time'].iloc[0]} // {datetime.fromtimestamp(int(df['time'].iloc[0]/1000), tz=timezone.utc)}")
+# print(f"LAST VALUE: {df['time'].iloc[-1]} // {datetime.fromtimestamp(int(df['time'].iloc[-1]/1000), tz=timezone.utc)}")

@@ -8,11 +8,11 @@ class ExchangeType(Enum):
 
 class Exchange:
     def __init__(self, exchange:ExchangeType):
-        self.ExchangeType = exchange
+        self.exchange_type = exchange
 
-    def __repr__(self) -> ExchangeType:
-        return self.ExchangeType
+    def __repr__(self) -> str:
+        return self.exchange_type
 
     def __str__(self) -> str:
-        return self.ExchangeType.name
+        return self.exchange_type.name
     
