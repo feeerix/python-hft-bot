@@ -6,6 +6,11 @@ This contains notes for future me, to make sure I understand what I'm trying to 
 
 Looking to recreate the test_run function as per the README. This would also involve recreating the way that the dataframes work, and how we add the indicators in as well.
 
+We have adjusted how the dataframes are checksummed, so we know that the data will stay the same.
+Our next step is now to rebuild the Binance API - so that it is easier to read and the boilerplate is in place so that it can be updated to any exchange easily.
+
+---
+
 We want to try to stay as computationally efficient as possible now, especially as we're starting to reach data sizes that might be much more noticeable than before. We currently cannot move from python (it's a personal skill issue), so the next step is to try and optimise the code at the same time.
 
 At the moment, the signals for trading (STOCH RSI k above d) is within the same dataframe as the original data. We will now look to separate those so that the market data and the signals will reside on different Dataframes. As such, we would not only need to rebuild the test_run function but also how we handle databases.

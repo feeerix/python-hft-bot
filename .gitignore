@@ -48,6 +48,7 @@ frontend/next-env.d.ts
 
 
 # Byte-compiled / optimized / DLL files
+*/__pycache__/
 __pycache__/
 lib/api/binance/__pycache__/
 *.py[cod]
@@ -99,3 +100,8 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+lib/api/__pycache__/api.cpython-311.pyc
+lib/api/__pycache__/gopher.cpython-311.pyc
+tests/__pycache__/__init__.cpython-310.pyc
+tests/__pycache__/__init__.cpython-311.pyc
+tests/__pycache__/battery.cpython-311.pyc
