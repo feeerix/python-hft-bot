@@ -9,7 +9,7 @@ from backtest.strat.composer import get_required_params
 
 
 class Indicator:
-    def __init__(self, _settings:settings, verbose:bool=True):
+    def __init__(self, _settings:settings, verbose:bool=True, df:pd.DataFrame=None):
         # Verbosity
         self.verbose = verbose
         
@@ -27,6 +27,9 @@ class Indicator:
         #         "arg2": default_value2
         #     }
         # }
+
+        if df is not None:
+            self.df = self.ret_indicator(df)
     
     def print_settings(self):
         print(self.settings.data)
@@ -75,6 +78,5 @@ class Indicator:
             print("SOMETHING WENT WRONG")
             print(type(ret_data))
             exit()
-        
         
     

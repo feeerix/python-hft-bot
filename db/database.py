@@ -19,6 +19,8 @@ class DatabaseType(Enum):
     signals = 'signals'
     portfolio = 'portfolio'
     info = 'info'
+    positions = 'positions'
+    indicators = 'indicators'
 
 class _Database:
     def __init__(self, database_type:DatabaseType, symbol:Symbol, interval:Interval, starttime:int, endtime:int, exchange:Exchange, verbose:bool=False):
@@ -43,17 +45,28 @@ class _Database:
 class Database:
     """
     Database class that we will use to create kline, trading signal and other dataframes.
+
+    It's job is to maintain the data - and if something is being done live making sure it's
+    up to date as well as correct. We can eventually move the hash and checking mechanism
+    directly within this class
+    
     """
 
     # Initialises
-    def __init__(self, verbose:bool=False):
+    def __init__(self, db_type:DatabaseType=None, verbose:bool=False, *args, **kwargs):
         self.verbose = verbose
+
+        # mapping for data below
         self.db_mapping = {
             DatabaseType.kline: self._kline_df,
             DatabaseType.signals: self._signals_df,
             DatabaseType.portfolio: self._portfolio_df,
             DatabaseType.info: self._info_df,
         }
+
+        self.data = None
+        if db_type is not None:
+            self.data = self.df(db_type, *args, **kwargs)
 
     def df(self, db_type:DatabaseType, *args, **kwargs):
         func = self.db_mapping.get(db_type)

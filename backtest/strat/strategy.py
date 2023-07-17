@@ -4,23 +4,18 @@ import pandas_ta as ta
 import numpy as np
 from hashlib import sha256
 import time
+from enum import Enum
 
 # Local Imports
 from backtest.strat.indicator import Indicator
+from db.database import Database
 from backtest.strat.settings.settings import import_setting, Settings
 from lib.file.writer import folder_exists, create_folder, file_exists, write_json
 from lib.file.reader import get_json
 
-class Strategy:
+class _Strategy:
     """
-    The strategy class is designed to encompass everything that might involve the trading decisions that we make.
-
-    This would include things like:
-    
-    - Indicators
-    - Portfolio
-    - Capital and Risk Management
-
+    The strategy class is designed to encompass everything related to the strategy that I want to implement.
     """
 
     def __init__(self, name:str, df:pd.DataFrame, verbose:bool=False, retreive:bool=False): 
@@ -204,4 +199,122 @@ class Strategy:
         """
         pass
 
-    
+
+class Strategy:
+    """
+    The strategy class is designed to encompass everything related to the strategy that I want to implement.
+
+    At it's core, the strategy revolves around the information reltaed to the trading decisions that I would be using.
+    This means that:
+    - Indicators
+    - Trading logic
+    - Risk Management
+
+    Are all going to be things I'd need to consider within this class.
+
+    I might need to take in as arugments:
+    - The initial Data with OHCLV
+    - Orderbook data
+    - Non-price related data
+    """
+
+    def __init__(self, name:str="", df:pd.DataFrame=None, orderbook:Database=None, signals:Database=None, logic:Database=None, verbose:bool=False): 
+        self.name = name
+        self.verbose = verbose
+
+        # TODO - Not sure if this should be changed at all - seems to complex to include in the class
+        # Specifical OHLCV -> will add indicators to this
+        self.df = df
+        # Trading signals
+        self.signals = signals
+        # For trading logic / risk management etc
+        self.logic = logic
+        # Orderbook
+        self.orderbook = orderbook
+
+        self.indicator_settings_list = []
+        self.position_condition_settings = {
+            "long": [],
+            "short": []
+        }
+
+    def add(self, indicator:Indicator):
+        if self.verbose:
+            print("ADDING")
+
+    def save(self):
+        if self.verbose:
+            print("SAVING")
+        
+    # Add indicator to self.df
+    def add_indicator(self, _indicator:Indicator, recording:bool=True):
+        if self.verbose:
+            print(_indicator.settings.data)
+
+        # If we want to write the settings
+        if recording:
+            self.indicator_settings_list.append(_indicator.settings.data)
+
+        # Add individual indicator
+        self.df = pd.concat(
+            [
+                self.df, # Existing DF
+                _indicator.ret_indicator(self.df)
+            ], # New DF
+            axis=1, 
+            # ignore_index=True # -> removed index
+        )
+
+    # Add entry conditions
+    def add_entry(self, _settings:Settings, recording:bool=True):
+
+        """
+        I should note that the entries are just adding booleans for specific trading signals
+        """
+        # Test print
+        if self.verbose:
+            print(_settings.data)
+            
+        if recording:
+            for pos_type in self.position_condition_settings.keys():
+
+                if pos_type == _settings.data["func_name"]:
+                    self.position_condition_settings[pos_type].append(
+                        _settings.data
+                    )
+
+            self.df[_settings.data['name']] = np.where((
+                    (self.df[_settings.data['arguments']['open'][True]].all(axis=1)) &
+                    (self.df[_settings.data['arguments']['open'][False]].sum(axis=1) == 0)
+            ), 1, 0)
+        else:
+            self.df[_settings.data['name']] = np.where((
+                    (self.df[_settings.data['arguments']['open']['true']].all(axis=1)) &
+                    (self.df[_settings.data['arguments']['open']['false']].sum(axis=1) == 0)
+            ), 1, 0)
+
+    # Add close conditions
+    def add_close(self, _settings:Settings, recording:bool=True):    
+        # Test print
+        if self.verbose:
+            print(_settings.data)
+        
+
+        if recording:
+            for pos_type in self.position_condition_settings.keys():
+
+                if pos_type == _settings.data["func_name"]:
+                    self.position_condition_settings[pos_type].append(
+                        _settings.data
+                    )
+            
+            self.df[_settings.data['name']] = np.where((
+                    (self.df[_settings.data['arguments']['close'][True]].all(axis=1)) &
+                    (self.df[_settings.data['arguments']['close'][False]].sum(axis=1) == 0)
+            ), 1, 0)
+            
+        else:
+            self.df[_settings.data['name']] = np.where((
+                    (self.df[_settings.data['arguments']['close']['true']].all(axis=1)) &
+                    (self.df[_settings.data['arguments']['close']['false']].sum(axis=1) == 0)
+            ), 1, 0)
