@@ -9,6 +9,8 @@ db/strategies/indicators/settings/*
 db/strategies/results/*
 db/strategies/settings/*
 
+*.pyc
+
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
@@ -51,6 +53,7 @@ frontend/next-env.d.ts
 */__pycache__/
 __pycache__/
 lib/api/binance/__pycache__/
+lib/api/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -105,3 +108,5 @@ lib/api/__pycache__/gopher.cpython-311.pyc
 tests/__pycache__/__init__.cpython-310.pyc
 tests/__pycache__/__init__.cpython-311.pyc
 tests/__pycache__/battery.cpython-311.pyc
+lib/api/__pycache__/api.cpython-311.pyc
+lib/api/__pycache__/gopher.cpython-311.pyc

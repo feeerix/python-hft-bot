@@ -24,3 +24,11 @@ def list_folders(path:str) -> list:
 
 def list_files(path:str) -> list:
     return [name for name in os.listdir(path) if os.path.isfile(os.path.join(path, name))]
+
+def db_check(path:str) -> dict:
+    # If the file exists
+    path += "/check.json"
+    if file_exists(path):
+        get_json(path)
+    else:
+        print("File does not exist!")

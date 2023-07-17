@@ -38,7 +38,10 @@ class Crawler:
 
     def verify_kline(self, symbol:Symbol=None, interval:Interval=None):
         """
-        It turns out that hashing very large files is quite computationally intensive!
+        Verifies klines by hashing (with SHA256) the dataframe so that we know if data has changed or not.
+
+        Calls itself recursively if we do not input a symbol or interval, and does it for all symbols/intervals that are in the database.
+
         """
         
         filepath = f"db/klines/"

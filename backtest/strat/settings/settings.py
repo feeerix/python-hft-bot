@@ -17,9 +17,19 @@ def import_setting(settings_data:dict, verbose:bool=False):
     ret_data.data = settings_data
     return ret_data
 
+"""
+There are many things we want to change about our settings class
+
+- We will want to make it less comlicated to initiate.
+- Allow it to come up with it's own unique name, depending on the arguments
+- All while still allowing it to interact with multiple classes as a "settings" class.
+
+It might be more prudent to allow the class we want to adjust the setting for, to be input as an argument itself, so that we can return it modeified with our specific setting.
+"""
+
 class Settings:
     # The main reason we create this class is so that we can load settings from the coresponding folders
-    def __init__(self, name:str, func_name:str, arguments:dict=None, transform:dict=None, verbose:bool=True, **kwargs) -> None:
+    def __init__(self, name:str, func_name:str, arguments:dict=None, transform:dict=None, verbose:bool=False, **kwargs) -> None:
         # Add the setting details based on what's added
 
         # settings = {

@@ -25,4 +25,3 @@ warnings.simplefilter(action='ignore',category=FutureWarning)
 start = 1546300800
 end = 1672531200
 
-

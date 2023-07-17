@@ -6,8 +6,12 @@ This contains notes for future me, to make sure I understand what I'm trying to 
 
 Looking to recreate the test_run function as per the README. This would also involve recreating the way that the dataframes work, and how we add the indicators in as well.
 
-We have adjusted how the dataframes are checksummed, so we know that the data will stay the same.
 Our next step is now to rebuild the Binance API - so that it is easier to read and the boilerplate is in place so that it can be updated to any exchange easily.
+Remembering that the main aim is to be able to create settings well, and knowing that I need to have:
+
+- The ability to manage multiple timeframes.
+- The ability to work with multiple assets.
+- Easily be able to model statistics. We want to use whatever information we have to map something that's happenning in the future.
 
 ---
 

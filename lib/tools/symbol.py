@@ -11,7 +11,7 @@ Symbol class
 """
 
 class Symbol:
-    def __init__(self, symbol:str, assets:List[Asset], exchange:Exchange):
+    def __init__(self, symbol:str, assets:List[Asset]=[], exchange:Exchange=None):
         self.symbol = symbol
         self.assets = assets
         self.exchange = exchange

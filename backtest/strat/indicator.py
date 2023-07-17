@@ -1,21 +1,24 @@
 # Imports
 import pandas as pd
 import pandas_ta as ta
-import inspect
 
 # Local Imports
 from lib.file.writer import *
 from backtest.strat.settings import settings
-from backtest.strat.composer import get_required_params, write_required_params
+from backtest.strat.composer import get_required_params
 
 
 class Indicator:
-    def __init__(self, _settings:settings):
+    def __init__(self, _settings:settings, verbose:bool=True):
+        # Verbosity
+        self.verbose = verbose
+        
         # Add the func into the class
         self.ind_func = getattr(ta, _settings.data['func_name'])
         
         # Settings - a way to set up the indicator
         self.settings = _settings
+
         # settings = {
         #     "name": setting_name,
         #     "func_name": func_name 
@@ -28,14 +31,14 @@ class Indicator:
     def print_settings(self):
         print(self.settings.data)
 
-    def ret_indicator(self, df:pd.DataFrame, verbose:bool=False) -> pd.DataFrame:
+    def ret_indicator(self, df:pd.DataFrame) -> pd.DataFrame:
         # initialise empty settings
         ind_settings = {}
 
         # Get the required parameters (OHLCV)
         req_params = get_required_params(self.settings.data['func_name'])
         
-        if verbose:
+        if self.verbose:
             print(f"PARAMS TO ADD: {self.settings.data['arguments']}")
         
         # OHLCV
@@ -58,7 +61,7 @@ class Indicator:
         ret_data = self.ind_func(**ind_settings)
 
         # Verbosity prints
-        if verbose:
+        if self.verbose:
             print(ind_settings)
         
         # --------------------------------------------------------------

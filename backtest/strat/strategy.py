@@ -12,11 +12,21 @@ from lib.file.writer import folder_exists, create_folder, file_exists, write_jso
 from lib.file.reader import get_json
 
 class Strategy:
-    def __init__(self, name:str, df:pd.DataFrame, verbose:bool=False, retreive:bool=False, higher_df:list=None): 
+    """
+    The strategy class is designed to encompass everything that might involve the trading decisions that we make.
+
+    This would include things like:
+    
+    - Indicators
+    - Portfolio
+    - Capital and Risk Management
+
+    """
+
+    def __init__(self, name:str, df:pd.DataFrame, verbose:bool=False, retreive:bool=False): 
         self.name = name
         self.verbose = verbose
         self.df = None
-        self.h_df = higher_df
 
         # ------------------
         # indicator_example = [
@@ -71,21 +81,11 @@ class Strategy:
         self.df = pd.concat(
             [
                 self.df, # Existing DF
-                _indicator.ret_indicator(self.df, self.verbose)
+                _indicator.ret_indicator(self.df)
             ], # New DF
             axis=1, 
             # ignore_index=True # -> removed index
         )
-
-        # for tf in self.h_df:
-        #     tf = pd.concat(
-        #         [
-        #             self.df, # Existing DF
-        #             _indicator.ret_indicator(tf, self.verbose)
-        #         ], # New DF
-        #         axis=1, 
-        #         # ignore_index=True # -> removed index
-        #     )
 
     # Add entry conditions
     def add_entry(self, _settings:Settings, recording:bool=True):

@@ -1,21 +1,19 @@
 # Imports
 import pandas as pd
-from datetime import datetime, timezone
+import pandas_ta as ta
+import warnings
+from datetime import datetime
 
 # Loca Imports
+from lib.api.binance.binance import Binance
 from db.database import Database
-from db.database import _Database as DatabaseV2
-from db.database import DatabaseType
+from lib.tools.symbol import Symbol
 from lib.tools.interval import _Interval as Interval
-from lib.tools.exchange import Exchange, ExchangeType
-from lib.tools.internal.chunk import Chunk
-from lib.tools.internal.crawler import Crawler
-
-# from backtest.strat.strat import strategy
-# from backtest.strat.settings.settings import settings
-# from backtest.strat.indicator import indicator
-# from backtest.strat.composer import get_required_params
-# from backtest.backtester import Backtester
+from lib.tools.asset import Asset, AssetType
+from lib.tools.network import Network
+from backtest.strat.strategy import Strategy
+from backtest.strat.indicator import Indicator
+from backtest.strat.settings.settings import Settings
 
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -33,15 +31,73 @@ Let's also try to clean everything up and make everything more performant.
 
 """
 
-test_crawler = Crawler()
-test_crawler.verify_kline()
 
-# test_df = DatabaseV2(DatabaseType.kline,'ETHUSDT', Interval._1m, start, end, Exchange(ExchangeType.BINANCE),True)
-# print(test_df)
+# from lib.tools.exchange import Exchange, ExchangeType
+# from lib.file.reader import get_json
 
-# --------------------------------------------------------------------------------
-# df = Database(verbose=True).kline_df('ETHUSDT','1m',start,end)
+# pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+# pd.set_option('display.width', None)
+# pd.set_option('display.max_colwidth', None)
+pd.set_option('display.float_format', lambda x: '%.5f' % x)
+
+# Ignoring future warning initially
+warnings.simplefilter(action='ignore',category=FutureWarning)
+
+start = 1569888000 # ETH / BTC
+end = 1685592000
+
+test_binance = Binance()
+
+# Database().kline_df('ETHUSDT',"4h",start,end)
+eth = Asset("Ethereum", "ETH", "0x0", AssetType.COIN, Network.ETHEREUM)
+usdt = Asset("Tether", "USDT", "0x0", AssetType.TOKEN, Network.ETHEREUM)
+
+ethusdt = Symbol("ETHUSDT", [eth, usdt])
+interval1 = str(Interval._4h)
+# interval2 = str(Interval._1m)
+
+"""
+Currently, what I'm working through is that a strategy is VERY likely going to need more than one database potentially.
+Is it more efficient to have the database in memory, as a dataframe or would it be better to try to access the corresponding data ad hoc?
+At the moment, experimenting with allowing the strategy to have more than one 'database'.
+
+Instead of inputting the dataframe into the strategy, it's probably a better idea for the strategy to not even need a dataframe (as not all strategies require that
+you define what assets you're interacting with.).
+
+For example, if I wanted to hotswap a strategy between two datasets (and therefore check the correlation between the two assets and if my strategy works between then
+I should be able to do so.)
+
+"""
+
+df1 = Database(verbose=True)._kline_df(ethusdt, interval1, start, end)
+# df2 = Database(verbose=True)._kline_df(ethusdt, interval2, start, end)
+
+test_strat = Strategy("test1", df1)
+# test_strat2 = Strategy("test2", df2)
+
+ema8 = Indicator(Settings("ema8", "ema", {'length': 8}))
+ema21 = Indicator(Settings("ema21", "ema", {'length': 21}))
+ema144 = Indicator(Settings("ema144", "ema", {'length': 144}))
+ema233 = Indicator(Settings("ema233", "ema", {'length': 233}))
+stochrsi = Indicator(Settings("stochrsi", "stochrsi", {"length": 21, "rsi_length": 21, "k": 5, "d": 5}))
+
+test_strat.add_indicator(ema8)
+test_strat.add_indicator(ema21)
+test_strat.add_indicator(ema144)
+test_strat.add_indicator(ema233)
+test_strat.add_indicator(stochrsi)
 
 
-# print(f"FIRST VALUE: {df['time'].iloc[0]} // {datetime.fromtimestamp(int(df['time'].iloc[0]/1000), tz=timezone.utc)}")
-# print(f"LAST VALUE: {df['time'].iloc[-1]} // {datetime.fromtimestamp(int(df['time'].iloc[-1]/1000), tz=timezone.utc)}")
+
+# test_strat2.add_indicator(ema8)
+# test_strat2.add_indicator(ema21)
+# test_strat2.add_indicator(ema144)
+# test_strat2.add_indicator(ema233)
+# test_strat2.add_indicator(stochrsi)
+
+
+"""
+Now that we have created both dataframes as well as added the indicators, let's see if we want to perform the modelling within the strategy class?
+"""
+

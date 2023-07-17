@@ -45,10 +45,7 @@ def fetch_kline(base_url:str, verbose:bool, params:dict):
 def depth(base_url:str, verbose:bool, params:dict): 
     if verbose:
         print(f"Params: {params}")
-    # print(base_url)
-    # print(endpoints['depth'])
-    # print(params)
-    # exit()
+    
     return req.get(
         f"{base_url}{endpoints['depth']}",
         params=params

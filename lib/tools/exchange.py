@@ -5,6 +5,7 @@ import json
 
 # lOCAL IMPORT
 from lib.file.reader import get_json, get_list
+from lib.tools.interval import Interval
 
 
 class ExchangeType(Enum):
@@ -66,5 +67,18 @@ class Exchange(ABC):
         Exchange Info
 
         Always writes to: db/info/{exchange}/exchange_info.json
+        """
+        pass
+
+    @abstractmethod
+    def update_klines(self, symbol:str, interval:Interval):
+        """
+        
+        """
+        pass
+
+    @abstractmethod
+    def api_request(self, request_type:str, params:dict):
+        """
         """
         pass
