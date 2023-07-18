@@ -11,10 +11,14 @@ Symbol class
 """
 
 class Symbol:
-    def __init__(self, symbol:str, assets:List[Asset]=[], exchange:Exchange=None):
+    def __init__(self, symbol:str="", assets:List[Asset]=[], exchange:Exchange=None):
         self.symbol = symbol
         self.assets = assets
         self.exchange = exchange
 
     def __str__(self) -> str:
         return self.symbol
+    
+
+    def create_symbol(self):
+        pass

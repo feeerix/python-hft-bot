@@ -216,27 +216,81 @@ class Strategy:
     - The initial Data with OHCLV
     - Orderbook data
     - Non-price related data
+
+    We can try to adjust code to combine and separe the dataframes for performance metrics to see which is better.
     """
 
-    def __init__(self, name:str="", df:pd.DataFrame=None, orderbook:Database=None, signals:Database=None, logic:Database=None, verbose:bool=False): 
+    def __init__(
+            self, 
+            name:str="", 
+            klines:Database=None, 
+            indicators:Database=None, 
+            orderbook:Database=None, 
+            signals:Database=None, 
+            logic:Database=None, 
+            positions:Database=None,
+            verbose:bool=False
+    ): 
         self.name = name
         self.verbose = verbose
 
         # TODO - Not sure if this should be changed at all - seems to complex to include in the class
-        # Specifical OHLCV -> will add indicators to this
-        self.df = df
-        # Trading signals
+        
+        """
+        Klines
+        This will hold all the things that klines hold that comes from the kline + and the 
+        indicators associated with it. We do have an indicator database that holds the 
+        settings for the corresponding indicators.
+        """
+        self.klines = klines
+
+        """
+        Signals
+        This will hold the boleans for example, if something is above another or if an 
+        indicator has reached a certain level. These should be the things that specifically
+        will signal that a trade should be put on. 
+        """
         self.signals = signals
-        # For trading logic / risk management etc
+
+        """
+        Indicator Settings
+        Holds the settings for the indicators which will generally preside in the klines
+        datbase. These include thinks like settings for EMAs and RSI etc.
+        """
+        self.indicators = indicators
+
+        """
+        Logic
+        This involves any trading logic that needs to take place. For example if an EMA
+        is above another EMA that would be under signal, there would also be a (very simple)
+        piece of logic that would just open a trade. 
+        """
         self.logic = logic
-        # Orderbook
+
+        """
+        Orderbook - TODO
+        Pretty self explanatory.
+        """
         self.orderbook = orderbook
 
-        self.indicator_settings_list = []
-        self.position_condition_settings = {
-            "long": [],
-            "short": []
-        }
+        """
+        Positions - TODO
+        """
+        self.positions = positions
+
+        print(self.__dict__.items())
+        
+        for attr, value in self.__dict__.items():
+            print(f"{attr} = {str(value)}")
+
+        exit()
+
+
+    def __str__(self) -> str:
+        return ""
+    
+    def __repr__(self) -> str:
+        return ""
 
     def add(self, indicator:Indicator):
         if self.verbose:

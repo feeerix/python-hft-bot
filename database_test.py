@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Loca Imports
 from lib.api.binance.binance import Binance
-from db.database import Database
+from db.database import Database, DatabaseType
 from lib.tools.symbol import Symbol
 from lib.tools.interval import _Interval as Interval
 from lib.tools.asset import Asset, AssetType
@@ -70,23 +70,33 @@ I should be able to do so.)
 
 """
 
-df1 = Database(verbose=True)._kline_df(ethusdt, interval1, start, end)
+
+
 # df2 = Database(verbose=True)._kline_df(ethusdt, interval2, start, end)
 
-test_strat = Strategy("test1", df1)
+test_strat = Strategy(
+    name="test1", 
+    klines=Database(db_type=DatabaseType.KLINES),
+    indicators=Database(db_type=DatabaseType.INDICATORS),
+    orderbook=Database(db_type=DatabaseType.ORDERBOOK),
+    signals=Database(db_type=DatabaseType.SIGNALS),
+    logic=Database(db_type=DatabaseType.LOGIC),
+    positions=Database(db_type=DatabaseType.POSITIONS),
+    verbose=True,
+)
 # test_strat2 = Strategy("test2", df2)
 
-ema8 = Indicator(Settings("ema8", "ema", {'length': 8}))
-ema21 = Indicator(Settings("ema21", "ema", {'length': 21}))
-ema144 = Indicator(Settings("ema144", "ema", {'length': 144}))
-ema233 = Indicator(Settings("ema233", "ema", {'length': 233}))
-stochrsi = Indicator(Settings("stochrsi", "stochrsi", {"length": 21, "rsi_length": 21, "k": 5, "d": 5}))
+# ema8 = Indicator(Settings("ema8", "ema", {'length': 8}))
+# ema21 = Indicator(Settings("ema21", "ema", {'length': 21}))
+# ema144 = Indicator(Settings("ema144", "ema", {'length': 144}))
+# ema233 = Indicator(Settings("ema233", "ema", {'length': 233}))
+# stochrsi = Indicator(Settings("stochrsi", "stochrsi", {"length": 21, "rsi_length": 21, "k": 5, "d": 5}))
 
-test_strat.add_indicator(ema8)
-test_strat.add_indicator(ema21)
-test_strat.add_indicator(ema144)
-test_strat.add_indicator(ema233)
-test_strat.add_indicator(stochrsi)
+# test_strat.add_indicator(ema8)
+# test_strat.add_indicator(ema21)
+# test_strat.add_indicator(ema144)
+# test_strat.add_indicator(ema233)
+# test_strat.add_indicator(stochrsi)
 
 
 

@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 from enum import Enum
+import uuid
 
 # Local Imports
 from lib.api.binance.local import filename
@@ -15,12 +16,19 @@ from lib.tools.symbol import Symbol
 from lib.tools.interval import _Interval as Interval
 
 class DatabaseType(Enum):
-    kline = 'klines'
-    signals = 'signals'
-    portfolio = 'portfolio'
-    info = 'info'
-    positions = 'positions'
-    indicators = 'indicators'
+    KLINES = 'klines'
+    SIGNALS = 'signals'
+    PORTFOLIO = 'portfolio'
+    INFO = 'info'
+    LOGIC = 'logic'
+    POSITIONS = 'positions'
+    INDICATORS = 'indicators'
+    ORDERBOOK = 'orderbook'
+
+class DatabaseFactory:
+    def create_db(self, db_type:DatabaseType):
+        raise NotImplementedError("create_db not implemented!")
+
 
 class _Database:
     def __init__(self, database_type:DatabaseType, symbol:Symbol, interval:Interval, starttime:int, endtime:int, exchange:Exchange, verbose:bool=False):
@@ -31,12 +39,12 @@ class _Database:
         self.verbose = verbose
 
     def __str__(self) -> str:
-        return self.database_type.name
+        return f"{self.database_type.name} // {self.symbol.symbol} - {self.interval.name}"
 
     def verify(self):
         # First go to the database file
         filepath = f"db/{self.database_type.name}/{self.symbol}/{self.interval}/"
-        filename = f"{self.exchange.exchange_type.name}-{self.symbol.symbol}-{0}-{1}.csv"
+        filename = f"{self.exchange.exchange_type.name}-{self.symbol.assets}-{0}-{1}.csv"
         print(filepath)
         print(filename)
 
@@ -51,23 +59,21 @@ class Database:
     directly within this class
     
     """
+    # DB_NAMESPACE = uuid.uuid4()
 
     # Initialises
-    def __init__(self, db_type:DatabaseType=None, verbose:bool=False, *args, **kwargs):
+    def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, *args, **kwargs):
+        self.db_type = db_type
+        self.name = name
         self.verbose = verbose
 
-        # mapping for data below
-        self.db_mapping = {
-            DatabaseType.kline: self._kline_df,
-            DatabaseType.signals: self._signals_df,
-            DatabaseType.portfolio: self._portfolio_df,
-            DatabaseType.info: self._info_df,
-        }
+        # Create a custom name based on type and uuid
+        if not name:
+            self.name = f'{db_type.name}-{uuid.uuid3(uuid.NAMESPACE_OID, db_type.name)}'
 
-        self.data = None
-        if db_type is not None:
-            self.data = self.df(db_type, *args, **kwargs)
-
+    def __str__(self) -> str:
+        return f"Name: {self.name} | db_type: {self.db_type.name}"
+    
     def df(self, db_type:DatabaseType, *args, **kwargs):
         func = self.db_mapping.get(db_type)
         if func:

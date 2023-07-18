@@ -28,6 +28,6 @@ So currently we'd want to:
 
 ---
 
-I must remember that I may want to perform computation on a whole portfolio of assets, throughout time, for multiple data points. It would be a 4 dimensional matrix?
+Alright - so I think I'll create a factory class for the settings and many of the different classes that I have created. In this way, I can dynamically add them when required and actually add a function to save them as well.
 
-Overall this will improve the computational efficiency as well as be easier to use.
+When I've done that, I can continue to add functions to the strategy class, to allow it to better manage the overall trading strategy.

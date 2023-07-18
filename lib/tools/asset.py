@@ -36,7 +36,7 @@ class Asset:
         self.network = network
 
     def __repr__(self):
-        return f"ASSET: {self.name} | {self.ticker} | {self.network}"
+        return f"Asset(name={self.name}, ticker-{self.ticker}, network={self.network})"
     
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.ticker}"
