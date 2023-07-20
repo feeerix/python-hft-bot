@@ -12,6 +12,18 @@ Symbol class
 
 class Symbol:
     def __init__(self, symbol:str="", assets:List[Asset]=[], exchange:Exchange=None):
+        """
+        NOTE:
+        Symbols in our sense can only have a pair
+        """
+        if len(assets) == 2:
+            if symbol == "":
+                self.symbol = f"{assets[0].name}{assets[1].name}"
+            else:
+                raise ValueError("Symbol string not included.")
+        else:
+            raise ValueError("Asset List Length incorrect.")
+        
         self.symbol = symbol
         self.assets = assets
         self.exchange = exchange
@@ -19,6 +31,3 @@ class Symbol:
     def __str__(self) -> str:
         return self.symbol
     
-
-    def create_symbol(self):
-        pass

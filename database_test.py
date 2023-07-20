@@ -84,6 +84,8 @@ test_strat = Strategy(
     positions=Database(db_type=DatabaseType.POSITIONS),
     verbose=True,
 )
+
+
 # test_strat2 = Strategy("test2", df2)
 
 # ema8 = Indicator(Settings("ema8", "ema", {'length': 8}))

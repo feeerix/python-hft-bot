@@ -229,6 +229,8 @@ class Strategy:
             signals:Database=None, 
             logic:Database=None, 
             positions:Database=None,
+            trigger:bool=False, # Trigger to start building all databases
+            retreive:bool=False, # If we want to get the settings
             verbose:bool=False
     ): 
         self.name = name
@@ -278,19 +280,33 @@ class Strategy:
         """
         self.positions = positions
 
-        print(self.__dict__.items())
-        
+        # Check if any of the attr is None - Return Error
         for attr, value in self.__dict__.items():
-            print(f"{attr} = {str(value)}")
-
-        exit()
-
+            if isinstance(value, Database) and value is None:
+                raise ValueError(f"The attribute {attr} of type Database is None.")
+            
+        if trigger:
+            self.trigger()
 
     def __str__(self) -> str:
-        return ""
+        return f"STRATEGY >> Name: {self.name} "
     
+    """
+    TODO - A more representative string that is able to define the whole database
+    """
+    def __str__(self) -> str:
+        return f"STRATEGY: {self.name}"
+    
+    # TODO - create representation
     def __repr__(self) -> str:
-        return ""
+        return f""
+
+    def trigger(self):
+        """
+        This function 'triggers' all the required database to return their corresponding dataframes.
+        In doing so, you can then start to either backtest or perform the strategy accordingly.
+        """
+        pass
 
     def add(self, indicator:Indicator):
         if self.verbose:
@@ -300,75 +316,4 @@ class Strategy:
         if self.verbose:
             print("SAVING")
         
-    # Add indicator to self.df
-    def add_indicator(self, _indicator:Indicator, recording:bool=True):
-        if self.verbose:
-            print(_indicator.settings.data)
-
-        # If we want to write the settings
-        if recording:
-            self.indicator_settings_list.append(_indicator.settings.data)
-
-        # Add individual indicator
-        self.df = pd.concat(
-            [
-                self.df, # Existing DF
-                _indicator.ret_indicator(self.df)
-            ], # New DF
-            axis=1, 
-            # ignore_index=True # -> removed index
-        )
-
-    # Add entry conditions
-    def add_entry(self, _settings:Settings, recording:bool=True):
-
-        """
-        I should note that the entries are just adding booleans for specific trading signals
-        """
-        # Test print
-        if self.verbose:
-            print(_settings.data)
-            
-        if recording:
-            for pos_type in self.position_condition_settings.keys():
-
-                if pos_type == _settings.data["func_name"]:
-                    self.position_condition_settings[pos_type].append(
-                        _settings.data
-                    )
-
-            self.df[_settings.data['name']] = np.where((
-                    (self.df[_settings.data['arguments']['open'][True]].all(axis=1)) &
-                    (self.df[_settings.data['arguments']['open'][False]].sum(axis=1) == 0)
-            ), 1, 0)
-        else:
-            self.df[_settings.data['name']] = np.where((
-                    (self.df[_settings.data['arguments']['open']['true']].all(axis=1)) &
-                    (self.df[_settings.data['arguments']['open']['false']].sum(axis=1) == 0)
-            ), 1, 0)
-
-    # Add close conditions
-    def add_close(self, _settings:Settings, recording:bool=True):    
-        # Test print
-        if self.verbose:
-            print(_settings.data)
-        
-
-        if recording:
-            for pos_type in self.position_condition_settings.keys():
-
-                if pos_type == _settings.data["func_name"]:
-                    self.position_condition_settings[pos_type].append(
-                        _settings.data
-                    )
-            
-            self.df[_settings.data['name']] = np.where((
-                    (self.df[_settings.data['arguments']['close'][True]].all(axis=1)) &
-                    (self.df[_settings.data['arguments']['close'][False]].sum(axis=1) == 0)
-            ), 1, 0)
-            
-        else:
-            self.df[_settings.data['name']] = np.where((
-                    (self.df[_settings.data['arguments']['close']['true']].all(axis=1)) &
-                    (self.df[_settings.data['arguments']['close']['false']].sum(axis=1) == 0)
-            ), 1, 0)
+    
