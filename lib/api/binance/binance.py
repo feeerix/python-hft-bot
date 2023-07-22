@@ -20,7 +20,6 @@ from lib.api.binance.interface import *
 
 # Each exchange class is unique but is expected to follow some standards
 class Binance(Exchange):
-    
     def __init__(self, url_index:int=0, verbose:bool=True) -> None:
         
         # Initiates Exchange type
@@ -28,6 +27,7 @@ class Binance(Exchange):
 
         # Verbose
         self.verbose = verbose
+        self.name = self.exchange_type.name.lower()
 
         # Get base URL
         self.base_url = self.base_url_list[url_index]
@@ -49,6 +49,7 @@ class Binance(Exchange):
     
     # Get exchange info
     def exchange_info(self) -> bool:
+        
         ret_data = exchange_info(self.base_url, self.verbose)
 
         # If we received an OK status

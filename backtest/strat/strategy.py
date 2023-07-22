@@ -286,7 +286,7 @@ class Strategy:
                 raise ValueError(f"The attribute {attr} of type Database is None.")
             
         if trigger:
-            self.trigger()
+            self.build()
 
     def __str__(self) -> str:
         return f"STRATEGY >> Name: {self.name} "
@@ -307,14 +307,15 @@ class Strategy:
         This function builds all the required database to return their corresponding dataframes.
         In doing so, you can then start to either backtest or perform the strategy accordingly.
         """
-        pass
+        # Build klines
+        self.klines.build()
 
-    def add(self, indicator:Indicator):
-        if self.verbose:
-            print("ADDING")
+        
 
     def save(self):
         if self.verbose:
-            print("SAVING")
+            print("SAVING...")
+        
+        
         
     """  """

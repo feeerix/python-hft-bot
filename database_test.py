@@ -8,6 +8,7 @@ from datetime import datetime
 from lib.api.binance.binance import Binance
 from db.database import Database, DatabaseType
 from lib.tools.symbol import Symbol
+from lib.tools.exchange import ExchangeType
 from lib.tools.interval import _Interval as Interval
 from lib.tools.asset import Asset, AssetType
 from lib.tools.network import Network
@@ -57,11 +58,17 @@ ethusdt = Symbol("ETHUSDT", [eth, usdt])
 interval1 = str(Interval._4h)
 
 # def _kline_df(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int) -> pd.DataFrame:
-klines = Database("ethusdt_klines", DatabaseType.KLINES, True)
-klines.build(symbol=ethusdt, interval=Interval._4h, starttime=start, endtime=end)
-# klines._kline_df()
+"""
+Think about how I want to implement the settings for the database
+we want to be able to include multiple klines - 
+"""
+klines = Database("ethusdt_klines", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._4h, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+indicators = Database("ethusdt_indicators", DatabaseType.INDICATORS, True, symbol=ethusdt, interval=Interval._4h, starttime=start, endtime=end)
 
+klines.build()
+print(klines.df.columns.tolist())
 
+exit()
 """
 Currently, what I'm working through is that a strategy is VERY likely going to need more than one database potentially.
 Is it more efficient to have the database in memory, as a dataframe or would it be better to try to access the corresponding data ad hoc?
@@ -78,17 +85,16 @@ I should be able to do so.)
 
 
 
-# test_strat = Strategy(
-#     name="test1", 
-#     klines=Database(db_type=DatabaseType.KLINES),
-#     indicators=Database(db_type=DatabaseType.INDICATORS),
-#     orderbook=Database(db_type=DatabaseType.ORDERBOOK),
-#     signals=Database(db_type=DatabaseType.SIGNALS),
-#     logic=Database(db_type=DatabaseType.LOGIC),
-#     positions=Database(db_type=DatabaseType.POSITIONS),
-#     verbose=True,
-# )
-
+test_strat = Strategy(
+    name="test1", 
+    klines=klines,
+    indicators=Database(db_type=DatabaseType.INDICATORS),
+    orderbook=Database(db_type=DatabaseType.ORDERBOOK),
+    signals=Database(db_type=DatabaseType.SIGNALS),
+    logic=Database(db_type=DatabaseType.LOGIC),
+    positions=Database(db_type=DatabaseType.POSITIONS),
+    verbose=True,
+)
 
 # test_strat2 = Strategy("test2", df2)
 

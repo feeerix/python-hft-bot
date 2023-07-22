@@ -4,13 +4,16 @@ from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 from enum import Enum
 import uuid
+from typing import List
 
 # Local Imports
 from lib.api.binance.local import filename
 from lib.cli.printer import line
+from lib.file.reader import get_json, get_list
+from lib.file.writer import write_json
 
 from lib.tools.asset import Asset
-from lib.tools.exchange import Exchange
+from lib.tools.exchange import Exchange, ExchangeType
 from lib.tools.blockchain import Blockchain
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
@@ -47,14 +50,22 @@ class Database:
     # DB_NAMESPACE = uuid.uuid4()
 
     # Initialises
-    def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, *args, **kwargs):
+    def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
         self.db_type = db_type
         self.name = name
         self.verbose = verbose
         self.df = None
+        self.arguments = kwargs
 
         self.db_mapping = {
-            DatabaseType.KLINES: self._kline_df
+            DatabaseType.KLINES: self._klines,
+            DatabaseType.INDICATORS: self._indicators,
+            DatabaseType.ORDERBOOK: self._orderbook,
+            DatabaseType.SIGNALS: self._signals,
+            DatabaseType.LOGIC: self._logic,
+            DatabaseType.POSITIONS: self._positions,
+            DatabaseType.PORTFOLIO: self._portfolio,
+            DatabaseType.INFO: self._info
         }
 
         # Create a custom name based on type and uuid
@@ -64,12 +75,15 @@ class Database:
     def __str__(self) -> str:
         return f"DATABASE >> Name: {self.name} | db_type: {self.db_type.name}"
     
-    def build(self, **kwargs):
-        self.df = self.db_mapping[self.db_type](**kwargs)
+    def build(self):
+        self.df = self.db_mapping[self.db_type](**self.arguments)
         return self.df
     
-    # TODO - to make this the default kline df going forward
-    def _kline_df(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int) -> pd.DataFrame:
+    def _klines(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int, source:ExchangeType) -> pd.DataFrame:
+        """
+        This will build the klines dataframe, and add it to self.df
+        """
+        
         # Filepath based on inputs
         filepath = f"db/klines/{symbol.symbol.lower()}/{interval}/"
 
@@ -82,7 +96,7 @@ class Database:
         # Verbose print
         if self.verbose:
             print(line)
-            print("CREATING DATABASE")
+            print(f"CREATING DATABASE - {symbol.symbol.symbol} | {interval}")
             print(f"start: {datetime.fromtimestamp(starttime,  tz=timezone.utc)}")
             print(f"end: {datetime.fromtimestamp(endtime, tz=timezone.utc)}")
         
@@ -148,18 +162,31 @@ class Database:
         # Return data
         return ret_data
 
+    def _indicators(self, indicator_settings:List[Indicator]):
+        print(indicator_settings)
+        pass
+
+    def _orderbook(self):
+        pass
+
+    def _logic(self):
+        pass
+
+    def _positions(self):
+        pass
+
     # Create a signals dataframe
-    def _signals_df(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int, *args, **kwargs) -> pd.DataFrame:
+    def _signals(self) -> pd.DataFrame:
         # Your implementation here
         pass
 
     # Create a portfolio dataframe
-    def _portfolio_df(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int, *args, **kwargs) -> pd.DataFrame:
+    def _portfolio(self) -> pd.DataFrame:
         # Your implementation here
         pass
 
     # Create an info dataframe
-    def _info_df(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int, *args, **kwargs) -> pd.DataFrame:
+    def _info(self) -> pd.DataFrame:
         # Your implementation here
         pass
 

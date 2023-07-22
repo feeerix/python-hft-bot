@@ -33,3 +33,5 @@ start = 1569888000 # ETH / BTC
 end = 1685592000
 
 test_binance = Binance()
+test_list = test_binance.get_print_symbols(live=True)
+print(test_list)
