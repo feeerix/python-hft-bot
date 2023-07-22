@@ -55,7 +55,12 @@ usdt = Asset("Tether", "USDT", "0x0", AssetType.TOKEN, Network.ETHEREUM)
 
 ethusdt = Symbol("ETHUSDT", [eth, usdt])
 interval1 = str(Interval._4h)
-# interval2 = str(Interval._1m)
+
+# def _kline_df(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int) -> pd.DataFrame:
+klines = Database("ethusdt_klines", DatabaseType.KLINES, True)
+klines.build(symbol=ethusdt, interval=Interval._4h, starttime=start, endtime=end)
+# klines._kline_df()
+
 
 """
 Currently, what I'm working through is that a strategy is VERY likely going to need more than one database potentially.
@@ -72,18 +77,17 @@ I should be able to do so.)
 
 
 
-# df2 = Database(verbose=True)._kline_df(ethusdt, interval2, start, end)
 
-test_strat = Strategy(
-    name="test1", 
-    klines=Database(db_type=DatabaseType.KLINES),
-    indicators=Database(db_type=DatabaseType.INDICATORS),
-    orderbook=Database(db_type=DatabaseType.ORDERBOOK),
-    signals=Database(db_type=DatabaseType.SIGNALS),
-    logic=Database(db_type=DatabaseType.LOGIC),
-    positions=Database(db_type=DatabaseType.POSITIONS),
-    verbose=True,
-)
+# test_strat = Strategy(
+#     name="test1", 
+#     klines=Database(db_type=DatabaseType.KLINES),
+#     indicators=Database(db_type=DatabaseType.INDICATORS),
+#     orderbook=Database(db_type=DatabaseType.ORDERBOOK),
+#     signals=Database(db_type=DatabaseType.SIGNALS),
+#     logic=Database(db_type=DatabaseType.LOGIC),
+#     positions=Database(db_type=DatabaseType.POSITIONS),
+#     verbose=True,
+# )
 
 
 # test_strat2 = Strategy("test2", df2)

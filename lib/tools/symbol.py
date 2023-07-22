@@ -17,10 +17,7 @@ class Symbol:
         Symbols in our sense can only have a pair
         """
         if len(assets) == 2:
-            if symbol == "":
-                self.symbol = f"{assets[0].name}{assets[1].name}"
-            else:
-                raise ValueError("Symbol string not included.")
+            self.symbol = f"{assets[0].name}{assets[1].name}"
         else:
             raise ValueError("Asset List Length incorrect.")
         

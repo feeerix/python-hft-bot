@@ -299,11 +299,12 @@ class Strategy:
     
     # TODO - create representation
     def __repr__(self) -> str:
+        
         return f""
 
-    def trigger(self):
+    def build(self):
         """
-        This function 'triggers' all the required database to return their corresponding dataframes.
+        This function builds all the required database to return their corresponding dataframes.
         In doing so, you can then start to either backtest or perform the strategy accordingly.
         """
         pass
@@ -316,4 +317,4 @@ class Strategy:
         if self.verbose:
             print("SAVING")
         
-    
+    """  """
