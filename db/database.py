@@ -5,20 +5,22 @@ from dateutil.relativedelta import relativedelta
 from enum import Enum
 import uuid
 from typing import List
+import numpy as np
 
 # Local Imports
 from lib.api.binance.local import filename
 from lib.cli.printer import line
-from lib.file.reader import get_json, get_list
-from lib.file.writer import write_json
+# from lib.file.reader import get_json, get_list
+# from lib.file.writer import write_json
 
-from lib.tools.asset import Asset
-from lib.tools.exchange import Exchange, ExchangeType
-from lib.tools.blockchain import Blockchain
+# from lib.tools.asset import Asset
+from lib.tools.exchange import Exchange
+from lib.tools.internal.exchange_type import ExchangeType
+# from lib.tools.blockchain import Blockchain
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
 from lib.tools.symbol import Symbol
-from lib.tools.interval import _Interval as Interval
+from lib.tools.interval import Interval
 
 class DatabaseType(Enum):
     KLINES = 'klines'
@@ -96,9 +98,9 @@ class Database:
         # Verbose print
         if self.verbose:
             print(line)
-            print(f"CREATING DATABASE - {symbol.symbol.symbol} | {interval}")
-            print(f"start: {datetime.fromtimestamp(starttime,  tz=timezone.utc)}")
-            print(f"end: {datetime.fromtimestamp(endtime, tz=timezone.utc)}")
+            print(f"CREATING DATABASE - {symbol.symbol} | {interval}")
+            print(f"START: {datetime.fromtimestamp(starttime,  tz=timezone.utc)}")
+            print(f"END: {datetime.fromtimestamp(endtime, tz=timezone.utc)}")
         
         # return file
         ret_data = pd.DataFrame(columns=[
@@ -124,7 +126,7 @@ class Database:
                 print(f"{round(((int(dt_start.timestamp()) - starttime) / distance) * 100, 3)}% COMPLETE")
             
             # Get filename
-            fn = filename(symbol, interval, f"{dt_start.year}", f"{dt_start.month:02d}")
+            fn = filename(source.name.lower(), symbol.symbol.lower(), interval, f"{dt_start.year}", f"{dt_start.month:02d}")
             
             # add new data to return df
             new_df = pd.read_csv(f'{filepath}{fn}')
@@ -135,8 +137,7 @@ class Database:
             df_number += 1
 
             ret_data = pd.concat([ret_data, new_df], axis=0, ignore_index=True)
-            
-            
+        
             # TODO - See if we can speed this up a bit
             if dt_start.month == datetime.fromtimestamp(ret_data.iloc[0]['time']/1000, tz=timezone.utc).month and dt_start.timestamp() > (int(ret_data.iloc[0]['time']/1000)):
                 ret_data = ret_data.loc[dt_start.timestamp()*1000 > ret_data['time']]
@@ -162,9 +163,28 @@ class Database:
         # Return data
         return ret_data
 
-    def _indicators(self, indicator_settings:List[Indicator]):
-        print(indicator_settings)
-        pass
+    def _indicators(self, indicators:List[Indicator], recording:bool=False):
+        
+        # Add all the indicators
+        for indicator in indicators:
+            if self.verbose:
+                print(indicator.settings.data)
+
+            # If we want to write the settings
+            if recording:
+                self.indicator_settings_list.append(indicator.settings.data)
+
+            """
+            This adds the indicator columns to the current df Database
+            """
+            self.df = pd.concat(
+                [
+                    self.df, # Existing DF
+                    indicator.ret_indicator(self.df)
+                ], # New DF
+                axis=1, 
+                # ignore_index=True # -> removed index
+            )
 
     def _orderbook(self):
         pass
@@ -176,9 +196,58 @@ class Database:
         pass
 
     # Create a signals dataframe
-    def _signals(self) -> pd.DataFrame:
-        # Your implementation here
-        pass
+    def _signals(self, settings:List[Settings], recording:bool=False) -> pd.DataFrame:
+        """
+        I should note that the entries are just adding booleans for specific trading signals.
+        I will need to update this so that it better generalises when I'm adding signals for everything, not just opening and closing positions
+        """
+
+        for _settings in settings:
+            # Test print
+            if self.verbose:
+                print(_settings.data)
+                
+            if recording:
+                for pos_type in self.position_condition_settings.keys():
+
+                    if pos_type == _settings.data["func_name"]:
+                        self.position_condition_settings[pos_type].append(
+                            _settings.data
+                        )
+
+                self.df[_settings.data['name']] = np.where((
+                        (self.df[_settings.data['arguments']['open'][True]].all(axis=1)) &
+                        (self.df[_settings.data['arguments']['open'][False]].sum(axis=1) == 0)
+                ), 1, 0)
+            else:
+                self.df[_settings.data['name']] = np.where((
+                        (self.df[_settings.data['arguments']['open']['true']].all(axis=1)) &
+                        (self.df[_settings.data['arguments']['open']['false']].sum(axis=1) == 0)
+                ), 1, 0)
+            # CLOSE -----------------------------------------------------------------------------------------
+            if self.verbose:
+                print(_settings.data)
+            
+
+            if recording:
+                for pos_type in self.position_condition_settings.keys():
+
+                    if pos_type == _settings.data["func_name"]:
+                        self.position_condition_settings[pos_type].append(
+                            _settings.data
+                        )
+                
+                self.df[_settings.data['name']] = np.where((
+                        (self.df[_settings.data['arguments']['close'][True]].all(axis=1)) &
+                        (self.df[_settings.data['arguments']['close'][False]].sum(axis=1) == 0)
+                ), 1, 0)
+                
+            else:
+                self.df[_settings.data['name']] = np.where((
+                        (self.df[_settings.data['arguments']['close']['true']].all(axis=1)) &
+                        (self.df[_settings.data['arguments']['close']['false']].sum(axis=1) == 0)
+                ), 1, 0)
+
 
     # Create a portfolio dataframe
     def _portfolio(self) -> pd.DataFrame:
@@ -190,87 +259,4 @@ class Database:
         # Your implementation here
         pass
 
-    """
-    ADDED THE BELOW FUNCTIONS FROM STRATEGY
     
-    Migrating these from strategy means that we can better isolate functions within the
-    classes to make sure classes have single abstracted responsibility
-
-    TODO - to make sure that all the functions are working correctly based on the corresponding
-    context.
-    """
-    
-    # Add indicator to self.df
-    def add_indicator(self, _indicator:Indicator, recording:bool=True):
-        if self.verbose:
-            print(_indicator.settings.data)
-
-        # If we want to write the settings
-        if recording:
-            self.indicator_settings_list.append(_indicator.settings.data)
-
-        """
-        This adds the indicator columns to the current df Database
-        """
-        self.df = pd.concat(
-            [
-                self.df, # Existing DF
-                _indicator.ret_indicator(self.df)
-            ], # New DF
-            axis=1, 
-            # ignore_index=True # -> removed index
-        )
-
-    # Add entry conditions
-    def add_entry(self, _settings:Settings, recording:bool=True):
-
-        """
-        I should note that the entries are just adding booleans for specific trading signals
-        """
-        # Test print
-        if self.verbose:
-            print(_settings.data)
-            
-        if recording:
-            for pos_type in self.position_condition_settings.keys():
-
-                if pos_type == _settings.data["func_name"]:
-                    self.position_condition_settings[pos_type].append(
-                        _settings.data
-                    )
-
-            self.df[_settings.data['name']] = np.where((
-                    (self.df[_settings.data['arguments']['open'][True]].all(axis=1)) &
-                    (self.df[_settings.data['arguments']['open'][False]].sum(axis=1) == 0)
-            ), 1, 0)
-        else:
-            self.df[_settings.data['name']] = np.where((
-                    (self.df[_settings.data['arguments']['open']['true']].all(axis=1)) &
-                    (self.df[_settings.data['arguments']['open']['false']].sum(axis=1) == 0)
-            ), 1, 0)
-
-    # Add close conditions
-    def add_close(self, _settings:Settings, recording:bool=True):    
-        # Test print
-        if self.verbose:
-            print(_settings.data)
-        
-
-        if recording:
-            for pos_type in self.position_condition_settings.keys():
-
-                if pos_type == _settings.data["func_name"]:
-                    self.position_condition_settings[pos_type].append(
-                        _settings.data
-                    )
-            
-            self.df[_settings.data['name']] = np.where((
-                    (self.df[_settings.data['arguments']['close'][True]].all(axis=1)) &
-                    (self.df[_settings.data['arguments']['close'][False]].sum(axis=1) == 0)
-            ), 1, 0)
-            
-        else:
-            self.df[_settings.data['name']] = np.where((
-                    (self.df[_settings.data['arguments']['close']['true']].all(axis=1)) &
-                    (self.df[_settings.data['arguments']['close']['false']].sum(axis=1) == 0)
-            ), 1, 0)

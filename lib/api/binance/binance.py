@@ -13,7 +13,8 @@ from lib.file.reader import file_exists
 # from lib.api.api import API
 from lib.file.finder import *
 from lib.tools.interval import Interval
-from lib.tools.exchange import Exchange, ExchangeType
+from lib.tools.exchange import Exchange
+from lib.tools.internal.exchange_type import ExchangeType
 
 # TODO - potentially to remove this specific import
 from lib.api.binance.interface import *

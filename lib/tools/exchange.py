@@ -1,17 +1,14 @@
 # IMPORTS
-from enum import Enum
+
 from abc import ABC, abstractmethod
 import json
 
 # lOCAL IMPORT
 from lib.file.reader import get_json, get_list
 from lib.tools.interval import Interval
+from lib.tools.symbol import Symbol
+from lib.tools.internal.exchange_type import ExchangeType
 
-
-class ExchangeType(Enum):
-    BINANCE = "binance"
-    BYBIT = "bybit"
-    PHEMEX = "phemex"
 
 class Exchange(ABC):
     
@@ -71,7 +68,7 @@ class Exchange(ABC):
         pass
 
     @abstractmethod
-    def update_klines(self, symbol:str, interval:Interval):
+    def update_klines(self, symbol:Symbol, interval:Interval):
         """
         
         """

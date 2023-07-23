@@ -4,14 +4,15 @@ from typing import List
 
 # LOCAL IMPORTS
 from lib.tools.asset import Asset
-from lib.tools.exchange import Exchange
+# from lib.tools.exchange import ExchangeType
+from lib.tools.internal.exchange_type import ExchangeType
 
 """
 Symbol class
 """
 
 class Symbol:
-    def __init__(self, symbol:str="", assets:List[Asset]=[], exchange:Exchange=None):
+    def __init__(self, symbol:str="", assets:List[Asset]=[], exchange:ExchangeType=None):
         """
         NOTE:
         Symbols in our sense can only have a pair

@@ -10,7 +10,7 @@ def get_last_closed_time(interval_tc:int):
 """
 Potentially how I can change my specific interval class to.
 """
-class _Interval(Enum):
+class Interval(Enum):
     _1m = 60
     _5m = 300
     _15m = 900
@@ -41,40 +41,40 @@ class _Interval(Enum):
             return get_last_closed_time(self.value)
 
 # Not sure if a whole class is required yet - will leave in and go from there
-class Interval():
-    # _1m = 60
-    # _5m = 300
-    # _15m = 900
-    # _1h = 3600
-    # _4h = 14400
-    # _1D = 86400
-    # _1W = 604800
+# class Interval():
+#     # _1m = 60
+#     # _5m = 300
+#     # _15m = 900
+#     # _1h = 3600
+#     # _4h = 14400
+#     # _1D = 86400
+#     # _1W = 604800
 
-    def __init__(self, str_interval:str, ms:bool=False):
-        self.str_interval = str_interval
+#     def __init__(self, str_interval:str, ms:bool=False):
+#         self.str_interval = str_interval
 
-        self.interval_table = {
-            '1m': 60,
-            '5m': 300,
-            '15m': 900,
-            '1h': 3600,
-            '4h': 14400,
-            '1D': 86400,
-            '1W': 604800
-        }
+#         self.interval_table = {
+#             '1m': 60,
+#             '5m': 300,
+#             '15m': 900,
+#             '1h': 3600,
+#             '4h': 14400,
+#             '1D': 86400,
+#             '1W': 604800
+#         }
 
-        self.ms = ms
+#         self.ms = ms
         
 
-    def tc_rep(self) -> int:
-        return self.interval_table[self.str_interval]
+#     def tc_rep(self) -> int:
+#         return self.interval_table[self.str_interval]
     
-    def str_rep(self) -> str:
+#     def str_rep(self) -> str:
         
-        return self.str_interval
+#         return self.str_interval
     
-    def last_close(self) -> int:
-        if self.ms:
-            return get_last_closed_time(self.tc_rep()) * 1000
-        else:
-            return get_last_closed_time(self.tc_rep())
+#     def last_close(self) -> int:
+#         if self.ms:
+#             return get_last_closed_time(self.tc_rep()) * 1000
+#         else:
+#             return get_last_closed_time(self.tc_rep())

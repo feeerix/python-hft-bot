@@ -5,7 +5,7 @@ from lib.cli.printer import *
 
 class Creator:
     """
-    This is the creator class. We'll use this class to create strategies.
+    This is the creator class. We'll use this class to create portfolios.
     """
     def __init__(self, _strategy:strategy) -> None:
         self.strategy = strategy

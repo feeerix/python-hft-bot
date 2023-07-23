@@ -5,16 +5,16 @@ import warnings
 from datetime import datetime
 
 # Loca Imports
-from lib.api.binance.binance import Binance
+# from lib.api.binance.binance import Binance
 from db.database import Database, DatabaseType
 from lib.tools.symbol import Symbol
 from lib.tools.exchange import ExchangeType
-from lib.tools.interval import _Interval as Interval
+from lib.tools.interval import Interval
 from lib.tools.asset import Asset, AssetType
 from lib.tools.network import Network
 from backtest.strat.strategy import Strategy
-from backtest.strat.indicator import Indicator
-from backtest.strat.settings.settings import Settings
+# from backtest.strat.indicator import Indicator
+# from backtest.strat.settings.settings import Settings
 
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -48,7 +48,7 @@ warnings.simplefilter(action='ignore',category=FutureWarning)
 start = 1569888000 # ETH / BTC
 end = 1685592000
 
-test_binance = Binance()
+# test_binance = Binance()
 
 # Database().kline_df('ETHUSDT',"4h",start,end)
 eth = Asset("Ethereum", "ETH", "0x0", AssetType.COIN, Network.ETHEREUM)
@@ -58,16 +58,12 @@ ethusdt = Symbol("ETHUSDT", [eth, usdt])
 interval1 = str(Interval._4h)
 
 # def _kline_df(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int) -> pd.DataFrame:
-"""
-Think about how I want to implement the settings for the database
-we want to be able to include multiple klines - 
-"""
+
 klines = Database("ethusdt_klines", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._4h, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+
 indicators = Database("ethusdt_indicators", DatabaseType.INDICATORS, True, symbol=ethusdt, interval=Interval._4h, starttime=start, endtime=end)
 
 klines.build()
-print(klines.df.columns.tolist())
-
 exit()
 """
 Currently, what I'm working through is that a strategy is VERY likely going to need more than one database potentially.

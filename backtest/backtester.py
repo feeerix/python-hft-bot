@@ -8,7 +8,6 @@ import numpy as np
 
 # Local Imports
 from lib.api.binance.interface import Binance
-from lib.api.binance.local import filename
 from lib.file.writer import *
 from lib.file.reader import *
 

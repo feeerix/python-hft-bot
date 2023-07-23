@@ -6,13 +6,33 @@ import inspect
 from lib.file.writer import *
 from lib.file.reader import *
 
+from lib.tools.exchange import Exchange, ExchangeType
+from lib.tools.asset import Asset
+
 # TODO - create way for us to compose a strategy
 class Composer:
-    def __init__(self):
+    """
+    We shall use this as the class that creates the settings for strategies programatically
+
+    Previously we had been using pandas_ta to create functions.
+    """
+
+    def __init__(self, verbose:bool=False):
         pass
 
     def add_setting(self):
         pass
+
+    def write(self):
+        pass
+
+    def verify(self):
+        pass
+
+
+"""
+Initial functions I was using?
+"""
 
 # Quick and dirty way to get the require params
 def get_params(verbosity:bool=False):
@@ -65,6 +85,9 @@ def write_required_params(verbosity:bool=False): # TODO - Make sure to add verbo
     # TODO - Make sure to add correct return values
     return True
 
+"""
+This is the only function that seems to appear in another file
+"""
 def get_required_params(func_name:str, verbosity:bool=False) -> dict:
     if verbosity:
         print(f"Getting required params for: {func_name}")

@@ -8,10 +8,9 @@ from settings.settings import settings
 """
 CREATING A STATE MACHINE TO MODEL THE MARKET
 
-
 """
 # ---------------------------------------------------------------
 
-class AgentState:
+class Agent:
     def __init__(self) -> None:
         pass
