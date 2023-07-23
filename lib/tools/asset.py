@@ -3,7 +3,7 @@ from enum import Enum
 
 # LOCAL IMPORT
 from lib.tools.network import Network
-# from lib.tools.exchange import ExchangeType
+from lib.tools.internal.exchange_type import ExchangeType
 
 """
 At this stage, we specifically will want to define all of the assets
@@ -27,7 +27,7 @@ class Asset:
             address:str="", 
             asset_type:AssetType=None,
             network:Network=None,
-            # exchange: ExchangeType=None
+            # exchange: ExchangeType=None # Deciding whether we want to do this or not
             ):
         self.ticker = ticker
         self.asset = asset_type

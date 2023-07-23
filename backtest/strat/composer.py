@@ -6,7 +6,8 @@ import inspect
 from lib.file.writer import *
 from lib.file.reader import *
 
-from lib.tools.exchange import Exchange, ExchangeType
+# from lib.tools.exchange import Exchange, ExchangeType
+from lib.tools.internal.exchange_type import ExchangeType
 from lib.tools.asset import Asset
 
 # TODO - create way for us to compose a strategy

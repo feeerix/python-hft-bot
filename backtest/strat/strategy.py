@@ -38,9 +38,9 @@ class Strategy:
             self, 
             # Name of the Database
             name:str="", 
-            klines:List[Database]=None,
-            indicators:List[Database]=None, 
-            orderbook:List[Database]=None, 
+            klines:List[Database]=[],
+            indicators:List[Database]=[], 
+            orderbook:List[Database]=[], 
             signals:Database=None, 
             logic:Database=None, 
             positions:Database=None,
@@ -122,9 +122,27 @@ class Strategy:
         This function builds all the required database to return their corresponding dataframes.
         In doing so, you can then start to either backtest or perform the strategy accordingly.
         """
-        # Build klines
-        self.klines.build()
+        # print(self.indicators.kwargs)
+        
 
+        # Build klines
+        for kline_db in self.klines:
+            kline_db.build()
+
+            # ADD INDICATOR TO THE CORRESPONDING KLINE DB
+            for indicator in self.indicators:
+                if indicator.arguments['symbol'] == kline_db.arguments['symbol']:
+                    if indicator.arguments['interval'] == kline_db.arguments['interval']:
+                        
+                        # Add the reference to the same df
+                        indicator.df = kline_db.df
+                        kline_db.df = indicator.build()
+                        
+                        if self.verbose:
+                            print("ADDED INDICATOR(S)")
+            
+
+        
 
     def save(self):
         if self.verbose:

@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 from enum import Enum
 import uuid
-from typing import List
+from typing import List, Dict
 import numpy as np
 
 # Local Imports
@@ -47,7 +47,10 @@ class Database:
     It's job is to maintain the data - and if something is being done live making sure it's
     up to date as well as correct. We can eventually move the hash and checking mechanism
     directly within this class
-    
+   
+    TODO - Somehow the Database uuid's seem to be the same in some circumstances.
+    Need to check on what's happening here
+
     """
     # DB_NAMESPACE = uuid.uuid4()
 
@@ -71,16 +74,29 @@ class Database:
         }
 
         # Create a custom name based on type and uuid
-        if not name:
+        if not name or name == "":
             self.name = f'{db_type.name}-{uuid.uuid3(uuid.NAMESPACE_OID, db_type.name)}'
 
     def __str__(self) -> str:
+        # {self.db_type.name}_{self.arguments['symbol']}_{self.arguments['interval']}_{self.arguments['source'].name}
         return f"DATABASE >> Name: {self.name} | db_type: {self.db_type.name}"
     
     def build(self):
-        self.df = self.db_mapping[self.db_type](**self.arguments)
-        return self.df
-    
+        """
+        Totally hacky way for now to specifically append df for klines at the moment
+        """
+        if self.db_type == DatabaseType.KLINES:
+            # kline_title = f"{self.db_type.name}_{self.arguments['symbol']}_{self.arguments['interval']}_{self.arguments['source'].name}"
+            self.df = self.db_mapping[self.db_type](**self.arguments)
+
+            return self.df
+
+        elif self.db_type == DatabaseType.INDICATORS:
+            self.df = self.db_mapping[self.db_type](**self.arguments)
+
+            return self.df
+
+
     def _klines(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int, source:ExchangeType) -> pd.DataFrame:
         """
         This will build the klines dataframe, and add it to self.df
@@ -163,16 +179,13 @@ class Database:
         # Return data
         return ret_data
 
-    def _indicators(self, indicators:List[Indicator], recording:bool=False):
+    def _indicators(self, symbol:Symbol, interval:Interval, indicators:List[Indicator], recording:bool=False) -> pd.DataFrame:
         
+        # for kline
         # Add all the indicators
         for indicator in indicators:
             if self.verbose:
-                print(indicator.settings.data)
-
-            # If we want to write the settings
-            if recording:
-                self.indicator_settings_list.append(indicator.settings.data)
+                print(f"ADDING: {indicator.settings.data['name']} -> {self.name}")
 
             """
             This adds the indicator columns to the current df Database
@@ -185,6 +198,9 @@ class Database:
                 axis=1, 
                 # ignore_index=True # -> removed index
             )
+        
+        # Return DF after all indicators in list added
+        return self.df
 
     def _orderbook(self):
         pass
