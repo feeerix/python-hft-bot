@@ -31,14 +31,13 @@ class DatabaseType(Enum):
     POSITIONS = 'positions'
     INDICATORS = 'indicators'
     ORDERBOOK = 'orderbook'
+    RESULTS = 'results'
 
 class DatabaseFactory:
     def create_db(self, db_type:DatabaseType=None):
 
         if not db_type:
             raise NotImplementedError("create_db not implemented!")
-
-
 
 class Database:
     """
@@ -52,7 +51,7 @@ class Database:
     Need to check on what's happening here
 
     """
-    # DB_NAMESPACE = uuid.uuid4()
+    DB_NAMESPACE = uuid.uuid4()
 
     # Initialises
     def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
@@ -75,7 +74,14 @@ class Database:
 
         # Create a custom name based on type and uuid
         if not name or name == "":
-            self.name = f'{db_type.name}-{uuid.uuid3(uuid.NAMESPACE_OID, db_type.name)}'
+            """
+            Hacky way to get good names
+            """
+            if self.db_type == DatabaseType.KLINES or self.db_type == DatabaseType.INDICATORS:
+                self.name = f'{db_type.name}-{self.arguments["symbol"]}-{self.arguments["interval"]}'
+            else:
+                # TODO - Making sure to update later
+                self.name = f'{db_type.name}-TEST'
 
     def __str__(self) -> str:
         # {self.db_type.name}_{self.arguments['symbol']}_{self.arguments['interval']}_{self.arguments['source'].name}

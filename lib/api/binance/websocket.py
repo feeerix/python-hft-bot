@@ -9,6 +9,7 @@ from ..ws_gopher import ws_gopher
 from lib.api.binance.interface import process_kline
 from lib.cli.printer import line
 from lib.tools.interval import Interval
+from lib.tools.exchange import ExchangeType
 from lib.file.reader import get_json
 
 ws_urls = [
@@ -94,9 +95,13 @@ def payload(method:str, stream_type:str, symbol:str="", interval:str="", level:i
         ]
     }
 
+
+"""
+Getting ready to change the websocket classes so they receive data efficiently
+"""
 class ws_agent(ws_gopher):
     def __init__(self, verbose:bool=False): 
-        super().__init__('binance', verbose=verbose)
+        super().__init__(ExchangeType.BINANCE, verbose=verbose)
         self.last_ping = 0
         self.ws_table = get_json('lib/api/binance/config/websocket_table.json')
 
@@ -128,8 +133,6 @@ class ws_agent(ws_gopher):
                 "id": id
             }
         )
-        
-
 
     def unsubscribe(self, params:list, id:int):
         super().send(

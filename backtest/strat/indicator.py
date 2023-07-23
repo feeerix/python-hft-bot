@@ -37,8 +37,12 @@ class Indicator:
         if df is not None:
             self.df = self.ret_indicator(df)
     
-    def print_settings(self):
-        print(self.settings.data)
+    def __str__(self) -> str:
+        return f"{self.settings.data['name']}-{self.settings.data['columns']}"
+
+    @property
+    def columns(self):
+        return self.settings.data['columns']
 
     def ret_indicator(self, df:pd.DataFrame) -> pd.DataFrame:
         # initialise empty settings
@@ -65,7 +69,7 @@ class Indicator:
                 ind_settings.update({argument: self.settings.data['arguments'][argument]})
         
         ret_data = self.ind_func(**ind_settings)
-        
+
         
         # --------------------------------------------------------------
         if type(ret_data) == pd.DataFrame:
@@ -77,6 +81,6 @@ class Indicator:
         else:
             print("SOMETHING WENT WRONG")
             print(type(ret_data))
-            exit()
+            exit() # PANIC
         
     

@@ -5,7 +5,7 @@ import numpy as np
 from hashlib import sha256
 import time
 from enum import Enum
-from typing import List
+from typing import List, Dict
 
 # Local Imports
 from backtest.strat.indicator import Indicator
@@ -112,6 +112,26 @@ class Strategy:
     def __str__(self) -> str:
         return f"STRATEGY: {self.name}"
     
+    @property
+    def df_columns(self) -> Dict[str, list]:
+        """
+        Returns:
+        Dict(
+            str(Name of Dataframe): [List of Dataframe columns]
+        )
+        """
+        
+        ret_data = {}
+        for kline_db in self.klines:
+            new_col_list = kline_db.df.columns.tolist()
+            ret_data[f"{kline_db.name}"] = new_col_list
+            
+            if self.verbose:
+                print(f"-- COLUMNS FOR: {kline_db.name} --")
+                print(new_col_list)
+
+        return ret_data
+
     # TODO - create representation
     def __repr__(self) -> str:
         
@@ -141,16 +161,17 @@ class Strategy:
                         if self.verbose:
                             print("ADDED INDICATOR(S)")
             
-
         
 
     def save(self):
         if self.verbose:
             print("SAVING...")
-        
     
     def backtest(self):
         pass
         
+
+    def go_live(self):
+        pass
         
     """  """

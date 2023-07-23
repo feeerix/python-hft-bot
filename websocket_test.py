@@ -2,9 +2,9 @@
 import time
 
 # Local Imports
-from lib.api.updater import update
+# from lib.api.updater import update
 from lib.api.binance.websocket import ws_agent
-from lib.api.binance.interface import Binance
+# from lib.api.binance.interface import Binance
 from lib.cli.printer import line
 # from lib.file.reader import get_json
 

@@ -59,11 +59,11 @@ interval1 = str(Interval._4h)
 
 # def _kline_df(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int) -> pd.DataFrame:
 
-klines_4h = Database("ethusdt_klines", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._4h, starttime=start, endtime=end, source=ExchangeType.BINANCE)
-klines_1h = Database("ethusdt_klines", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._1h, starttime=start, endtime=end, source=ExchangeType.BINANCE)
-klines_15m = Database("ethusdt_klines", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._15m, starttime=start, endtime=end, source=ExchangeType.BINANCE)
-klines_5m = Database("ethusdt_klines", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._5m, starttime=start, endtime=end, source=ExchangeType.BINANCE)
-klines_1m = Database("ethusdt_klines", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._1m, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+klines_4h = Database("", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._4h, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+klines_1h = Database("", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._1h, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+klines_15m = Database("", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._15m, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+klines_5m = Database("", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._5m, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+klines_1m = Database("", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._1m, starttime=start, endtime=end, source=ExchangeType.BINANCE)
 
 indicator_list = [
     Indicator(Settings("ema8", "ema", {'length': 8})),
@@ -148,13 +148,29 @@ indicator_dbs = [
     # indicators_1m
 ]
 
+signal_indicators = [
+    Indicator(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"})),
+    Indicator(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"})),
+    Indicator(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"})),
+    Indicator(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"})),
+    Indicator(Settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 20.0})),
+    Indicator(Settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 20.0})),
+    Indicator(Settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 80.0})),
+    Indicator(Settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 80.0})),
+    Indicator(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8"})),
+    Indicator(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8", "above": False}))
+]
+# def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
+signal_dbs = Database("", DatabaseType.SIGNALS, True, indicators=signal_indicators)
+
+
 
 test_strat = Strategy(
     name="test1", 
     klines=klines_dbs,
     indicators=indicator_dbs,
     orderbook=[Database(db_type=DatabaseType.ORDERBOOK)], # TODO - need to update exchange class to add ws functions
-    signals=Database(db_type=DatabaseType.SIGNALS),
+    signals=signal_dbs,
     logic=Database(db_type=DatabaseType.LOGIC),
     positions=Database(db_type=DatabaseType.POSITIONS),
     verbose=True,
@@ -163,10 +179,14 @@ test_strat = Strategy(
 print("CREATED TEST STRAT")
 test_strat.build()
 
-print(test_strat.klines[0].df)
+"""
+Next step is to make sure we can implement our signals, and then the logic for trading
+Once we have done that, we will add to the positions database, and then create a performance
+database, with the corresponding trades (A DB WITHIN DB?!) and then continue from there.
+"""
 
-# for x in test_strat.klines:
-#     print(x.df)
+# print(test_strat.klines[0].df)
+
 
 exit()
 
