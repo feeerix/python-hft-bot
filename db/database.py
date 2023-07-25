@@ -1,5 +1,6 @@
 # Imports
 import pandas as pd
+import pandas_ta as ta
 from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 from enum import Enum
@@ -54,7 +55,7 @@ class Database:
     DB_NAMESPACE = uuid.uuid4()
 
     # Initialises
-    def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
+    def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs:List[Indicator]):
         self.db_type = db_type
         self.name = name
         self.verbose = verbose
@@ -87,21 +88,26 @@ class Database:
         # {self.db_type.name}_{self.arguments['symbol']}_{self.arguments['interval']}_{self.arguments['source'].name}
         return f"DATABASE >> Name: {self.name} | db_type: {self.db_type.name}"
     
-    def build(self):
+    def build(self, **kwargs):
         """
-        Totally hacky way for now to specifically append df for klines at the moment
+        This function builds any database. 
+        We currently do not want the function to take arguments.
         """
-        if self.db_type == DatabaseType.KLINES:
+
+        # Totally hacky way for now to specifically append df for klines at the moment
+        if self.db_type == DatabaseType.KLINES or self.db_type == DatabaseType.INDICATORS:
             # kline_title = f"{self.db_type.name}_{self.arguments['symbol']}_{self.arguments['interval']}_{self.arguments['source'].name}"
             self.df = self.db_mapping[self.db_type](**self.arguments)
 
             return self.df
-
-        elif self.db_type == DatabaseType.INDICATORS:
-            self.df = self.db_mapping[self.db_type](**self.arguments)
-
-            return self.df
-
+        
+        if self.db_type == DatabaseType.SIGNALS:
+            # kwargs['dataframe']
+            for indicator in self.arguments['indicators']:
+                print(indicator)
+            # print(self.arguments)
+            exit()
+    
 
     def _klines(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int, source:ExchangeType) -> pd.DataFrame:
         """
@@ -218,18 +224,28 @@ class Database:
         pass
 
     # Create a signals dataframe
-    def _signals(self, settings:List[Settings], recording:bool=False) -> pd.DataFrame:
+    def _signals(self, indicators:List[Indicator]=[], recording:bool=False) -> pd.DataFrame:
         """
         I should note that the entries are just adding booleans for specific trading signals.
         I will need to update this so that it better generalises when I'm adding signals for everything, not just opening and closing positions
         """
+        
+        for _settings in indicators:
+            
+            
+            print(self.df[_settings.settings.data['arguments']['series_a']])
+            exit()
 
-        for _settings in settings:
             # Test print
             if self.verbose:
                 print(_settings.data)
                 
+
+            
+
+            # Let's figure out what the fuck is happening here first.
             if recording:
+                
                 for pos_type in self.position_condition_settings.keys():
 
                     if pos_type == _settings.data["func_name"]:
@@ -247,6 +263,7 @@ class Database:
                         (self.df[_settings.data['arguments']['open']['false']].sum(axis=1) == 0)
                 ), 1, 0)
             # CLOSE -----------------------------------------------------------------------------------------
+
             if self.verbose:
                 print(_settings.data)
             

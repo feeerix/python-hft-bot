@@ -160,6 +160,41 @@ class Strategy:
                         
                         if self.verbose:
                             print("ADDED INDICATOR(S)")
+
+            # print(kline_db.df)
+
+            self.signals.build(dataframe=kline_db.df)
+            exit()
+                        
+                        # for x in self.signals.arguments['indicators']:
+                        #     print(x)
+                        #     for argument in x.settings.data['arguments']:
+                        #         if argument == 'series_a':
+                        #             series_a = x.settings.data['arguments'][argument]
+                        #         elif argument == 'series_b':
+                        #             series_b = x.settings.data['arguments'][argument]
+                                    
+                            
+                        #     test = x.ind_func(series_a=kline_db.df[series_a], series_b=kline_db.df[series_b])
+                        #     print(test)
+                        #     exit()
+
+        for x in self.signals.arguments['indicators']:
+            print(x.settings.data['name'])
+            for argument in x.settings.data['arguments']:
+                if argument.startswith("series_"):
+                    print(argument)
+                else:
+                    print("ANOTHER?")
+                    print(argument)
+            print(x.settings.data['arguments'])
+            exit()
+            func = getattr(ta, x.settings.data['func_name'])
+            test = func(**x.settings.data['arguments'])
+            print(test)
+            print()
+            
+        exit()
             
         
 

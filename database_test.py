@@ -162,9 +162,9 @@ signal_indicators = [
 ]
 # def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
 signal_dbs = Database("", DatabaseType.SIGNALS, True, indicators=signal_indicators)
-
-
-
+# signal_dbs.build()
+# print(signal_dbs.df)
+# exit()
 test_strat = Strategy(
     name="test1", 
     klines=klines_dbs,
@@ -178,7 +178,7 @@ test_strat = Strategy(
 
 print("CREATED TEST STRAT")
 test_strat.build()
-
+exit()
 """
 Next step is to make sure we can implement our signals, and then the logic for trading
 Once we have done that, we will add to the positions database, and then create a performance
