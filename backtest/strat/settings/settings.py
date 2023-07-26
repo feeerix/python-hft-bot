@@ -5,6 +5,7 @@ from typing import Dict, Callable
 
 # Local Imports
 from lib.file.writer import *
+from lib.tools.interval import Interval
 # from backtest.strat.composer import get_required_params, write_required_params
 
 
@@ -30,60 +31,6 @@ There are many things we want to change about our settings class
 It might be more prudent to allow the class we want to adjust the setting for, to be input as an argument itself, so that we can return it modeified with our specific setting.
 """
 
-class _Settings:
-    """
-    This class will essentially be what we input into Indicator
-    """
-    def __init__(
-            self, 
-            name:str="", 
-            func_name:str=None, 
-            arguments:dict=None, # Th
-            transform:dict=None, 
-            verbose:bool=False, 
-            **kwargs
-        ) -> None:
-        # Add the setting details based on what's added
-
-        # settings = {
-        #     "name": setting_name,
-        #     "func_name": func_name 
-        #     "arguments": {
-        #         "arg1": default_value1,
-        #         "arg2": default_value2
-        #     }
-        # }
-
-        # Settings
-        self.data = {
-            "name": name,
-            "func_name": func_name,
-            "columns": [], # Programatically get column names
-            "arguments": arguments,
-            "transform": transform,
-            # "open": arguments.pop('open_close')
-        }
-
-        _utility = ['above', 'above_value', 'below', 'below_value', 'cross']
-        if self.data['func_name'] in _utility:
-            self.utility = True
-        else:
-            self.utility = False
-
-        self.verbose = verbose
-        if self.verbose:
-            print(self.data)
-    
-    def __str__(self) -> str:
-        return self.data
-    
-    def hash(self) -> str:
-        return hashlib.md5(bytes(repr(sorted(self.data.items())), "utf-8")).hexdigest()
-
-    # TODO - Make sure is still required and works correct
-    def validate_settings(self): 
-        return True
-         
 
 
 class Settings:
@@ -94,6 +41,7 @@ class Settings:
             func_name:str, 
             arguments:dict=None, 
             transform:dict=None, 
+            interval:Interval=None,
             verbose:bool=False, 
             **kwargs
         ) -> None:

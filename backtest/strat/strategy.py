@@ -126,10 +126,6 @@ class Strategy:
             new_col_list = kline_db.df.columns.tolist()
             ret_data[f"{kline_db.name}"] = new_col_list
             
-            if self.verbose:
-                print(f"-- COLUMNS FOR: {kline_db.name} --")
-                print(new_col_list)
-
         return ret_data
 
     # TODO - create representation
@@ -162,7 +158,8 @@ class Strategy:
                             print("ADDED INDICATOR(S)")
 
             # print(kline_db.df)
-
+            print("STRATEGY TEST PRINT")
+            print(self.df_columns)
             self.signals.build(dataframe=kline_db.df)
             exit()
                         

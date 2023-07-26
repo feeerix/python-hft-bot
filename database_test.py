@@ -12,6 +12,7 @@ from lib.tools.exchange import ExchangeType
 from lib.tools.interval import Interval
 from lib.tools.asset import Asset, AssetType
 from lib.tools.network import Network
+from backtest.strat.signal import Signal
 from backtest.strat.strategy import Strategy
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
@@ -149,16 +150,16 @@ indicator_dbs = [
 ]
 
 signal_indicators = [
-    Indicator(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"})),
-    Indicator(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"})),
-    Indicator(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"})),
-    Indicator(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"})),
-    Indicator(Settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 20.0})),
-    Indicator(Settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 20.0})),
-    Indicator(Settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 80.0})),
-    Indicator(Settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 80.0})),
-    Indicator(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8"})),
-    Indicator(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8", "above": False}))
+    Signal(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"})),
+    Signal(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"})),
+    Signal(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"})),
+    Signal(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"})),
+    Signal(Settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 20.0})),
+    Signal(Settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 20.0})),
+    Signal(Settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 80.0})),
+    Signal(Settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 80.0})),
+    Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8"})),
+    Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8", "above": False}))
 ]
 # def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
 signal_dbs = Database("", DatabaseType.SIGNALS, True, indicators=signal_indicators)

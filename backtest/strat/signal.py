@@ -33,20 +33,12 @@ class Signal:
         # Settings - a way to set up the indicator
         self.settings = _settings
 
-        # settings = {
-        #     "name": setting_name,
-        #     "func_name": func_name 
-        #     "arguments": {
-        #         "arg1": default_value1,
-        #         "arg2": default_value2
-        #     }
-        # }
-
         if df is not None:
             self.df = self.ret_indicator(df)
+
     
     def __str__(self) -> str:
-        return f"{self.settings.data['name']}-{self.settings.data['columns']}"
+        return f"SIGNAL -- {self.settings.data['name']}-{self.settings.data['columns']}"
 
     @property
     def columns(self):
