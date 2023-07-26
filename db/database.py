@@ -19,9 +19,11 @@ from lib.tools.exchange import Exchange
 from lib.tools.internal.exchange_type import ExchangeType
 # from lib.tools.blockchain import Blockchain
 from backtest.strat.indicator import Indicator
+from backtest.strat.signal import Signal
 from backtest.strat.settings.settings import Settings
 from lib.tools.symbol import Symbol
 from lib.tools.interval import Interval
+
 
 class DatabaseType(Enum):
     KLINES = 'klines'
@@ -105,7 +107,9 @@ class Database:
             # kwargs['dataframe']
             for indicator in self.arguments['indicators']:
                 print(indicator)
+
             # print(self.arguments)
+            print("END OF THE BUILD FUNCTION FOR SIGNAL DB")
             exit()
     
 
@@ -197,7 +201,7 @@ class Database:
         # Add all the indicators
         for indicator in indicators:
             if self.verbose:
-                print(f"ADDING: {indicator.settings.data['name']} -> {self.name}")
+                print(f"ADDING: {indicator.settings.name} -> {self.name}")
 
             """
             This adds the indicator columns to the current df Database
@@ -231,17 +235,10 @@ class Database:
         """
         
         for _settings in indicators:
-            
-            
-            print(self.df[_settings.settings.data['arguments']['series_a']])
-            exit()
 
             # Test print
             if self.verbose:
-                print(_settings.data)
-                
-
-            
+                print(_settings)
 
             # Let's figure out what the fuck is happening here first.
             if recording:

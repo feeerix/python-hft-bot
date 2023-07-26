@@ -47,37 +47,20 @@ class Settings:
         ) -> None:
         # Add the setting details based on what's added
 
-        # settings = {
-        #     "name": setting_name,
-        #     "func_name": func_name 
-        #     "arguments": {
-        #         "arg1": default_value1,
-        #         "arg2": default_value2
-        #     }
-        # }
-
-        # Settings
-        self.data = {
-            "name": name,
-            "func_name": func_name,
-            "columns": [], # Programatically get column names
-            "arguments": arguments,
-            "transform": transform,
-            # "open": arguments.pop('open_close')
-        }
-
-        _utility = ['above', 'above_value', 'below', 'below_value', 'cross']
-        if self.data['func_name'] in _utility:
-            self.utility = True
-        else:
-            self.utility = False
-
+        self.name = name
+        self.func_name = func_name
+        self.columns = [] # Not sure if required
+        self.arguments = arguments
+        self.transfer = transform # Not sure if required
         self.verbose = verbose
-        if self.verbose:
-            print(self.data)
-    
+
+        _utility = ('above', 'above_value', 'below', 'below_value', 'cross')
+        self.utility = False # utility setting?
+        if self.func_name in _utility:
+            self.utility = True
+        
     def __str__(self) -> str:
-        return self.data
+        return f"{self.name} - FUNC NAME: {self.func_name} - ARGUMENTS: {self.arguments}"
     
     def hash(self) -> str:
         return hashlib.md5(bytes(repr(sorted(self.data.items())), "utf-8")).hexdigest()

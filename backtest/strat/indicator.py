@@ -20,7 +20,7 @@ class Indicator:
         self.verbose = verbose
         
         # Add the func into the class
-        self.ind_func = getattr(ta, _settings.data['func_name'])
+        self.ind_func = getattr(ta, _settings.func_name)
         
         # Settings - a way to set up the indicator
         self.settings = _settings
@@ -49,7 +49,7 @@ class Indicator:
         ind_settings = {}
 
         # Get the required parameters (OHLCV)
-        req_params = get_required_params(self.settings.data['func_name'])
+        req_params = get_required_params(self.settings.func_name)
         
         # OHLCV
         for argument in req_params.keys():
@@ -57,27 +57,27 @@ class Indicator:
             if req_params[argument]:
                 
                 if argument.startswith('series_'):
-                    ind_settings.update({argument: df[self.settings.data['arguments'][argument]]})
+                    ind_settings.update({argument: df[self.settings.arguments[argument]]})
                 
                 elif (argument not in df.columns.to_list()) and type(self.settings.data['arguments'][argument]) != str:
-                    ind_settings.update({argument: self.settings.data['arguments'][argument]})
+                    ind_settings.update({argument: self.settings.arguments[argument]})
 
                 else: # OHLCV
                     ind_settings.update({argument: df[argument]})
 
-            elif argument in self.settings.data['arguments'].keys():
-                ind_settings.update({argument: self.settings.data['arguments'][argument]})
+            elif argument in self.settings.arguments.keys():
+                ind_settings.update({argument: self.settings.arguments[argument]})
         
         ret_data = self.ind_func(**ind_settings)
 
         
         # --------------------------------------------------------------
         if type(ret_data) == pd.DataFrame:
-            self.settings.data['columns'] = ret_data.columns.tolist()
+            self.settings.columns = ret_data.columns.tolist()
             return ret_data
         elif type(ret_data) == pd.Series:
-            self.settings.data['columns'] = [ret_data.name]
-            return pd.DataFrame(ret_data, columns=self.settings.data['columns'])
+            self.settings.columns = [ret_data.name]
+            return pd.DataFrame(ret_data, columns=self.settings.columns)
         else:
             print("SOMETHING WENT WRONG")
             print(type(ret_data))
