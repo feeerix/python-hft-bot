@@ -79,8 +79,8 @@ indicators_4h = Database(
     "", # Name
     DatabaseType.INDICATORS, # To list that this is a database of indicators
     True, # Verbosity
-    symbol=ethusdt, # Symbol indicators relate to
-    interval=Interval._4h, # Interval it relates to
+    symbol=[ethusdt], # Symbol indicators relate to
+    interval=[Interval._4h], # Interval it relates to
     indicators=indicator_list, # The list of indicators to be added
     recording=False # If I'm recording and saving the data,
     )
@@ -89,8 +89,8 @@ indicators_1h = Database(
     "", # Name
     DatabaseType.INDICATORS, # To list that this is a database of indicators
     True, # Verbosity
-    symbol=ethusdt, # Symbol indicators relate to
-    interval=Interval._1h, # Interval it relates to
+    symbol=[ethusdt], # Symbol indicators relate to
+    interval=[Interval._1h], # Interval it relates to
     indicators=indicator_list, # The list of indicators to be added
     recording=False # If I'm recording and saving the data,
     )
@@ -99,8 +99,8 @@ indicators_15m = Database(
     "", # Name
     DatabaseType.INDICATORS, # To list that this is a database of indicators
     True, # Verbosity
-    symbol=ethusdt, # Symbol indicators relate to
-    interval=Interval._15m, # Interval it relates to
+    symbol=[ethusdt], # Symbol indicators relate to
+    interval=[Interval._15m], # Interval it relates to
     indicators=indicator_list, # The list of indicators to be added
     recording=False # If I'm recording and saving the data,
     )
@@ -109,8 +109,8 @@ indicators_5m = Database(
     "", # Name
     DatabaseType.INDICATORS, # To list that this is a database of indicators
     True, # Verbosity
-    symbol=ethusdt, # Symbol indicators relate to
-    interval=Interval._5m, # Interval it relates to
+    symbol=[ethusdt], # Symbol indicators relate to
+    interval=[Interval._5m], # Interval it relates to
     indicators=indicator_list, # The list of indicators to be added
     recording=False # If I'm recording and saving the data,
     )
@@ -119,8 +119,8 @@ indicators_1m = Database(
     "", # Name
     DatabaseType.INDICATORS, # To list that this is a database of indicators
     True, # Verbosity
-    symbol=ethusdt, # Symbol indicators relate to
-    interval=Interval._1m, # Interval it relates to
+    symbol=[ethusdt], # Symbol indicators relate to
+    interval=[Interval._1m], # Interval it relates to
     indicators=indicator_list, # The list of indicators to be added
     recording=False # If I'm recording and saving the data,
     )
@@ -169,12 +169,13 @@ signal_indicators = [
     Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8", "above": False}), Interval._4h)
 ]
 # def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
-signal_dbs = Database("", DatabaseType.SIGNALS, True, indicators=signal_indicators)
-# signal_dbs.build()
-# print(signal_dbs.df)
-# exit()
+signal_dbs = Database("", DatabaseType.SIGNALS, True, signals=signal_indicators)
+
+portfolio_db = Database(db_type=DatabaseType.PORTFOLIO, symbols=[])
+
 test_strat = Strategy(
-    name="test1", 
+    name="test1",
+    portfolio=Database(db_type=DatabaseType.PORTFOLIO),
     klines=klines_dbs,
     indicators=indicator_dbs,
     orderbook=[Database(db_type=DatabaseType.ORDERBOOK)], # TODO - need to update exchange class to add ws functions

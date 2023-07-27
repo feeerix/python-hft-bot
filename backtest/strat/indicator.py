@@ -8,10 +8,6 @@ from lib.file.writer import *
 from backtest.strat.settings.settings import Settings
 from backtest.strat.composer import get_required_params
 
-# ema8 = Indicator(Settings("ema8", "ema", {'length': 8}))
-# ema21 = Indicator(Settings("ema21", "ema", {'length': 21}))
-# ema144 = Indicator(Settings("ema144", "ema", {'length': 144}))
-# ema233 = Indicator(Settings("ema233", "ema", {'length': 233}))
 # stochrsi = Indicator(Settings("stochrsi", "stochrsi", {"length": 21, "rsi_length": 21, "k": 5, "d": 5}))
 
 class Indicator:

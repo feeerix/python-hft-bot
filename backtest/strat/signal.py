@@ -59,7 +59,6 @@ class Signal:
     def columns(self):
         return self.settings.columns
     
-
     def build_signal(self, df:pd.DataFrame) -> pd.DataFrame:
         # initialise empty settings
         ind_settings = {}

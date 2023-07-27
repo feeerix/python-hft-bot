@@ -38,6 +38,7 @@ class Strategy:
             self, 
             # Name of the Database
             name:str="", 
+            portfolio:Database=None,
             klines:List[Database]=[],
             indicators:List[Database]=[], 
             orderbook:List[Database]=[], 
@@ -53,6 +54,11 @@ class Strategy:
 
         # TODO - Not sure if this should be changed at all - seems to complex to include in the class
         
+        """
+        PORTFOLIO
+        """
+        self.portfolio = portfolio
+
         """
         Klines
         This will hold all the things that klines hold that comes from the kline + and the 
@@ -142,7 +148,6 @@ class Strategy:
         In doing so, you can then start to either backtest or perform the strategy accordingly.
         """
         # print(self.indicators.kwargs)
-        
 
         # Build klines
         for kline_db in self.klines:
@@ -197,7 +202,6 @@ class Strategy:
         exit()
             
         
-
     def save(self):
         if self.verbose:
             print("SAVING...")

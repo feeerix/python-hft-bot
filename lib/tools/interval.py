@@ -6,6 +6,8 @@ from enum import Enum
 def get_last_closed_time(interval_tc:int):
     return (int(time() - interval_tc) // interval_tc) * interval_tc
 
+def get_next_closing_time(interval_tc:int):
+    return ((int(time()) // interval_tc) + 1) * interval_tc
 
 """
 Potentially how I can change my specific interval class to.

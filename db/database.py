@@ -23,7 +23,7 @@ from backtest.strat.signal import Signal
 from backtest.strat.settings.settings import Settings
 from lib.tools.symbol import Symbol
 from lib.tools.interval import Interval
-
+from lib.tools.asset import Asset
 
 class DatabaseType(Enum):
     KLINES = 'klines'
@@ -91,12 +91,7 @@ class Database:
         return f"DATABASE >> Name: {self.name} | db_type: {self.db_type.name}"
     
     def build(self, **kwargs):
-        """
-        This function builds any database. 
-        We currently do not want the function to take arguments.
-        """
 
-        # Totally hacky way for now to specifically append df for klines at the moment
         if self.db_type == DatabaseType.KLINES or self.db_type == DatabaseType.INDICATORS:
             # kline_title = f"{self.db_type.name}_{self.arguments['symbol']}_{self.arguments['interval']}_{self.arguments['source'].name}"
             self.df = self.db_mapping[self.db_type](**self.arguments)
@@ -104,14 +99,11 @@ class Database:
             return self.df
         
         if self.db_type == DatabaseType.SIGNALS:
-            # kwargs['dataframe']
-            for indicator in self.arguments['indicators']:
-                print(indicator)
+            self._signals(signals=self.arguments['signals'])
 
             # print(self.arguments)
             print("END OF THE BUILD FUNCTION FOR SIGNAL DB")
             exit()
-    
 
     def _klines(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int, source:ExchangeType) -> pd.DataFrame:
         """
@@ -195,7 +187,7 @@ class Database:
         # Return data
         return ret_data
 
-    def _indicators(self, symbol:Symbol, interval:Interval, indicators:List[Indicator], recording:bool=False) -> pd.DataFrame:
+    def _indicators(self, symbol:List[Symbol], interval:List[Interval], indicators:List[Indicator], recording:bool=False) -> pd.DataFrame:
         
         # for kline
         # Add all the indicators
@@ -218,7 +210,7 @@ class Database:
         # Return DF after all indicators in list added
         return self.df
 
-    def _orderbook(self):
+    def _orderbook(self, symbols:List[Symbol]):
         pass
 
     def _logic(self):
@@ -228,14 +220,18 @@ class Database:
         pass
 
     # Create a signals dataframe
-    def _signals(self, indicators:List[Indicator]=[], recording:bool=False) -> pd.DataFrame:
+    def _signals(self, signals:List[Signal]=[], dataframe:pd.DataFrame=None, recording:bool=False) -> pd.DataFrame:
         """
         I should note that the entries are just adding booleans for specific trading signals.
         I will need to update this so that it better generalises when I'm adding signals for everything, not just opening and closing positions
         """
-        
-        for _settings in indicators:
-
+        print("_signals")
+        for x in signals:
+            print(x)
+            
+            print(x.interval)
+        exit()
+        for _settings in signals:
             # Test print
             if self.verbose:
                 print(_settings)
@@ -283,7 +279,8 @@ class Database:
                         (self.df[_settings.data['arguments']['close']['true']].all(axis=1)) &
                         (self.df[_settings.data['arguments']['close']['false']].sum(axis=1) == 0)
                 ), 1, 0)
-
+        print("END OF _SIGNAL")
+        exit()
 
     # Create a portfolio dataframe
     def _portfolio(self) -> pd.DataFrame:
