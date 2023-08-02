@@ -135,18 +135,18 @@ add those after we've built all the kline and indicator dataframes.
 
 klines_dbs = [
     klines_4h, 
-    # klines_1h, 
-    # klines_15m, 
-    # klines_5m, 
-    # klines_1m
+    klines_1h, 
+    klines_15m, 
+    klines_5m, 
+    klines_1m
 ]
 
 indicator_dbs = [
     indicators_4h,
-    # indicators_1h,
-    # indicators_15m,
-    # indicators_5m,
-    # indicators_1m
+    indicators_1h,
+    indicators_15m,
+    indicators_5m,
+    indicators_1m
 ]
 
 """
@@ -157,7 +157,7 @@ columns to select what is above another etc.
 
 
 signal_indicators = [
-    Signal(Settings("144Above233_bullish", "above",{"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+    Signal(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
     Signal(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
     Signal(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
     Signal(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),

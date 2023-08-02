@@ -72,6 +72,9 @@ class Signal:
             if req_params[argument]:
                 
                 if argument.startswith('series_'):
+                    print(df.columns.tolist())
+                    print(argument)
+                    exit()
                     ind_settings.update({argument: df[self.settings.arguments[argument]]})
                 
                 elif (argument not in df.columns.to_list()) and type(self.settings.arguments[argument]) != str:

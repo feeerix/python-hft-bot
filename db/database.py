@@ -90,15 +90,22 @@ class Database:
         # {self.db_type.name}_{self.arguments['symbol']}_{self.arguments['interval']}_{self.arguments['source'].name}
         return f"DATABASE >> Name: {self.name} | db_type: {self.db_type.name}"
     
+    @property
+    def intervals(self) -> list:
+        pass
+        # return
+    
     def build(self, **kwargs):
 
-        if self.db_type == DatabaseType.KLINES or self.db_type == DatabaseType.INDICATORS:
-            # kline_title = f"{self.db_type.name}_{self.arguments['symbol']}_{self.arguments['interval']}_{self.arguments['source'].name}"
+        if self.db_type == DatabaseType.KLINES:
             self.df = self.db_mapping[self.db_type](**self.arguments)
-
             return self.df
         
-        if self.db_type == DatabaseType.SIGNALS:
+        elif self.db_type == DatabaseType.INDICATORS:
+            self.df = self.db_mapping[self.db_type](**self.arguments)
+            return self.df
+
+        elif self.db_type == DatabaseType.SIGNALS:
             self._signals(signals=self.arguments['signals'])
 
             # print(self.arguments)
@@ -225,61 +232,15 @@ class Database:
         I should note that the entries are just adding booleans for specific trading signals.
         I will need to update this so that it better generalises when I'm adding signals for everything, not just opening and closing positions
         """
-        print("_signals")
-        for x in signals:
-            print(x)
-            
-            print(x.interval)
-        exit()
-        for _settings in signals:
-            # Test print
-            if self.verbose:
-                print(_settings)
+        df = pd.DataFrame()
+        if self.verbose:
+            print("Adding Signals...")
 
-            # Let's figure out what the fuck is happening here first.
-            if recording:
-                
-                for pos_type in self.position_condition_settings.keys():
-
-                    if pos_type == _settings.data["func_name"]:
-                        self.position_condition_settings[pos_type].append(
-                            _settings.data
-                        )
-
-                self.df[_settings.data['name']] = np.where((
-                        (self.df[_settings.data['arguments']['open'][True]].all(axis=1)) &
-                        (self.df[_settings.data['arguments']['open'][False]].sum(axis=1) == 0)
-                ), 1, 0)
-            else:
-                self.df[_settings.data['name']] = np.where((
-                        (self.df[_settings.data['arguments']['open']['true']].all(axis=1)) &
-                        (self.df[_settings.data['arguments']['open']['false']].sum(axis=1) == 0)
-                ), 1, 0)
-            # CLOSE -----------------------------------------------------------------------------------------
-
-            if self.verbose:
-                print(_settings.data)
-            
-
-            if recording:
-                for pos_type in self.position_condition_settings.keys():
-
-                    if pos_type == _settings.data["func_name"]:
-                        self.position_condition_settings[pos_type].append(
-                            _settings.data
-                        )
-                
-                self.df[_settings.data['name']] = np.where((
-                        (self.df[_settings.data['arguments']['close'][True]].all(axis=1)) &
-                        (self.df[_settings.data['arguments']['close'][False]].sum(axis=1) == 0)
-                ), 1, 0)
-                
-            else:
-                self.df[_settings.data['name']] = np.where((
-                        (self.df[_settings.data['arguments']['close']['true']].all(axis=1)) &
-                        (self.df[_settings.data['arguments']['close']['false']].sum(axis=1) == 0)
-                ), 1, 0)
-        print("END OF _SIGNAL")
+        for signal in signals:
+            print(signal.settings.arguments)
+            print(signal.settings)
+            df = signal.build_signal(dataframe)
+            print(df)
         exit()
 
     # Create a portfolio dataframe

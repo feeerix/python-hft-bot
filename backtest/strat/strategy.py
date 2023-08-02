@@ -42,7 +42,7 @@ class Strategy:
             klines:List[Database]=[],
             indicators:List[Database]=[], 
             orderbook:List[Database]=[], 
-            signals:Database=None, 
+            signals:List[Database]=[], 
             logic:Database=None, 
             positions:Database=None,
             trigger:bool=False, # Trigger to start building all databases
@@ -151,25 +151,34 @@ class Strategy:
 
         # Build klines
         for kline_db in self.klines:
-            kline_db.build()
+            test_df = kline_db.build()
+
 
             # ADD INDICATOR TO THE CORRESPONDING KLINE DB
             for indicator in self.indicators:
-                if indicator.arguments['symbol'] == kline_db.arguments['symbol']:
-                    if indicator.arguments['interval'] == kline_db.arguments['interval']:
-                        
-                        # Add the reference to the same df
-                        indicator.df = kline_db.df
-                        kline_db.df = indicator.build()
-                        
-                        if self.verbose:
-                            print("ADDED INDICATOR(S)")
-
-            # print(kline_db.df)
-            print("STRATEGY TEST PRINT")
-            # print(self.df_columns)
-            self.signals.build(dataframe=kline_db.df)
+                for relevant_symbol in indicator.arguments['symbol']:
+                    if relevant_symbol == kline_db.arguments['symbol']:
+                        for relevant_interval in indicator.arguments['interval']:
+                            if relevant_interval == kline_db.arguments['interval']:
+                                """
+                                At this point still seems to be adding for 4h - when it shouldn't be
+                                """
+                                indicator.df = kline_db.df
+                                kline_db.df = indicator.build()
+            print("----ENDENDEND")
             exit()
+            for signal in self.signals.arguments['signals']:
+                if signal.interval == kline_db.arguments['interval']:
+                    
+                    signal.build_signal(df=kline_db.df)
+                    # print(signal)
+                    # print(signal.interval)
+                    # print("FOUND YA")
+                    # exit()
+            # for signal in self.signals:
+            #     signal.build(dataframe=kline_db.df)
+            
+                exit()
                         
                         # for x in self.signals.arguments['indicators']:
                         #     print(x)
