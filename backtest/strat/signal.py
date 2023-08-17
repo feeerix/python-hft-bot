@@ -72,9 +72,6 @@ class Signal:
             if req_params[argument]:
                 
                 if argument.startswith('series_'):
-                    print(df.columns.tolist())
-                    print(argument)
-                    exit()
                     ind_settings.update({argument: df[self.settings.arguments[argument]]})
                 
                 elif (argument not in df.columns.to_list()) and type(self.settings.arguments[argument]) != str:
@@ -83,19 +80,24 @@ class Signal:
                 else: # OHLCV
                     ind_settings.update({argument: df[argument]})
 
-            elif argument in self.settings.data.arguments.keys():
+            elif argument in self.settings.arguments.keys():
                 ind_settings.update({argument: self.settings.arguments[argument]})
         
+        print(self.ind_func)
+        print(ind_settings)
+        exit()
         ret_data = self.ind_func(**ind_settings)
 
         
         # --------------------------------------------------------------
         if type(ret_data) == pd.DataFrame:
-            self.settings.columns = ret_data.columns.tolist()
-            return ret_data
+            # self.settings.columns = ret_data.columns.tolist()
+            return pd.concat(df, ret_data)
+            # return ret_data
         elif type(ret_data) == pd.Series:
             self.settings.columns = [ret_data.name]
-            return pd.DataFrame(ret_data, columns=self.settings.columns)
+            return pd.concat([df, pd.DataFrame(ret_data, columns=self.settings.columns)])
+
         else:
             print("SOMETHING WENT WRONG")
             print(type(ret_data))

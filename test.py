@@ -14,7 +14,7 @@ from datetime import datetime
 # from lib.cli.listener import *
 # from lib.file.reader import *
 
-from backtest.strat.composer import write_required_params
+from backtest.strat.composer import get_required_params, write_required_params
 
 # pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
@@ -27,7 +27,7 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 # -------------------
 
 
-
+# get_required_params()
 write_required_params()
 
 exit()

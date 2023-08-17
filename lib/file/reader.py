@@ -3,8 +3,13 @@ import json
 import os
 
 # TODO - probably good to update this to "get_dict" to align with below function
-def get_json(path:str) -> dict:
-    with open(path, 'r') as json_file:
+# def get_json(path:str) -> dict:
+#     with open(path, 'r') as json_file:
+#         data = json.load(json_file)
+#     return data
+
+def get_json(path:str, filename:str) -> dict:
+    with open(path+filename, 'r') as json_file:
         data = json.load(json_file)
     return data
 

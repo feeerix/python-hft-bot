@@ -34,7 +34,8 @@ class Indicator:
             self.df = self.ret_indicator(df)
     
     def __str__(self) -> str:
-        return f"{self.settings.data['name']}-{self.settings.data['columns']}"
+        # TODO - can add more to the __STR__ representation
+        return f"{self.settings.name}"
 
     @property
     def columns(self):
@@ -43,9 +44,11 @@ class Indicator:
     def ret_indicator(self, df:pd.DataFrame) -> pd.DataFrame:
         # initialise empty settings
         ind_settings = {}
-
+        
         # Get the required parameters (OHLCV)
         req_params = get_required_params(self.settings.func_name)
+        
+        print(req_params)
         
         # OHLCV
         for argument in req_params.keys():

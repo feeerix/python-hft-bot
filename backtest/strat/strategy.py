@@ -151,48 +151,29 @@ class Strategy:
 
         # Build klines
         for kline_db in self.klines:
-            test_df = kline_db.build()
+            
+            kline_db.build()
 
 
             # ADD INDICATOR TO THE CORRESPONDING KLINE DB
-            for indicator in self.indicators:
-                for relevant_symbol in indicator.arguments['symbol']:
-                    if relevant_symbol == kline_db.arguments['symbol']:
-                        for relevant_interval in indicator.arguments['interval']:
-                            if relevant_interval == kline_db.arguments['interval']:
-                                """
-                                At this point still seems to be adding for 4h - when it shouldn't be
-                                """
-                                indicator.df = kline_db.df
-                                kline_db.df = indicator.build()
-            print("----ENDENDEND")
+            for indicator_db in self.indicators:
+                
+                kline_db.df = indicator_db.build(
+                    indicator_list=indicator_db.arguments['indicators'],
+                    df=kline_db.df
+                )
+            
+            print(kline_db.df.columns.tolist())
+            print("strategy.py in btween indicator and signal")
             exit()
             for signal in self.signals.arguments['signals']:
-                if signal.interval == kline_db.arguments['interval']:
-                    
-                    signal.build_signal(df=kline_db.df)
-                    # print(signal)
-                    # print(signal.interval)
-                    # print("FOUND YA")
-                    # exit()
-            # for signal in self.signals:
-            #     signal.build(dataframe=kline_db.df)
-            
+                print(kline_db.df.columns.tolist())
                 exit()
-                        
-                        # for x in self.signals.arguments['indicators']:
-                        #     print(x)
-                        #     for argument in x.settings.data['arguments']:
-                        #         if argument == 'series_a':
-                        #             series_a = x.settings.data['arguments'][argument]
-                        #         elif argument == 'series_b':
-                        #             series_b = x.settings.data['arguments'][argument]
-                                    
-                            
-                        #     test = x.ind_func(series_a=kline_db.df[series_a], series_b=kline_db.df[series_b])
-                        #     print(test)
-                        #     exit()
+                kline_db.df = signal.build_signal(df=kline_db.df)
 
+        print(kline_db.df)
+        print("STRATEGY.PY ENDING")
+        exit()
         for x in self.signals.arguments['indicators']:
             print(x.settings.data['name'])
             for argument in x.settings.data['arguments']:

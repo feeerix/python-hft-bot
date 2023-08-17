@@ -102,7 +102,7 @@ class Database:
             return self.df
         
         elif self.db_type == DatabaseType.INDICATORS:
-            self.df = self.db_mapping[self.db_type](**self.arguments)
+            self.df = self.db_mapping[self.db_type](**kwargs)
             return self.df
 
         elif self.db_type == DatabaseType.SIGNALS:
@@ -194,28 +194,40 @@ class Database:
         # Return data
         return ret_data
 
-    def _indicators(self, symbol:List[Symbol], interval:List[Interval], indicators:List[Indicator], recording:bool=False) -> pd.DataFrame:
+    def _indicators(
+            self, 
+            # symbol:List[Symbol], 
+            # interval:List[Interval], 
+            indicator_list:List['Database'], 
+            df:pd.DataFrame=None,
+            recording:bool=False
+            ) -> pd.DataFrame:
         
         # for kline
         # Add all the indicators
-        for indicator in indicators:
-            if self.verbose:
-                print(f"ADDING: {indicator.settings.name} -> {self.name}")
+        
+        for indicator in indicator_list:
+            
+            # print(indicator.settings.arguments)
+            # for indicator_class in indicator.arguments['indicators']:
+                # if self.verbose:
+                #     print(f"ADDING: {indicator.settings['name']} -> {self.name}")
 
             """
             This adds the indicator columns to the current df Database
             """
-            self.df = pd.concat(
+            df = pd.concat(
                 [
-                    self.df, # Existing DF
-                    indicator.ret_indicator(self.df)
+                    df, # Existing DF
+                    indicator.ret_indicator(df)
                 ], # New DF
                 axis=1, 
                 # ignore_index=True # -> removed index
             )
-        
+            print(df)
+            exit()
         # Return DF after all indicators in list added
-        return self.df
+        return df
 
     def _orderbook(self, symbols:List[Symbol]):
         pass

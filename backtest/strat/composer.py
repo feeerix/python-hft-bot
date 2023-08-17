@@ -92,8 +92,7 @@ This is the only function that seems to appear in another file
 def get_required_params(func_name:str, verbosity:bool=False) -> dict:
     if verbosity:
         print(f"Getting required params for: {func_name}")
-
-    return get_json("db/strategies/indicators/required_ta_params.json")[func_name]
+    return get_json("db/strategies/indicators/","required_ta_params.json")[func_name]
 
 def write_settings(setting_name:str, verbosity:bool=False): # TODO - Make sure to add verbosity and return
 

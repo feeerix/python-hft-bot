@@ -75,6 +75,11 @@ indicator_list = [
     Indicator(Settings("atr", "atr", {"length": 21, "mamode": "ema"}))
 ]
 
+
+"""
+This is a database of the indicators that are going to be used for a 
+particular timeframe interval
+"""
 indicators_4h = Database(
     "", # Name
     DatabaseType.INDICATORS, # To list that this is a database of indicators
@@ -187,6 +192,7 @@ test_strat = Strategy(
 
 print("CREATED TEST STRAT")
 test_strat.build()
+print("ending here?!")
 exit()
 """
 Next step is to make sure we can implement our signals, and then the logic for trading
