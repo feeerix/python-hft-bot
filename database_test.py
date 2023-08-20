@@ -140,10 +140,10 @@ add those after we've built all the kline and indicator dataframes.
 
 klines_dbs = [
     klines_4h, 
-    klines_1h, 
-    klines_15m, 
-    klines_5m, 
-    klines_1m
+    # klines_1h, 
+    # klines_15m, 
+    # klines_5m, 
+    # klines_1m
 ]
 
 indicator_dbs = [
@@ -166,12 +166,12 @@ signal_indicators = [
     Signal(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
     Signal(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
     Signal(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
-    Signal(Settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 20.0}), Interval._4h),
-    Signal(Settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 20.0}), Interval._4h),
-    Signal(Settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 80.0}), Interval._4h),
-    Signal(Settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 80.0}), Interval._4h),
-    Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8"}), Interval._4h),
-    Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8", "above": False}), Interval._4h)
+    Signal(Settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}), Interval._4h),
+    Signal(Settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0}), Interval._4h),
+    Signal(Settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0}), Interval._4h),
+    Signal(Settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0}), Interval._4h),
+    Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h),
+    Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "above": False}), Interval._4h)
 ]
 # def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
 signal_dbs = Database("", DatabaseType.SIGNALS, True, signals=signal_indicators)

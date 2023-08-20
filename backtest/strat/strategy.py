@@ -153,23 +153,24 @@ class Strategy:
         for kline_db in self.klines:
             
             kline_db.build()
-
+            
 
             # ADD INDICATOR TO THE CORRESPONDING KLINE DB
+            
             for indicator_db in self.indicators:
                 
-                kline_db.df = indicator_db.build(
-                    indicator_list=indicator_db.arguments['indicators'],
-                    df=kline_db.df
-                )
-            
-            print(kline_db.df.columns.tolist())
-            print("strategy.py in btween indicator and signal")
-            exit()
+                if indicator_db.arguments['interval'][0] == kline_db.arguments['interval']:
+                
+                    kline_db.df = indicator_db.build(
+                        indicator_list=indicator_db.arguments['indicators'],
+                        df=kline_db.df
+                    )
+
             for signal in self.signals.arguments['signals']:
+                # print(signal.build_signal(df=kline_db.df))
                 print(kline_db.df.columns.tolist())
-                exit()
                 kline_db.df = signal.build_signal(df=kline_db.df)
+                
 
         print(kline_db.df)
         print("STRATEGY.PY ENDING")

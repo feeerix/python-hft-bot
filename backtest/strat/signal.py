@@ -83,9 +83,7 @@ class Signal:
             elif argument in self.settings.arguments.keys():
                 ind_settings.update({argument: self.settings.arguments[argument]})
         
-        print(self.ind_func)
-        print(ind_settings)
-        exit()
+        
         ret_data = self.ind_func(**ind_settings)
 
         

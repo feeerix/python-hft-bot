@@ -205,7 +205,6 @@ class Database:
         
         # for kline
         # Add all the indicators
-        
         for indicator in indicator_list:
             
             # print(indicator.settings.arguments)
@@ -224,8 +223,6 @@ class Database:
                 axis=1, 
                 # ignore_index=True # -> removed index
             )
-            print(df)
-            exit()
         # Return DF after all indicators in list added
         return df
 
