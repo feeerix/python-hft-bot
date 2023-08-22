@@ -5,12 +5,45 @@ import warnings
 
 # Loca Imports
 from db.database import Database, DatabaseType
+from lib.tools.symbol import Symbol
+from lib.tools.exchange import ExchangeType
+from lib.tools.interval import Interval
+from lib.tools.asset import Asset, AssetType
+from lib.tools.network import Network
+from backtest.strat.signal import Signal
 from backtest.strat.strategy import Strategy
-from backtest.strat.settings.settings import Settings
 from backtest.strat.indicator import Indicator
+from backtest.strat.settings.settings import Settings
 from backtest.backtester import Backtester
 from lib.cli.printer import *
 from lib.cli.listener import *
+
+# Imports
+import pandas as pd
+import pandas_ta as ta
+import warnings
+from datetime import datetime
+
+# Local Imports
+# pd.set_option('display.max_rows', None)
+# pd.set_option('display.max_columns', None)
+# pd.set_option('display.width', None)
+# pd.set_option('display.max_colwidth', None)
+
+pd.set_option('display.float_format', lambda x: '%.5f' % x)
+
+start = 1569888000
+end = 1685592000
+
+"""
+First we are looking to update the way we handle dataframes.
+Let's also try to clean everything up and make everything more performant.
+
+"""
+
+
+# from lib.tools.exchange import Exchange, ExchangeType
+# from lib.file.reader import get_json
 
 # pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
@@ -18,134 +51,156 @@ pd.set_option('display.max_columns', None)
 # pd.set_option('display.max_colwidth', None)
 pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
-# -------------------
-# Trying to do everything manually
-# -------------------
-
 # Ignoring future warning initially
 warnings.simplefilter(action='ignore',category=FutureWarning)
-# start = 1546300800
-start = 1569888000 # ETH / BTC
-# start = 1568880000
 
-# start = 1527480000 # XRP BUSD
-# start = 1609502400
-# end = 1672531200
+start = 1569888000 # ETH / BTC
 end = 1685592000
 
+# test_binance = Binance()
 
-df = Database(db_type=DatabaseType.KLINES,verbose=True).kline_df('ETHUSDT', '1h', start, end)
+# Database().kline_df('ETHUSDT',"4h",start,end)
+eth = Asset("Ethereum", "ETH", "0x0", AssetType.COIN, Network.ETHEREUM)
+usdt = Asset("Tether", "USDT", "0x0", AssetType.TOKEN, Network.ETHEREUM)
 
-# Create method to create strategies easily
-test_strat = Strategy("default", df, retreive=False)
+ethusdt = Symbol("ETHUSDT", [eth, usdt])
+interval1 = str(Interval._4h)
 
-# MAIN COLUMNS
-# ------------------------------------------------------------
-# EMA
-ema8_setting = Settings("ema8", "ema", {'length': 8})
-ema21_setting = Settings("ema21", "ema", {'length': 21})
-ema144_setting = Settings("ema144", "ema", {'length': 144})
-ema233_setting = Settings("ema233", "ema", {'length': 233})
+# def _kline_df(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int) -> pd.DataFrame:
 
-test_strat.add_indicator(Indicator(ema8_setting))
-test_strat.add_indicator(Indicator(ema21_setting))
-test_strat.add_indicator(Indicator(ema144_setting))
-test_strat.add_indicator(Indicator(ema233_setting))
+klines_4h = Database("", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._4h, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+klines_1h = Database("", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._1h, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+klines_15m = Database("", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._15m, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+klines_5m = Database("", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._5m, starttime=start, endtime=end, source=ExchangeType.BINANCE)
+klines_1m = Database("", DatabaseType.KLINES, True, symbol=ethusdt, interval=Interval._1m, starttime=start, endtime=end, source=ExchangeType.BINANCE)
 
-stochrsi_setting = Settings("stochrsi", "stochrsi", {"length": 34, "rsi_length": 34, "k": 8, "d": 8})
-test_strat.add_indicator(Indicator(stochrsi_setting))
+indicator_list = [
+    Indicator(Settings("ema8", "ema", {'length': 8})),
+    Indicator(Settings("ema21", "ema", {'length': 21})),
+    Indicator(Settings("ema144", "ema", {'length': 144})),
+    Indicator(Settings("ema233", "ema", {'length': 233})),
+    Indicator(Settings("stochrsi", "stochrsi", {"length": 21, "rsi_length": 21, "k": 5, "d": 5})),
+    Indicator(Settings("atr", "atr", {"length": 21, "mamode": "ema"}))
+]
 
-atr_setting = Settings("atr", "atr", {"length": 21, "mamode": "ema"}, transform={"band": 2})
-test_strat.add_indicator(Indicator(atr_setting))
 
 """
-To Effectively "build" strategies, I will need to better abstract and automate the process, such that I could do it from the command line.
+This is a database of the indicators that are going to be used for a 
+particular timeframe interval
+"""
+indicators_4h = Database(
+    "", # Name
+    DatabaseType.INDICATORS, # To list that this is a database of indicators
+    True, # Verbosity
+    symbol=[ethusdt], # Symbol indicators relate to
+    interval=[Interval._4h], # Interval it relates to
+    indicators=indicator_list, # The list of indicators to be added
+    recording=False # If I'm recording and saving the data,
+    )
 
+indicators_1h = Database(
+    "", # Name
+    DatabaseType.INDICATORS, # To list that this is a database of indicators
+    True, # Verbosity
+    symbol=[ethusdt], # Symbol indicators relate to
+    interval=[Interval._1h], # Interval it relates to
+    indicators=indicator_list, # The list of indicators to be added
+    recording=False # If I'm recording and saving the data,
+    )
+
+indicators_15m = Database(
+    "", # Name
+    DatabaseType.INDICATORS, # To list that this is a database of indicators
+    True, # Verbosity
+    symbol=[ethusdt], # Symbol indicators relate to
+    interval=[Interval._15m], # Interval it relates to
+    indicators=indicator_list, # The list of indicators to be added
+    recording=False # If I'm recording and saving the data,
+    )
+
+indicators_5m = Database(
+    "", # Name
+    DatabaseType.INDICATORS, # To list that this is a database of indicators
+    True, # Verbosity
+    symbol=[ethusdt], # Symbol indicators relate to
+    interval=[Interval._5m], # Interval it relates to
+    indicators=indicator_list, # The list of indicators to be added
+    recording=False # If I'm recording and saving the data,
+    )
+
+indicators_1m = Database(
+    "", # Name
+    DatabaseType.INDICATORS, # To list that this is a database of indicators
+    True, # Verbosity
+    symbol=[ethusdt], # Symbol indicators relate to
+    interval=[Interval._1m], # Interval it relates to
+    indicators=indicator_list, # The list of indicators to be added
+    recording=False # If I'm recording and saving the data,
+    )
+
+"""
+You can see that the specific klines and indicators are all related to a symbol and interval.
+We build all the dataframes separately and add the indicators accordingly.
+
+When we want to add the signals (which might rely on multiple timeframes and symbols), we then
+add those after we've built all the kline and indicator dataframes.
+"""
+
+klines_dbs = [
+    klines_4h, 
+    klines_1h, 
+    # klines_15m, 
+    # klines_5m, 
+    # klines_1m
+]
+
+indicator_dbs = [
+    indicators_4h,
+    indicators_1h,
+    indicators_15m,
+    indicators_5m,
+    indicators_1m
+]
+
+"""
+Important question now is how we get the specific signals. At the moment, it is currently
+manually input, as you can see. We should be able to select from the currently available 
+columns to select what is above another etc.
 """
 
 
+signal_indicators = [
+    Signal(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+    Signal(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+    Signal(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+    Signal(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+    Signal(Settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}), Interval._4h),
+    Signal(Settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0}), Interval._4h),
+    Signal(Settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0}), Interval._4h),
+    Signal(Settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0}), Interval._4h),
+    Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h),
+    Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "above": False}), Interval._4h)
+]
+# def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
+signal_dbs = Database("Signal database", DatabaseType.SIGNALS, True, signals=signal_indicators)
 
-# ------------------------------------------------------------
-# CONDITIONAL COLUMNS
+portfolio_db = Database(db_type=DatabaseType.PORTFOLIO, symbols=[])
 
-"""
-First Bullish position:
-EMA 144 > EMA 233 -> Bullish overall trend
-EMA8 < EMA 21 -> Small reversion
-
-Stochastic RSI (k & d) < 20 -> Oversold short term
-Stochastic RSI bullish cross ->  Trigger
-
-Stochastic RSI (k & d) > 80 -> Overbought short term
-Stochastic RSI bearish cross ->  Trigger
-
-Opposite for bearish
-"""
-
-bullish_ema144_ema233 = Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"})
-bearish_ema144_ema233 = Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"})
-bearish_ema8_ema21 = Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"})
-bullish_ema8_ema21 = Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"})
-
-test_strat.add_indicator(Indicator(bullish_ema144_ema233))
-test_strat.add_indicator(Indicator(bearish_ema144_ema233))
-test_strat.add_indicator(Indicator(bullish_ema8_ema21))
-test_strat.add_indicator(Indicator(bearish_ema8_ema21))
-
-stochrsi_oversold_k = Settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 20.0})
-stochrsi_oversold_d = Settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 20.0})
-stochrsi_overbought_k = Settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_34_34_8_8", "value": 80.0})
-stochrsi_overbought_d = Settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_34_34_8_8", "value": 80.0})
-
-test_strat.add_indicator(Indicator(stochrsi_oversold_k))
-test_strat.add_indicator(Indicator(stochrsi_oversold_d))
-test_strat.add_indicator(Indicator(stochrsi_overbought_k))
-test_strat.add_indicator(Indicator(stochrsi_overbought_d))
-
-stochrsi_bullish_trigger = Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8"})
-stochrsi_bearish_trigger = Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8", "above": False})
-
-test_strat.add_indicator(Indicator(stochrsi_bullish_trigger))
-test_strat.add_indicator(Indicator(stochrsi_bearish_trigger))
-
-# <<<<<<< HEAD
-# =======
-
-# >>>>>>> 352442bdff94838c27720307d1bee356e9f606a4
-long1 = Settings(
-    "long1",
-    "long",
-    {
-        "open": {True: ["EMA_144_A_EMA_233", "EMA_8_B_EMA_21", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0", "STOCHRSIk_34_34_8_8_XA_STOCHRSId_34_34_8_8"],False:[]}, 
-        "close":{True:["EMA_144_B_EMA_233", "STOCHRSIk_34_34_8_8_B_20_0", "STOCHRSId_34_34_8_8_B_20_0"],False:[]}
-    }
+test_strat = Strategy(
+    name="test1",
+    portfolio=Database(db_type=DatabaseType.PORTFOLIO),
+    klines=klines_dbs,
+    indicators=indicator_dbs,
+    orderbook=[Database(db_type=DatabaseType.ORDERBOOK)], # TODO - need to update exchange class to add ws functions
+    signals=signal_dbs,
+    logic=Database(db_type=DatabaseType.LOGIC),
+    positions=Database(db_type=DatabaseType.POSITIONS),
+    verbose=True,
 )
-        
-short1 = Settings("short1","short",{"open":{True:["STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0", "STOCHRSIk_34_34_8_8_XB_STOCHRSId_34_34_8_8", "EMA_144_B_EMA_233", "EMA_8_B_EMA_21"],False:[]}, "close":{True:[],False:[]}})
 
-short1 = Settings(
-    "short1",
-    "short",
-    {
-        "open":{True:["STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0", "STOCHRSIk_34_34_8_8_XB_STOCHRSId_34_34_8_8", "EMA_144_B_EMA_233", "EMA_8_B_EMA_21"],False:[]}, 
-        "close":{True:["EMA_144_A_EMA_233", "STOCHRSIk_34_34_8_8_A_80_0", "STOCHRSId_34_34_8_8_A_80_0"],False:[]}
-    }
-)
+print("CREATED TEST STRAT")
+test_strat.build()
 
-exchange_settings = Settings(
-    "binance",
-    "binance",
-    {
-        "maker_fee": 0.1,
-        "taker_fee": 0.2
-    }
-)
-
-
-
-# We are now adjusting how the settings
-test_strat.add_entry(long1)
-test_strat.add_entry(short1)
 
 
 # ---
@@ -155,20 +210,12 @@ test_strat.add_entry(short1)
 
 bt = Backtester(verbose=True)
 
-
-
-# bt.test_run(bt.init_test_strat())
-# test_strat.write_settings()
 print(line)
 
 # def test_runv0(self, test_strat:strategy, capital:float, run_settings:settings=None, exchange_settings:settings=None, settings_write:bool=False):
 # bt.test_runv0(test_strat, 1000, exchange_settings=exchange_settings)
-bt.test_runv0a(test_strat, 1000, exchange_settings=exchange_settings)
+bt.backtest(test_strat, 1000)
 # print(test_strat.df.columns.to_list())
 
-"""
-Get List of indicators
-
-"""
 
 exit()

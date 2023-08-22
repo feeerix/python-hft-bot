@@ -65,7 +65,9 @@ class Signal:
 
         # Get the required parameters (OHLCV)
         req_params = get_required_params(self.settings.func_name)
-        
+        if self.verbose:
+            print(f"ADDING: {self.settings.func_name}")
+
         # OHLCV
         for argument in req_params.keys():
             
@@ -86,15 +88,13 @@ class Signal:
         
         ret_data = self.ind_func(**ind_settings)
 
-        
         # --------------------------------------------------------------
         if type(ret_data) == pd.DataFrame:
-            # self.settings.columns = ret_data.columns.tolist()
-            return pd.concat(df, ret_data)
-            # return ret_data
+            return pd.concat(df, ret_data, axis=1)
+            
         elif type(ret_data) == pd.Series:
             self.settings.columns = [ret_data.name]
-            return pd.concat([df, pd.DataFrame(ret_data, columns=self.settings.columns)])
+            return pd.concat([df, pd.DataFrame(ret_data, columns=self.settings.columns)], axis=1)
 
         else:
             print("SOMETHING WENT WRONG")

@@ -140,7 +140,7 @@ add those after we've built all the kline and indicator dataframes.
 
 klines_dbs = [
     klines_4h, 
-    # klines_1h, 
+    klines_1h, 
     # klines_15m, 
     # klines_5m, 
     # klines_1m
@@ -192,7 +192,7 @@ test_strat = Strategy(
 
 print("CREATED TEST STRAT")
 test_strat.build()
-print("ending here?!")
+
 exit()
 """
 Next step is to make sure we can implement our signals, and then the logic for trading

@@ -153,9 +153,7 @@ class Strategy:
         for kline_db in self.klines:
             
             kline_db.build()
-            
-
-            # ADD INDICATOR TO THE CORRESPONDING KLINE DB
+            print(f"INTERVAL: {kline_db.arguments['interval']}")
             
             for indicator_db in self.indicators:
                 
@@ -166,32 +164,14 @@ class Strategy:
                         df=kline_db.df
                     )
 
+            
             for signal in self.signals.arguments['signals']:
                 # print(signal.build_signal(df=kline_db.df))
-                print(kline_db.df.columns.tolist())
+                
                 kline_db.df = signal.build_signal(df=kline_db.df)
                 
 
-        print(kline_db.df)
-        print("STRATEGY.PY ENDING")
-        exit()
-        for x in self.signals.arguments['indicators']:
-            print(x.settings.data['name'])
-            for argument in x.settings.data['arguments']:
-                if argument.startswith("series_"):
-                    print(argument)
-                else:
-                    print("ANOTHER?")
-                    print(argument)
-            print(x.settings.data['arguments'])
-            exit()
-            func = getattr(ta, x.settings.data['func_name'])
-            test = func(**x.settings.data['arguments'])
-            print(test)
-            print()
-            
-        exit()
-            
+
         
     def save(self):
         if self.verbose:

@@ -1,6 +1,7 @@
 # Import
 import json
 import os
+from typing import Union
 
 # TODO - probably good to update this to "get_dict" to align with below function
 # def get_json(path:str) -> dict:
@@ -8,7 +9,7 @@ import os
 #         data = json.load(json_file)
 #     return data
 
-def get_json(path:str, filename:str) -> dict:
+def get_json(path:str, filename:str) -> Union[dict, list]:
     with open(path+filename, 'r') as json_file:
         data = json.load(json_file)
     return data

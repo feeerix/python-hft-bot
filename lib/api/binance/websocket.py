@@ -1,5 +1,6 @@
 # IMPORTS
 import websocket
+import websockets
 import json
 from datetime import datetime, timezone
 import pandas as pd
@@ -12,11 +13,6 @@ from lib.tools.interval import Interval
 from lib.tools.exchange import ExchangeType
 from lib.file.reader import get_json
 
-ws_urls = [
-    "wss://data-stream.binance.com:9443/ws",
-    "wss://stream.binance.com:443/ws",
-    "wss://stream.binance.com:9443/ws"
-]
 
 
 """
@@ -100,13 +96,18 @@ def payload(method:str, stream_type:str, symbol:str="", interval:str="", level:i
 Getting ready to change the websocket classes so they receive data efficiently
 """
 class ws_agent(ws_gopher):
-    def __init__(self, verbose:bool=False): 
-        super().__init__(ExchangeType.BINANCE, verbose=verbose)
+    def __init__(self, exchange:ExchangeType, verbose:bool=False): 
+        super().__init__(exchange, verbose=verbose)
         self.last_ping = 0
-        self.ws_table = get_json('lib/api/binance/config/websocket_table.json')
+        # Table of how all the websocket streams are differentiated
+        self.ws_table = get_json(f'lib/api/{exchange}/config/', 'websocket_table.json')
 
-    def create_connection(self, option:int):
-        # create connection
+
+    def create_connection(self, option:int=0):
+        # Get JSON for WS URLS
+        ws_urls = get_json(f"lib/api/{self.exchange}/config/","ws_urls.json")
+        
+        # create connection based on the options in ws_urls
         super().connect(ws_urls[option])
 
         # Make sure to ping immediately
@@ -153,8 +154,14 @@ class ws_agent(ws_gopher):
         self.last_ping = int(datetime.now(tz=timezone.utc).timestamp())
 
     def receive_data(self):
-        # Compute response
+        """
+        This function is triggered whenever we receive data from the websocket.
+        
+        """
+        # JSON Loads
         response = json.loads(super().receive())
+
+        # Create return data
         ret_data = None
 
         if 'result'in response.keys():

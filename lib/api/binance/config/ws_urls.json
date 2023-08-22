@@ -1,0 +1,5 @@
+[
+    "wss://data-stream.binance.com:9443/ws",
+    "wss://stream.binance.com:443/ws",
+    "wss://stream.binance.com:9443/ws"
+]

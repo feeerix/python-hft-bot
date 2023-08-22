@@ -13,6 +13,8 @@ so that I can start to run things live
 Main challenge is to make sure I'm matching 
 the data correctly.
 """
+
+
 class ws_gopher(ABC):
     def __init__(self, exchange:ExchangeType, verbose:bool=False) -> None:
         self.exchange = exchange
@@ -20,7 +22,7 @@ class ws_gopher(ABC):
 
     def connect(self, ws_url:str):
         self.ws = websocket.create_connection(ws_url)
-    
+
     def send(self, payload:dict):
         self.ws.send(
             json.dumps(
@@ -36,9 +38,3 @@ class ws_gopher(ABC):
     def receive(self):
         return self.ws.recv()
     
-    @abstractmethod
-    def ping(self):
-        """
-        Method to ping the corresponding websocket URL
-        """
-        pass

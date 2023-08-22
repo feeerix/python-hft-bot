@@ -5,6 +5,7 @@ import time
 # from lib.api.updater import update
 from lib.api.binance.websocket import ws_agent
 # from lib.api.binance.interface import Binance
+from lib.tools.exchange import ExchangeType
 from lib.cli.printer import line
 # from lib.file.reader import get_json
 
@@ -22,10 +23,20 @@ from lib.cli.printer import line
 # # Ignoring future warning initially
 # warnings.simplefilter(action='ignore',category=FutureWarning)
 
-websocket_agent = ws_agent(verbose=True)
-websocket_agent.create_connection(0)
-
 # --------------------------------------------------------------------------------------------
+
+# Create the corresponding class
+websocket_agent = ws_agent(ExchangeType.BINANCE, verbose=True)
+
+# Connect based on URL
+websocket_agent.create_connection()
+
+# Subscribe to the right stream
+
+
+# Start the loop
+
+
 websocket_agent.subscribe(
     {
         "stream_type": "kline",
@@ -43,6 +54,7 @@ while True:
         websocket_agent.close_connection()
         break
 exit()
+
 # --------------------------------------------------------------------------------------------
 websocket_agent = ws_agent(verbose=True)
 websocket_agent.create_connection(0)
