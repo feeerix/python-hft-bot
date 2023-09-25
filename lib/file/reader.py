@@ -10,6 +10,8 @@ from typing import Union
 #     return data
 
 def get_json(path:str, filename:str) -> Union[dict, list]:
+    # print(path)
+    # print(filename)
     with open(path+filename, 'r') as json_file:
         data = json.load(json_file)
     return data

@@ -141,9 +141,9 @@ add those after we've built all the kline and indicator dataframes.
 klines_dbs = [
     klines_4h, 
     klines_1h, 
-    # klines_15m, 
-    # klines_5m, 
-    # klines_1m
+    klines_15m, 
+    klines_5m, 
+    klines_1m
 ]
 
 indicator_dbs = [

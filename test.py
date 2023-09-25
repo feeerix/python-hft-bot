@@ -10,9 +10,9 @@ from datetime import datetime
 # from backtest.strat.settings.settings import Settings
 # from backtest.strat.indicator import Indicator
 # from backtest.backtester import Backtester
-# from lib.cli.printer import *
-# from lib.cli.listener import *
-# from lib.file.reader import *
+from lib.cli.printer import *
+from lib.cli.listener import *
+from lib.file.reader import *
 
 from backtest.strat.composer import get_required_params, write_required_params
 
@@ -28,13 +28,9 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
 
 # get_required_params()
-write_required_params()
+# write_required_params()
 
-exit()
-exchange_info = get_json("./db/info/binance/exchange_info.json")
-
-for symbol in exchange_info['symbols']:
-    if symbol['status'] == "TRADING":
-        if "USDT" in symbol['symbol']:
-            print(symbol['symbol'])
+# exit()
+exchange_info = get_json("./db/info/binance/", "exchange_info.json")
+print(exchange_info)
 exit()

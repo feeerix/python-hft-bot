@@ -157,7 +157,8 @@ class Database:
                 print(f"{round(((int(dt_start.timestamp()) - starttime) / distance) * 100, 3)}% COMPLETE")
             
             # Get filename
-            fn = filename(source.name.lower(), symbol.symbol.lower(), interval, f"{dt_start.year}", f"{dt_start.month:02d}")
+            # fn = filename(source.name.lower(), symbol.symbol.lower(), interval, f"{dt_start.year}", f"{dt_start.month:02d}")
+            fn = filename(source.name.lower(), symbol.symbol, interval, f"{dt_start.year}", f"{dt_start.month:02d}")
             
             # add new data to return df
             new_df = pd.read_csv(f'{filepath}{fn}')

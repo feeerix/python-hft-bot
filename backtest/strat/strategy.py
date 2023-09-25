@@ -171,6 +171,7 @@ class Strategy:
                 kline_db.df = signal.build_signal(df=kline_db.df)
                 
 
+            print(kline_db.df)
 
         
     def save(self):
