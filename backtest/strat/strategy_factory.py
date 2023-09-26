@@ -10,7 +10,7 @@ from backtest.strat.strategy import Strategy
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
 from backtest.portfolio import Portfolio
-from backtest.strat.signal import Signal
+from backtest.strat.trigger import Signal
 
 class StrategyFactory(Strategy):
     def __init__(self):

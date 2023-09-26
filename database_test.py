@@ -12,7 +12,7 @@ from lib.tools.exchange import ExchangeType
 from lib.tools.interval import Interval
 from lib.tools.asset import Asset, AssetType
 from lib.tools.network import Network
-from backtest.strat.signal import Signal
+from backtest.strat.trigger import Trigger
 from backtest.strat.strategy import Strategy
 from backtest.strat.logic import Logic
 from backtest.strat.indicator import Indicator
@@ -150,38 +150,69 @@ klines_dbs = [
 
 indicator_dbs = [
     indicators_4h,
-    indicators_1h,
-    indicators_15m,
-    indicators_5m,
-    indicators_1m
+    # indicators_1h,
+    # indicators_15m,
+    # indicators_5m,
+    # indicators_1m
 ]
 
 """
 Important question now is how we get the specific signals. At the moment, it is currently
 manually input, as you can see. We should be able to select from the currently available 
 columns to select what is above another etc.
+
+Additionally - this will be wha
 """
 
 
-signal_indicators = [
-    Signal(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
-    Signal(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
-    Signal(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
-    Signal(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
-    Signal(Settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}), Interval._4h),
-    Signal(Settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0}), Interval._4h),
-    Signal(Settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0}), Interval._4h),
-    Signal(Settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0}), Interval._4h),
-    Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h),
-    Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "above": False}), Interval._4h)
+trigger_indicators = [
+    Trigger(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+    Trigger(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+    Trigger(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+    Trigger(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+    Trigger(Settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}), Interval._4h),
+    Trigger(Settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0}), Interval._4h),
+    Trigger(Settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0}), Interval._4h),
+    Trigger(Settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0}), Interval._4h),
+    Trigger(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h),
+    Trigger(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "above": False}), Interval._4h)
 ]
 # def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
-signal_dbs = Database("signal_db", DatabaseType.SIGNALS, True, signals=signal_indicators)
+trigger_dbs = Database("trigger_db", DatabaseType.TRIGGERS, True, triggers=trigger_indicators)
 
 portfolio_db = Database("portfolio_db", DatabaseType.PORTFOLIO, symbols=[])
 
 logic_blocks = [
-    # Logic(Settings("bullish_long", "long"))
+    Logic(
+        Settings("bullish_long", "long", {
+                True:[
+                    "EMA_8_B_EMA_21", 
+                    "EMA_144_A_EMA_233",
+                    "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5",
+                    "STOCHRSIk_21_21_5_5_B_20_0",
+                    "STOCHRSId_21_21_5_5_B_20_0"
+                ],
+                False:[
+                ]
+            }
+        ),
+        [Interval.from_string('4h')]
+    ),
+    Logic(
+        Settings("bearish_short", "SHORT", {
+                True:[
+                    "EMA_8_A_EMA_21", 
+                    "EMA_144_B_EMA_233",
+                    "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5",
+                    "STOCHRSIk_21_21_5_5_A_80_0",
+                    "STOCHRSId_21_21_5_5_A_80_0"
+                ],
+                False:[
+                ]
+            }
+        ),
+        [Interval.from_string('4h')]
+    )
 ]
 
 logic_db = Database("Logic_db", db_type=DatabaseType.LOGIC, logic=logic_blocks)
@@ -192,10 +223,10 @@ test_strat = Strategy(
     klines=klines_dbs,
     indicators=indicator_dbs,
     orderbook=[Database(db_type=DatabaseType.ORDERBOOK)],
-    signals=signal_dbs,
-    logic=Database(db_type=DatabaseType.LOGIC),
+    triggers=trigger_dbs,
+    logic=logic_db,
     positions=Database(db_type=DatabaseType.POSITIONS),
-    verbose=True,
+    verbose=True
 )
 
 print("CREATED TEST STRAT")

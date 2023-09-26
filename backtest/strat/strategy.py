@@ -8,11 +8,11 @@ from enum import Enum
 from typing import List, Dict
 
 # Local Imports
-from backtest.strat.indicator import Indicator
+# from backtest.strat.indicator import Indicator
 from db.database import Database
-from backtest.strat.settings.settings import import_setting, Settings
-from lib.file.writer import folder_exists, create_folder, file_exists, write_json
-from lib.file.reader import get_json
+# from backtest.strat.settings.settings import import_setting, Settings
+# from lib.file.writer import folder_exists, create_folder, file_exists, write_json
+# from lib.file.reader import get_json
 
 class Strategy:
     """
@@ -42,6 +42,7 @@ class Strategy:
             klines:List[Database]=[],
             indicators:List[Database]=[], 
             orderbook:List[Database]=[], 
+            triggers:List[Database]=[],
             signals:List[Database]=[], 
             logic:Database=None, 
             positions:Database=None,
@@ -66,6 +67,12 @@ class Strategy:
         This will hold all the things that klines hold that comes from the kline + and the 
         indicators associated with it. We do have an indicator database that holds the 
         settings for the corresponding indicators.
+        """
+
+
+        self.triggers = triggers
+        """
+        Triggers are just the the boolean versions of signals
         """
         
 
@@ -169,9 +176,9 @@ class Strategy:
                         df=kline_db.df
                     )
             
-            for signal in self.signals.arguments['signals']:
-                kline_db.df = signal.build_signal(df=kline_db.df)
-                
+            for trigger in self.triggers.arguments['triggers']:
+                kline_db.df = trigger.build_trigger(df=kline_db.df)
+
             if self.verbose:
                 print("------------------------------ DATAFRAME ------------------------------")
                 print(kline_db.df)
@@ -192,4 +199,3 @@ class Strategy:
     def go_live(self):
         pass
         
-    """  """

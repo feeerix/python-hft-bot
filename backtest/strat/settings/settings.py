@@ -51,7 +51,7 @@ class Settings:
         self.func_name = func_name
         self.columns = [] # Not sure if required
         self.arguments = arguments
-        self.transfer = transform # Not sure if required
+        # self.transfer = transform # Not sure if required
         self.verbose = verbose
 
         _utility = ('above', 'above_value', 'below', 'below_value', 'cross')

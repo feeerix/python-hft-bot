@@ -11,6 +11,14 @@ class PositionType(Enum):
     ARB = 'arbitrage'
     OPTION = 'option'
 
+    @classmethod
+    def from_string(cls, position_str: str):
+        # Prepend underscore for our internal representation
+        if position_str in cls._member_names_:
+            return cls[position_str]
+        else:
+            raise ValueError(f"No position type found for '{position_str}'")
+
 class OptionType(Enum):
     AMERICAN = 'american'
     EUROPEAN = 'european'

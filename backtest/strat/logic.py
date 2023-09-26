@@ -1,21 +1,29 @@
 # Imports
 import pandas as pd
 import pandas_ta as ta
+from typing import List
 
 # Local Imports
 from lib.file.writer import *
 from backtest.strat.settings.settings import Settings
 from backtest.strat.composer import get_required_params
 from lib.tools.interval import Interval
-
+from backtest.position import Position, PositionType
 
 class Logic:
-    def __init__(self, _settings:Settings, _interval:Interval, verbose:bool=True, df:pd.DataFrame=None):
+    type_mapping = {
+        PositionType.LONG: "placeholder",
+        PositionType.SHORT: "placeholder",
+        PositionType.OPTION: "placeholder",
+        PositionType.ARB: "placeholder"
+    }
+
+    def __init__(self, _settings:Settings, _interval:List[Interval], verbose:bool=True, df:pd.DataFrame=None):
         # Verbosity
         self.verbose = verbose
         
         # Add the func into the class
-        self.ind_func = getattr(ta, _settings.func_name)
+        self.ind_func = getattr(self, self.type_mapping[PositionType.from_string(_settings.func_name.upper())])
         
         # Settings - a way to set up the indicator
         self.settings = _settings
@@ -32,7 +40,7 @@ class Logic:
 
     
     def __str__(self) -> str:
-        return f"SIGNAL -- {self.settings.name}-{self.settings.columns}"
+        return f"LOGIC -- {self.settings.name}-{self.settings.arguments}"
 
     @property
     def columns(self):
@@ -47,56 +55,26 @@ class Logic:
         pass
 
     def execute(self):
+        """
+        Executes whatever logic is required - creating a position for example etc
+        """
         pass
 
-    def check(self) -> bool:
+    def check(self, row:tuple) -> bool:
         """
         This is returns a boolean if the specific logic has been met.
         """
-        
-    
+        is_valid = True
+        # for col in self.settings.arguments[]
+        for col in self.settings.arguments[True]:
+            if getattr(row, col) == 0:
+                is_valid = False
+                break
+        for col in self.settings.arguments[False]:
+            if getattr(row, col) == 1:
+                is_valid = False
+                break
 
-
-    def build_signal(self, df:pd.DataFrame) -> pd.DataFrame:
-        # initialise empty settings
-        ind_settings = {}
-
-        # Get the required parameters (OHLCV)
-        req_params = get_required_params(self.settings.func_name)
-        if self.verbose:
-            print(f"ADDING: {self.settings.func_name}")
-
-        # OHLCV
-        for argument in req_params.keys():
-            
-            if req_params[argument]:
-                
-                if argument.startswith('series_'):
-                    ind_settings.update({argument: df[self.settings.arguments[argument]]})
-                
-                elif (argument not in df.columns.to_list()) and type(self.settings.arguments[argument]) != str:
-                    ind_settings.update({argument: self.settings.arguments[argument]})
-
-                else: # OHLCV
-                    ind_settings.update({argument: df[argument]})
-
-            elif argument in self.settings.arguments.keys():
-                ind_settings.update({argument: self.settings.arguments[argument]})
-        
-        
-        ret_data = self.ind_func(**ind_settings)
-
-        # --------------------------------------------------------------
-        if type(ret_data) == pd.DataFrame:
-            return pd.concat(df, ret_data, axis=1)
-            
-        elif type(ret_data) == pd.Series:
-            self.settings.columns = [ret_data.name]
-            return pd.concat([df, pd.DataFrame(ret_data, columns=self.settings.columns)], axis=1)
-
-        else:
-            print("SOMETHING WENT WRONG")
-            print(type(ret_data))
-            exit() # PANIC
-        
-    
+        return is_valid
+    def placeholder(self):
+        print("test")

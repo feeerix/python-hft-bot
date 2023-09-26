@@ -39,7 +39,8 @@ class Backtester:
         position_size = 0
         init_capital = capital
 
-
+        print(strategies.logic.build())
+        
         for df_index in range(len(strategies.klines)):
             distance = len(strategies.klines[df_index].df)
             # To be adjusted
@@ -61,85 +62,95 @@ class Backtester:
                 if self.verbose:
                     if (i % resolution) == 0:
                         print(f"{round((i/distance)*100, 3)}% COMPLETE")
-
-                # print(strategies[0].logic.name)
-                exit()
-                # Looking for new position
-                if current_position is None:
-                    # Cycle every position type (long/short/arb) etc
-                    for pos_type in test_strat.position_condition_settings.keys():
+                
+                
+                for pos_logic in strategies.logic.arguments['logic']:
+                    # We have found a place where we might be able to make a transaction
+                    if pos_logic.check(row):
+                        print("VALID!! ------------")
                         
-                        # For every type of position that we're trying to open (could be high risk long or short term for example)
-                        for idx in range(len(test_strat.position_condition_settings[pos_type])):
 
-                            # Get the name of the position
-                            pos_name = test_strat.position_condition_settings[pos_type][idx]['name']
+                        exit()
+                
+                
+                # print(strategies[0].logic.name)
+                
+                # # Looking for new position
+                # if current_position is None:
+                #     # Cycle every position type (long/short/arb) etc
+                #     for pos_type in test_strat.position_condition_settings.keys():
+                        
+                #         # For every type of position that we're trying to open (could be high risk long or short term for example)
+                #         for idx in range(len(test_strat.position_condition_settings[pos_type])):
+
+                #             # Get the name of the position
+                #             pos_name = test_strat.position_condition_settings[pos_type][idx]['name']
                             
-                            # if the position type exist and we are ready to open a position
-                            if getattr(row, pos_name) and (getattr(row, pos_name) == 1):
+                #             # if the position type exist and we are ready to open a position
+                #             if getattr(row, pos_name) and (getattr(row, pos_name) == 1):
                                 
-                                # If verbose
-                                if self.verbose:
-                                    print(f"POS_TYPE: {pos_type}")
-                                    print(f"CURRENT POSITION: {position}")
-                                    print("CREATING POSITION")
-                                    print(f"POS_NAME: {pos_name}")
+                #                 # If verbose
+                #                 if self.verbose:
+                #                     print(f"POS_TYPE: {pos_type}")
+                #                     print(f"CURRENT POSITION: {position}")
+                #                     print("CREATING POSITION")
+                #                     print(f"POS_NAME: {pos_name}")
                                 
-                                short_inverse = 1
-                                # If short we inverse
-                                if pos_type == 'short':
-                                    # We are short - inverse
-                                    position_type = PositionType.SHORT
-                                    short_inverse = -1
+                #                 short_inverse = 1
+                #                 # If short we inverse
+                #                 if pos_type == 'short':
+                #                     # We are short - inverse
+                #                     position_type = PositionType.SHORT
+                #                     short_inverse = -1
                                 
-                                # Get position type
-                                position = pos_type
+                #                 # Get position type
+                #                 position = pos_type
                                 
-                                # TODO - make sure we can update set arbitrary opening price
-                                opening_price = row.close
+                #                 # TODO - make sure we can update set arbitrary opening price
+                #                 opening_price = row.close
 
-                                # TODO - make sure we can set arbitrary opening time (within )
-                                open_time = row.close_time
-                                position_size = capital / opening_price
+                #                 # TODO - make sure we can set arbitrary opening time (within )
+                #                 open_time = row.close_time
+                #                 position_size = capital / opening_price
 
-                                # TODO - make sure we can select maker or taker fee (or even custom fee) via the settings
-                                fee += position_size * (maker_fee / 100)
+                #                 # TODO - make sure we can select maker or taker fee (or even custom fee) via the settings
+                #                 fee += position_size * (maker_fee / 100)
 
-                                # TODO - make sure we can have an arbitrary number of trailing stops
-                                atr = getattr(row, "ATRe_21")
-                                take_profit = opening_price + (atr * 1.8 * short_inverse)
-                                trailing_trigger = opening_price + (atr * 1.6 * short_inverse)
-                                trailing_stop = opening_price + (atr * 1.4 * short_inverse)
+                #                 # TODO - make sure we can have an arbitrary number of trailing stops
+                #                 atr = getattr(row, "ATRe_21")
+                #                 take_profit = opening_price + (atr * 1.8 * short_inverse)
+                #                 trailing_trigger = opening_price + (atr * 1.6 * short_inverse)
+                #                 trailing_stop = opening_price + (atr * 1.4 * short_inverse)
 
 
-                                trailing_trigger1 = opening_price + (atr * 1.4 * short_inverse)
-                                trailing_stop1 = opening_price + (atr * 1.3 * short_inverse)
+                #                 trailing_trigger1 = opening_price + (atr * 1.4 * short_inverse)
+                #                 trailing_stop1 = opening_price + (atr * 1.3 * short_inverse)
 
-                                trailing_trigger2 = opening_price + (atr * 1.3 * short_inverse)
-                                trailing_stop2 = opening_price + (atr * 1.1 * short_inverse)
+                #                 trailing_trigger2 = opening_price + (atr * 1.3 * short_inverse)
+                #                 trailing_stop2 = opening_price + (atr * 1.1 * short_inverse)
 
-                                trailing_trigger3 = opening_price + (atr * 1 * short_inverse)
-                                trailing_stop3 = opening_price + (atr * 0.5 * short_inverse)
+                #                 trailing_trigger3 = opening_price + (atr * 1 * short_inverse)
+                #                 trailing_stop3 = opening_price + (atr * 0.5 * short_inverse)
 
-                                stop_loss = opening_price - (atr * 0.2 * short_inverse)
+                #                 stop_loss = opening_price - (atr * 0.2 * short_inverse)
 
-                                _triggers = [
-                                    trailing_trigger,
-                                    trailing_trigger1,
-                                    trailing_trigger2,
-                                    trailing_trigger3,
-                                    # trailing_trigger4
-                                ]
+                #                 _triggers = [
+                #                     trailing_trigger,
+                #                     trailing_trigger1,
+                #                     trailing_trigger2,
+                #                     trailing_trigger3,
+                #                     # trailing_trigger4
+                #                 ]
 
-                                _stops = [
-                                    trailing_stop,
-                                    trailing_stop1,
-                                    trailing_stop2,
-                                    trailing_stop3,
-                                    # trailing_stop4
-                                ]
+                #                 _stops = [
+                #                     trailing_stop,
+                #                     trailing_stop1,
+                #                     trailing_stop2,
+                #                     trailing_stop3,
+                #                     # trailing_stop4
+                #                 ]
 
-                                # ---------------------------------------------------
+                #                 # ---------------------------------------------------
 
 
     def test_run(self, test_strat:Strategy, capital:float):

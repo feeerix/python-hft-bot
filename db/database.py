@@ -19,7 +19,7 @@ from lib.tools.exchange import Exchange
 from lib.tools.internal.exchange_type import ExchangeType
 # from lib.tools.blockchain import Blockchain
 from backtest.strat.indicator import Indicator
-from backtest.strat.signal import Signal
+from backtest.strat.trigger import Trigger
 from backtest.strat.settings.settings import Settings
 from lib.tools.symbol import Symbol
 from lib.tools.interval import Interval
@@ -27,6 +27,7 @@ from lib.tools.asset import Asset
 
 class DatabaseType(Enum):
     KLINES = 'klines'
+    TRIGGERS = 'triggers'
     SIGNALS = 'signals'
     PORTFOLIO = 'portfolio'
     INFO = 'info'
@@ -55,6 +56,16 @@ class Database:
 
     """
     DB_NAMESPACE = uuid.uuid4()
+    db_mapping = {
+        DatabaseType.KLINES: "_klines",
+        DatabaseType.INDICATORS: "_indicators",
+        DatabaseType.ORDERBOOK: "_orderbook",
+        DatabaseType.TRIGGERS: "_triggers",
+        DatabaseType.LOGIC: "_logic",
+        DatabaseType.POSITIONS: "_positions",
+        DatabaseType.PORTFOLIO: "_portfolio",
+        DatabaseType.INFO: "_info"
+    }
 
     # Initialises
     def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs:List[Indicator]):
@@ -64,16 +75,16 @@ class Database:
         self.df = None
         self.arguments = kwargs
 
-        self.db_mapping = {
-            DatabaseType.KLINES: self._klines,
-            DatabaseType.INDICATORS: self._indicators,
-            DatabaseType.ORDERBOOK: self._orderbook,
-            DatabaseType.SIGNALS: self._signals,
-            DatabaseType.LOGIC: self._logic,
-            DatabaseType.POSITIONS: self._positions,
-            DatabaseType.PORTFOLIO: self._portfolio,
-            DatabaseType.INFO: self._info
-        }
+        # self.db_mapping = {
+        #     DatabaseType.KLINES: self._klines,
+        #     DatabaseType.INDICATORS: self._indicators,
+        #     DatabaseType.ORDERBOOK: self._orderbook,
+        #     DatabaseType.SIGNALS: self._signals,
+        #     DatabaseType.LOGIC: self._logic,
+        #     DatabaseType.POSITIONS: self._positions,
+        #     DatabaseType.PORTFOLIO: self._portfolio,
+        #     DatabaseType.INFO: self._info
+        # }
 
         # Create a custom name based on type and uuid
         if not name or name == "":
@@ -101,19 +112,20 @@ class Database:
         """
 
         if self.db_type == DatabaseType.KLINES:
-            self.df = self.db_mapping[self.db_type](**self.arguments)
+            self.df = getattr(self, self.db_mapping[self.db_type])(**self.arguments)
             return self.df
         
         elif self.db_type == DatabaseType.INDICATORS:
-            self.df = self.db_mapping[self.db_type](**kwargs)
+            self.df = getattr(self, self.db_mapping[self.db_type])(**kwargs)
             return self.df
 
         elif self.db_type == DatabaseType.SIGNALS:
             self._signals(signals=self.arguments['signals'])
 
-            # print(self.arguments)
-            print("END OF THE BUILD FUNCTION FOR SIGNAL DB")
-            exit()
+        # elif self.db_type
+
+        else:
+            print("You input a build type that's not recognised!")
 
     def _klines(self, symbol:Symbol, interval:Interval, starttime:int, endtime:int, source:ExchangeType) -> pd.DataFrame:
         """
@@ -229,13 +241,14 @@ class Database:
         pass
 
     def _logic(self):
-        pass
+        print("_logic in database.py")
+        exit()
 
     def _positions(self):
         pass
 
     # Create a signals dataframe
-    def _signals(self, signals:List[Signal]=[], dataframe:pd.DataFrame=None, recording:bool=False) -> pd.DataFrame:
+    def _triggers(self, triggers:List[Trigger]=[], dataframe:pd.DataFrame=None, recording:bool=False) -> pd.DataFrame:
         """
         I should note that the entries are just adding booleans for specific trading signals.
         I will need to update this so that it better generalises when I'm adding signals for everything, not just opening and closing positions
@@ -244,7 +257,7 @@ class Database:
         if self.verbose:
             print("Adding Signals...")
 
-        for signal in signals:
+        for signal in triggers:
             print(signal.settings.arguments)
             print(signal.settings)
             df = signal.build_signal(dataframe)

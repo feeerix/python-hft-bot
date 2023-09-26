@@ -23,7 +23,7 @@ from lib.tools.interval import Interval
 #     Indicator(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_34_34_8_8", "series_b": "STOCHRSId_34_34_8_8", "above": False}))
 # ]
 
-class Signal:
+class Trigger:
     def __init__(self, _settings:Settings, _interval:Interval, verbose:bool=True, df:pd.DataFrame=None):
         # Verbosity
         self.verbose = verbose
@@ -49,7 +49,7 @@ class Signal:
         """
 
         if df is not None:
-            self.df = self.build_signal(df)
+            self.df = self.build_trigger(df)
 
     
     def __str__(self) -> str:
@@ -59,7 +59,7 @@ class Signal:
     def columns(self):
         return self.settings.columns
     
-    def build_signal(self, df:pd.DataFrame) -> pd.DataFrame:
+    def build_trigger(self, df:pd.DataFrame) -> pd.DataFrame:
         # initialise empty settings
         ind_settings = {}
 

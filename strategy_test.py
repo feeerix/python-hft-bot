@@ -10,7 +10,7 @@ from lib.tools.exchange import ExchangeType
 from lib.tools.interval import Interval
 from lib.tools.asset import Asset, AssetType
 from lib.tools.network import Network
-from backtest.strat.signal import Signal
+from backtest.strat.trigger import Signal
 from backtest.strat.strategy import Strategy
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
