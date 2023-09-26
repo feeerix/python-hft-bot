@@ -49,7 +49,7 @@ class Database:
     It's job is to maintain the data - and if something is being done live making sure it's
     up to date as well as correct. We can eventually move the hash and checking mechanism
     directly within this class
-   
+
     TODO - Somehow the Database uuid's seem to be the same in some circumstances.
     Need to check on what's happening here
 
@@ -96,6 +96,9 @@ class Database:
         # return
     
     def build(self, **kwargs):
+        """
+        Build based on the database type.
+        """
 
         if self.db_type == DatabaseType.KLINES:
             self.df = self.db_mapping[self.db_type](**self.arguments)
@@ -208,11 +211,6 @@ class Database:
         # Add all the indicators
         for indicator in indicator_list:
             
-            # print(indicator.settings.arguments)
-            # for indicator_class in indicator.arguments['indicators']:
-                # if self.verbose:
-                #     print(f"ADDING: {indicator.settings['name']} -> {self.name}")
-
             """
             This adds the indicator columns to the current df Database
             """

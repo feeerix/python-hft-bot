@@ -68,4 +68,3 @@ class Settings:
     # TODO - Make sure is still required and works correct
     def validate_settings(self): 
         return True
-         

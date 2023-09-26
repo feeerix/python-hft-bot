@@ -54,52 +54,59 @@ class Strategy:
 
         # TODO - Not sure if this should be changed at all - seems to complex to include in the class
         
+        self.portfolio = portfolio
         """
         PORTFOLIO
         """
-        self.portfolio = portfolio
+        
 
+        self.klines = klines
         """
         Klines
         This will hold all the things that klines hold that comes from the kline + and the 
         indicators associated with it. We do have an indicator database that holds the 
         settings for the corresponding indicators.
         """
-        self.klines = klines
+        
 
+        self.signals = signals
         """
         Signals
         This will hold the boleans for example, if something is above another or if an 
         indicator has reached a certain level. These should be the things that specifically
         will signal that a trade should be put on. 
         """
-        self.signals = signals
+        
 
+        self.indicators = indicators
         """
         Indicator Settings
         Holds the settings for the indicators which will generally preside in the klines
         datbase. These include thinks like settings for EMAs and RSI etc.
         """
-        self.indicators = indicators
+        
 
+        self.logic = logic
         """
         Logic
         This involves any trading logic that needs to take place. For example if an EMA
         is above another EMA that would be under signal, there would also be a (very simple)
         piece of logic that would just open a trade. 
         """
-        self.logic = logic
+        
 
+
+        self.orderbook = orderbook
         """
         Orderbook - TODO
         Pretty self explanatory.
         """
-        self.orderbook = orderbook
-
+        
+        self.positions = positions
         """
         Positions - TODO
         """
-        self.positions = positions
+        
 
         # Check if any of the attr is None - Return Error
         for attr, value in self.__dict__.items():
@@ -147,8 +154,6 @@ class Strategy:
         This function builds all the required database to return their corresponding dataframes.
         In doing so, you can then start to either backtest or perform the strategy accordingly.
         """
-        # print(self.indicators.kwargs)
-
         # Build klines
         for kline_db in self.klines:
             
@@ -163,16 +168,18 @@ class Strategy:
                         indicator_list=indicator_db.arguments['indicators'],
                         df=kline_db.df
                     )
-
             
             for signal in self.signals.arguments['signals']:
-                # print(signal.build_signal(df=kline_db.df))
-                
                 kline_db.df = signal.build_signal(df=kline_db.df)
                 
+            if self.verbose:
+                print("------------------------------ DATAFRAME ------------------------------")
+                print(kline_db.df)
 
-            print(kline_db.df)
+        
 
+    def backtest(self):
+        pass
         
     def save(self):
         if self.verbose:

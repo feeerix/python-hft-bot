@@ -14,8 +14,10 @@ from lib.tools.asset import Asset, AssetType
 from lib.tools.network import Network
 from backtest.strat.signal import Signal
 from backtest.strat.strategy import Strategy
+from backtest.strat.logic import Logic
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
+from backtest.backtester import Backtester
 
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -139,11 +141,11 @@ add those after we've built all the kline and indicator dataframes.
 """
 
 klines_dbs = [
-    klines_4h, 
-    klines_1h, 
-    klines_15m, 
-    klines_5m, 
-    klines_1m
+    klines_4h,
+    # klines_1h, 
+    # klines_15m, 
+    # klines_5m, 
+    # klines_1m
 ]
 
 indicator_dbs = [
@@ -174,16 +176,22 @@ signal_indicators = [
     Signal(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "above": False}), Interval._4h)
 ]
 # def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
-signal_dbs = Database("", DatabaseType.SIGNALS, True, signals=signal_indicators)
+signal_dbs = Database("signal_db", DatabaseType.SIGNALS, True, signals=signal_indicators)
 
-portfolio_db = Database(db_type=DatabaseType.PORTFOLIO, symbols=[])
+portfolio_db = Database("portfolio_db", DatabaseType.PORTFOLIO, symbols=[])
+
+logic_blocks = [
+    # Logic(Settings("bullish_long", "long"))
+]
+
+logic_db = Database("Logic_db", db_type=DatabaseType.LOGIC, logic=logic_blocks)
 
 test_strat = Strategy(
     name="test1",
-    portfolio=Database(db_type=DatabaseType.PORTFOLIO),
+    portfolio=portfolio_db,
     klines=klines_dbs,
     indicators=indicator_dbs,
-    orderbook=[Database(db_type=DatabaseType.ORDERBOOK)], # TODO - need to update exchange class to add ws functions
+    orderbook=[Database(db_type=DatabaseType.ORDERBOOK)],
     signals=signal_dbs,
     logic=Database(db_type=DatabaseType.LOGIC),
     positions=Database(db_type=DatabaseType.POSITIONS),
@@ -192,8 +200,10 @@ test_strat = Strategy(
 
 print("CREATED TEST STRAT")
 test_strat.build()
+# print(test_strat.klines)
 
-exit()
+Backtester(verbose=True).backtest(test_strat, 1000)
+
 """
 Next step is to make sure we can implement our signals, and then the logic for trading
 Once we have done that, we will add to the positions database, and then create a performance

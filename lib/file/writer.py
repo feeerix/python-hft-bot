@@ -19,12 +19,6 @@ def folder_exists(folder_name:str, folder_path:str) -> bool:
 def create_file(filename:str, filepath: str) -> bool:
     f = open(f"{filepath}{filename}", "x")
     return True # Adjust to return correct boolean
-
-def file_exists(filename:str, filepath:str) -> bool:
-    if os.path.isfile(f"{filepath}{filename}"):
-        return True
-    else:
-        return False
     
 def write_json(file_data:dict, filename:str, folder_path:str):
     if not file_exists(filename, folder_path):

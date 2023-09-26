@@ -102,13 +102,14 @@ class Binance(Exchange):
             # use specified start time (and works backwards!)
             dt_starttime = starttime
         
-        pre_check(symbol.lower(), interval.str_rep())
+        pre_check(symbol.lower(), interval.str)
 
         # Loop for each bulk file
         while True:
             # If file does not exist
-            filepath = f"db/klines/{symbol.lower()}/{interval.str_rep()}/binance-{symbol}-{interval.str_rep()}-{dt_starttime.year}-{dt_starttime.month:02d}.csv"
-            if not file_exists(filepath):
+            filepath = f"db/klines/{symbol.lower()}/{interval.str}/"
+            filename = f"binance-{symbol}-{interval.str}-{dt_starttime.year}-{dt_starttime.month:02d}.csv"
+            if not file_exists(filename, filepath):
             
                 # Download kline data
                 bulk(
@@ -116,7 +117,7 @@ class Binance(Exchange):
                     self.verbose,
                     {
                         'symbol':symbol.upper(),
-                        'interval': interval.str_rep(),
+                        'interval': interval.str,
                         'timestamp': dt_starttime.timestamp()
                     }
                 )
@@ -134,7 +135,7 @@ class Binance(Exchange):
                     'spot',
                     'klines',
                     symbol,
-                    interval.str_rep(),
+                    interval.str,
                     next_time.year,
                     f"{next_time.month:02d}"
                 )
@@ -147,22 +148,22 @@ class Binance(Exchange):
 
     # Current function being created
     def update_klines(self, symbol:str, interval:Interval):
-          
         # Pre-check
-        pre_check(symbol.lower(), interval.str_rep())
+        pre_check(symbol.lower(), interval.str)
 
         # Last Close
-        starttime = int(interval.last_close()/1000)
+        starttime = int(interval.last_close())
         
         # Limit
         limit = 1000
 
         # Start of the month
         finaltime = int(datetime.today().replace(day=1, hour=0, minute=0, second=0, microsecond=0).timestamp())
-        filepath = f"db/klines/{symbol.lower()}/{interval.str_rep()}/binance-{symbol}-{interval.str_rep()}-{datetime.today().year}-{datetime.today().month:02d}.csv"
+        filepath = f"db/klines/{symbol.lower()}/{interval.str}/"
+        filename = f"binance-{symbol}-{interval.str}-{datetime.today().year}-{datetime.today().month:02d}.csv"
         
         # If this month's file exists
-        if not file_exists(filepath):
+        if not file_exists(filename, filepath):
             # Initialise empty df
             ret_data = pd.DataFrame(columns=[
                 'time',
@@ -182,7 +183,7 @@ class Binance(Exchange):
             
         else:
             # Get existing df
-            ret_data = pd.read_csv(filepath)
+            ret_data = pd.read_csv(filepath+filename)
 
             # earliest time / final time
             finaltime = int((ret_data['time'].iloc[-1] / 1000) + interval.tc_rep())
@@ -227,7 +228,7 @@ class Binance(Exchange):
                 self.verbose,
                 {
                     'symbol': symbol,
-                    'interval': interval.str_rep(),
+                    'interval': interval.str,
                     'startTime': starttime * 1000,
                     'limit': limit
                 }
@@ -251,14 +252,17 @@ class Binance(Exchange):
             print(f"First time: {datetime.fromtimestamp(int(ret_data['time'].iloc[0])/1000)}")
             print(f"Last time: {datetime.fromtimestamp(int(ret_data['time'].iloc[-1])/1000)}")
         
+        
         # Write to file
         pd.DataFrame.to_csv(
             ret_data,
-            filepath,
+            filepath+filename,
             index=False,
             float_format='%.0f'
         )
 
+
+        
         # Then update klines via bulk
         self.update_bulk_klines(
             symbol,

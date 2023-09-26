@@ -22,16 +22,38 @@ class Interval(Enum):
     _1W = 604800
 
     # Bypassing Enum's __new__ method
-    def __new__(cls, seconds):
-        obj = object.__new__(cls)
-        obj._value_ = seconds
-        return obj
+    # def __new__(cls, seconds):
+    #     obj = object.__new__(cls)
+    #     obj._value_ = seconds
+    #     return obj
+    
+    @property
+    def str(self):
+        return self.name[1:]
+
+    @classmethod
+    def from_string(cls, interval_str: str):
+        # Prepend underscore for our internal representation
+        interval_key = f"_{interval_str}"
+        if interval_key in cls._member_names_:
+            return cls[interval_key]
+        else:
+            raise ValueError(f"No interval found for '{interval_str}'")
+        
+    @classmethod
+    def from_seconds(cls, seconds: int):
+        for member in cls:
+            if member.value == seconds:
+                return member
+        raise ValueError(f"No interval found for '{seconds}' seconds")
 
     def __init__(self, seconds):
         self.ms = False
 
     def __str__(self) -> str:
         return self.name[1:]
+    
+    
 
     def tc_rep(self) -> int:
         return self.value

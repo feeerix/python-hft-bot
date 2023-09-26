@@ -74,7 +74,7 @@ def bulk(base_url:str, verbose:bool, params:dict):
 
     # Filename and filepath
     filename = f'binance-{params["symbol"]}-{params["interval"]}-{year}-{month}'
-    filepath = f'db/klines/{params["symbol"]}/{params["interval"]}/'
+    filepath = f'db/klines/{params["symbol"].lower()}/{params["interval"]}/'
     
     # Download file
     download_file(

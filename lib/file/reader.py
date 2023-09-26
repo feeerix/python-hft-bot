@@ -21,8 +21,8 @@ def get_list(path:str) -> list:
         data = json.load(json_file)
     return data
 
-def file_exists(path:str) -> bool:
-    if os.path.isfile(path):
+def file_exists(filename:str, filepath:str) -> bool:
+    if os.path.isfile(f"{filepath}{filename}"):
         return True
     else:
         return False
