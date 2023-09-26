@@ -184,7 +184,20 @@ portfolio_db = Database("portfolio_db", DatabaseType.PORTFOLIO, symbols=[])
 
 logic_blocks = [
     Logic(
-        Settings("bullish_long", "long", {
+        Settings(
+            "bullish_long", 
+            "long", # Side
+            { # This dictionary is piped into Position factory to create our position object
+                "symbol": None, # If none - for any
+                "trade_type": "limit", # limit / market / stoplimit / stopmarket / trailing
+                "time_in_force": "GTC", # GTC: Good Till Cancel / IOC: Immediate or Cancel / FOK: Fill or Kill
+                "fee_pct": 0.1,
+                "time_valid": 0, # 0 if GTC/IOC/FOK otherwise validity in seconds and will cancel
+                "stop_types": [], # list of stops
+                "size": 100,
+                "timestamp": 0,
+            }, 
+            { # Columns
                 True:[
                     "EMA_8_B_EMA_21", 
                     "EMA_144_A_EMA_233",
@@ -199,7 +212,20 @@ logic_blocks = [
         [Interval.from_string('4h')]
     ),
     Logic(
-        Settings("bearish_short", "SHORT", {
+        Settings(
+            "bearish_short", 
+            "short", 
+            { # This dictionary is piped into Position factory to create our position object
+                "symbol": None, # If none - for any
+                "trade_type": "limit", # limit / market / stoplimit / stopmarket / trailing
+                "time_in_force": "GTC", # GTC: Good Till Cancel / IOC: Immediate or Cancel / FOK: Fill or Kill
+                "fee_pct": 0.1,
+                "time_valid": 0, # 0 if GTC/IOC/FOK otherwise validity in seconds and will cancel
+                "stop_types": [], # list of stops
+                "size": 100,
+                "timestamp": 0,
+            }, 
+            {
                 True:[
                     "EMA_8_A_EMA_21", 
                     "EMA_144_B_EMA_233",

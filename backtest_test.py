@@ -137,25 +137,6 @@ exchange_settings = settings(
     }
 )
 
-# We are now adjusting how the settings
-test_strat.add_entry(long1)
-test_strat.add_entry(short1)
-
-# ---
-# FIND A WAY TO CREATE STRATEGIES
-# ---
-
-bt = Backtester(verbose=True)
-
-
-# bt.test_run(bt.init_test_strat())
-# test_strat.write_settings()
-print(line)
-
-# def test_runv0(self, test_strat:strategy, capital:float, run_settings:settings=None, exchange_settings:settings=None, settings_write:bool=False):
-bt.test_runv0(test_strat, 1000, exchange_settings=exchange_settings)
-# print(test_strat.df.columns.to_list())
-
 """
 Get List of indicators
 

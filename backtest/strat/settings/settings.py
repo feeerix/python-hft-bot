@@ -40,7 +40,7 @@ class Settings:
             name:str, 
             func_name:str, 
             arguments:dict=None, 
-            transform:dict=None, 
+            columns:dict=None, 
             interval:Interval=None,
             verbose:bool=False, 
             **kwargs
@@ -51,6 +51,7 @@ class Settings:
         self.func_name = func_name
         self.columns = [] # Not sure if required
         self.arguments = arguments
+        self.columns = columns
         # self.transfer = transform # Not sure if required
         self.verbose = verbose
 

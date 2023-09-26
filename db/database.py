@@ -46,6 +46,7 @@ class DatabaseFactory:
 class Database:
     """
     Database class that we will use to create kline, trading signal and other dataframes.
+    I know it's not a REAL database lol.
 
     It's job is to maintain the data - and if something is being done live making sure it's
     up to date as well as correct. We can eventually move the hash and checking mechanism
@@ -75,17 +76,6 @@ class Database:
         self.df = None
         self.arguments = kwargs
 
-        # self.db_mapping = {
-        #     DatabaseType.KLINES: self._klines,
-        #     DatabaseType.INDICATORS: self._indicators,
-        #     DatabaseType.ORDERBOOK: self._orderbook,
-        #     DatabaseType.SIGNALS: self._signals,
-        #     DatabaseType.LOGIC: self._logic,
-        #     DatabaseType.POSITIONS: self._positions,
-        #     DatabaseType.PORTFOLIO: self._portfolio,
-        #     DatabaseType.INFO: self._info
-        # }
-
         # Create a custom name based on type and uuid
         if not name or name == "":
             """
@@ -99,7 +89,7 @@ class Database:
 
     def __str__(self) -> str:
         # {self.db_type.name}_{self.arguments['symbol']}_{self.arguments['interval']}_{self.arguments['source'].name}
-        return f"DATABASE >> Name: {self.name} | db_type: {self.db_type.name}"
+        return f"DATABASE >> Name: {self.name} | db_type: {self.db_type.name} | {self.arguments}"
     
     @property
     def intervals(self) -> list:
@@ -257,10 +247,10 @@ class Database:
         if self.verbose:
             print("Adding Signals...")
 
-        for signal in triggers:
-            print(signal.settings.arguments)
-            print(signal.settings)
-            df = signal.build_signal(dataframe)
+        for trigger in triggers:
+            print(trigger.settings.arguments)
+            print(trigger.settings)
+            df = trigger.build_trigger(dataframe)
             print(df)
         exit()
 

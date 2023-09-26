@@ -65,12 +65,12 @@ class Logic:
         This is returns a boolean if the specific logic has been met.
         """
         is_valid = True
-        # for col in self.settings.arguments[]
-        for col in self.settings.arguments[True]:
+        
+        for col in self.settings.columns[True]:
             if getattr(row, col) == 0:
                 is_valid = False
                 break
-        for col in self.settings.arguments[False]:
+        for col in self.settings.columns[False]:
             if getattr(row, col) == 1:
                 is_valid = False
                 break

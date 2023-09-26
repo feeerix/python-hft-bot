@@ -12,9 +12,9 @@ from typing import List
 from lib.file.writer import *
 from lib.file.reader import *
 
-from db.database import Database
+# from db.database import Database
 
-from backtest.strat.indicator import Indicator
+# from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
 from backtest.strat.strategy import Strategy
 from backtest.position import *
@@ -63,14 +63,28 @@ class Backtester:
                     if (i % resolution) == 0:
                         print(f"{round((i/distance)*100, 3)}% COMPLETE")
                 
-                
-                for pos_logic in strategies.logic.arguments['logic']:
-                    # We have found a place where we might be able to make a transaction
-                    if pos_logic.check(row):
-                        print("VALID!! ------------")
-                        
-
-                        exit()
+                if current_position is None:
+                    for pos_logic in strategies.logic.arguments['logic']:
+                        # We have found a place where we might be able to make a transaction
+                        if pos_logic.check(row):
+                            print("VALID!! ------------")
+                            print(pos_logic.settings.arguments)
+                            # If verbose
+                            """
+                            TODO
+                            BE ABLE TO MAKE A POSITION CLASS WITH A FACTORY
+                            Think about creating a Position class factory that can
+                            create all the lists of Trades based on simplified terms
+                            """
+                            
+                            if self.verbose:
+                                print("CREATING POSITION")
+                                # PositionType
+                                print(f"POS_TYPE: {pos_logic.settings.func_name}")
+                                # 
+                                print(f"NEW CURRENT POSITION NAME: {current_position}")
+                                
+                            exit()
                 
                 
                 # print(strategies[0].logic.name)
@@ -79,7 +93,6 @@ class Backtester:
                 # if current_position is None:
                 #     # Cycle every position type (long/short/arb) etc
                 #     for pos_type in test_strat.position_condition_settings.keys():
-                        
                 #         # For every type of position that we're trying to open (could be high risk long or short term for example)
                 #         for idx in range(len(test_strat.position_condition_settings[pos_type])):
 
