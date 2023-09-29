@@ -44,7 +44,7 @@ class Strategy:
             orderbook:List[Database]=[], 
             triggers:List[Database]=[],
             signals:List[Database]=[], 
-            logic:Database=None, 
+            intents:Database=None, 
             positions:Database=None,
             trigger:bool=False, # Trigger to start building all databases
             retreive:bool=False, # If we want to get the settings
@@ -93,7 +93,7 @@ class Strategy:
         """
         
 
-        self.logic = logic
+        self.intents = intents
         """
         Logic
         This involves any trading logic that needs to take place. For example if an EMA

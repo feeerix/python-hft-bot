@@ -14,10 +14,11 @@ from lib.tools.asset import Asset, AssetType
 from lib.tools.network import Network
 from backtest.strat.trigger import Trigger
 from backtest.strat.strategy import Strategy
-from backtest.strat.logic import Logic
+from backtest.strat.intents import Intents
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
 from backtest.backtester import Backtester
+from backtest.position import TradeType, PositionType, TradeArgs
 
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -182,36 +183,42 @@ trigger_dbs = Database("trigger_db", DatabaseType.TRIGGERS, True, triggers=trigg
 
 portfolio_db = Database("portfolio_db", DatabaseType.PORTFOLIO, symbols=[])
 
-logic_blocks = [
-    Logic(
+intent_blocks = [
+    Intents(
         Settings(
-            "bullish_long", 
-            "long", # Side
-            { # This dictionary is piped into Position factory to create our position object
-                "symbol": None, # If none - for any
-                "trade_type": "limit", # limit / market / stoplimit / stopmarket / trailing
-                "time_in_force": "GTC", # GTC: Good Till Cancel / IOC: Immediate or Cancel / FOK: Fill or Kill
-                "fee_pct": 0.1,
-                "time_valid": 0, # 0 if GTC/IOC/FOK otherwise validity in seconds and will cancel
-                "stop_types": [], # list of stops
-                "size": 100,
-                "timestamp": 0,
-            }, 
-            { # Columns
-                True:[
+            "bullish_long", # Name
+            "long", # Func_name // Side
+            # arguments // This dictionary is piped into Position factory to create our position object
+            TradeArgs(
+                eth, # Quote
+                usdt, # Base
+                1.0, # Amount
+                1.0, # Size
+                0, # Entry - Need a way to dynamically call this
+                0, # Entry Execute Price
+                0, # Init Timestamp
+                0, # Execute Timestamp
+                0, # Fill Timestamp
+                TradeType.LIMIT, # TradeType
+                PositionType.from_string("long"), # Position Type
+                0, # Fee PCT
+                0 # Total Fee
+            ), 
+            { # Columns that are:
+                True:[ # Required to be true
                     "EMA_8_B_EMA_21", 
                     "EMA_144_A_EMA_233",
                     "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5",
                     "STOCHRSIk_21_21_5_5_B_20_0",
                     "STOCHRSId_21_21_5_5_B_20_0"
                 ],
-                False:[
+                False:[ # Required to be false
                 ]
             }
         ),
         [Interval.from_string('4h')]
     ),
-    Logic(
+    Intents(
         Settings(
             "bearish_short", 
             "short", 
@@ -234,14 +241,15 @@ logic_blocks = [
                     "STOCHRSId_21_21_5_5_A_80_0"
                 ],
                 False:[
-                ]
+                ],
+                
             }
         ),
         [Interval.from_string('4h')]
     )
 ]
 
-logic_db = Database("Logic_db", db_type=DatabaseType.LOGIC, logic=logic_blocks)
+intent_db = Database("Intent_db", db_type=DatabaseType.INTENTS, logic=intent_blocks)
 
 test_strat = Strategy(
     name="test1",
@@ -250,7 +258,7 @@ test_strat = Strategy(
     indicators=indicator_dbs,
     orderbook=[Database(db_type=DatabaseType.ORDERBOOK)],
     triggers=trigger_dbs,
-    logic=logic_db,
+    intents=intent_db,
     positions=Database(db_type=DatabaseType.POSITIONS),
     verbose=True
 )

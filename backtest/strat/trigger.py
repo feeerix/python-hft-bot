@@ -59,6 +59,10 @@ class Trigger:
     def columns(self):
         return self.settings.columns
     
+    def check(self, row:tuple, lookback:int=0):
+        # _utility = ('above', 'above_value', 'below', 'below_value', 'cross')
+        pass
+    
     def build_trigger(self, df:pd.DataFrame) -> pd.DataFrame:
         # initialise empty settings
         ind_settings = {}

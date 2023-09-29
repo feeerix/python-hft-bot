@@ -6,6 +6,7 @@ from typing import List
 # Local Import
 from lib.tools.asset import Asset
 
+
 class FeeType(Enum):
     MAKER = 'maker'
     TAKER = 'taker'
@@ -20,8 +21,8 @@ class PositionType(Enum):
     @classmethod
     def from_string(cls, position_str: str):
         # Prepend underscore for our internal representation
-        if position_str in cls._member_names_:
-            return cls[position_str]
+        if position_str.upper() in cls._member_names_:
+            return cls[position_str.upper()]
         else:
             raise ValueError(f"No position type found for '{position_str}'")
 
@@ -49,19 +50,22 @@ class Fee:
 
 @dataclass
 class TradeArgs:
-    quote: Asset # Quote Asset (ETH in ETHUSD)
-    base: Asset # Base Asset (USD in ETHUSD)
-    amount: float # Amount of Quote asset being bought or sold
+    quote: Asset = None # Quote Asset (ETH in ETHUSD)
+    base: Asset = None # Base Asset (USD in ETHUSD)
+    amount: float = 0.0 # Amount of Quote asset being bought or sold
     size: float = 0.0 # Total Size
-    entry_price: float # Entry Price
-    close_price: float = 0.0
+    entry_price: float = 0.0 # Entry Price
+    entry_execute_price: float = 0.0
+    # close_price: float = 0.0 # Don't need these
+    # close_execute_price: float = 0.0 # Don't need these
     init_timestamp: float = 0.0
     execute_timestamp: float = 0.0
     fill_timestamp: float = 0.0
-    trade_type: TradeType
-    pos_family: PositionType
+    trade_type: TradeType = None
+    pos_family: PositionType = None
     fee_pct: float = 0.0
     total_fee: float = 0.0
+    
 
     def __post_init__(self):
         """
@@ -77,6 +81,9 @@ class TradeArgs:
         would mean that the size is:
         size = 1.5 * 1800 = 2700 (Note this is in USDC terms)
         """
+
+    def __str__(self) -> str:
+        return f"{self.quote}{self.base} | {self.trade_type} | {self.pos_family}"
 
 
 class Trade:
@@ -109,11 +116,14 @@ class Trade:
         """
         This method returns a Trade class
         """
-        amount = trade_args.amount
-        entry = trade_args.entry_price
-        fee_amount = amount * (trade_args.fee_pct / 100 )
-        fee = Fee(Trade.fee_mapping[trade_args.trade_type], fee_amount, trade_args.timestamp)
+        # amount = trade_args.amount
+        # entry = trade_args.entry_price
+        # fee_amount = amount * (trade_args.fee_pct / 100 )
+        # fee = Fee(Trade.fee_mapping[trade_args.trade_type], fee_amount, trade_args.timestamp)
         return Trade(trade_args)
+    
+    def execute(execute_price:float):
+        pass
 
     def close(self, close_type:FeeType, amount:float, timestampe_ms:float=0):
         pass
@@ -132,7 +142,7 @@ class OptionTrade(Trade):
 
 @dataclass
 class PositionArgs:
-    base_trade: List[Trade]
+    parent_trade: List[Trade]
     take_profit: List[Trade]
     stop_loss: List[Trade]
 
@@ -183,4 +193,39 @@ class Position:
 """
 TODO
 CREATE A POSITION FACTORY
+
+When we have a specific position we want to execute, we will have a parent trade
+that is the primary thing that's taking on risk for example. For example, if you have
+a trade to 1ETH from 1500 USD, that would be a trade that is "long" ETH.
+
+You might then have a take profit that sells ETH to USD for 2000 USD and a stop loss
+that sells ETH to USD at a loss for 1000 USD.
+
+These are considered children of the primary trade, and will have a set of initial properties,
+that is as they have not been executed yet, and they are looking for the specific
+conditions to be executed.
+
+We should also embed logic blocks in them
+
 """
+
+class PositionFactory:
+    """
+    This is a factory to create the positions
+    """
+    @staticmethod
+    def create_position():
+        pass
+
+
+"""
+We create a set of pre-determined logic building blocks that we
+can place in testing section.
+
+This means we can check for specific conditions such as:
+- If we already have a position (the easiest condition)
+- If we already have an amount of risk on (if we're DCAing for example)
+
+"""
+class Conditions(Enum):
+    pass

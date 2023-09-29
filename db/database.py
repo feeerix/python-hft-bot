@@ -31,7 +31,7 @@ class DatabaseType(Enum):
     SIGNALS = 'signals'
     PORTFOLIO = 'portfolio'
     INFO = 'info'
-    LOGIC = 'logic'
+    INTENTS = 'intents'
     POSITIONS = 'positions'
     INDICATORS = 'indicators'
     ORDERBOOK = 'orderbook'
@@ -62,7 +62,7 @@ class Database:
         DatabaseType.INDICATORS: "_indicators",
         DatabaseType.ORDERBOOK: "_orderbook",
         DatabaseType.TRIGGERS: "_triggers",
-        DatabaseType.LOGIC: "_logic",
+        DatabaseType.INTENTS: "_intents",
         DatabaseType.POSITIONS: "_positions",
         DatabaseType.PORTFOLIO: "_portfolio",
         DatabaseType.INFO: "_info"
@@ -230,7 +230,7 @@ class Database:
     def _orderbook(self, symbols:List[Symbol]):
         pass
 
-    def _logic(self):
+    def _intents(self):
         print("_logic in database.py")
         exit()
 

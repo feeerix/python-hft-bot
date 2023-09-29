@@ -8,9 +8,11 @@ from lib.file.writer import *
 from backtest.strat.settings.settings import Settings
 from backtest.strat.composer import get_required_params
 from lib.tools.interval import Interval
-from backtest.position import Position, PositionType
+from backtest.position import Position, PositionType, Trade, TradeArgs
 
-class Logic:
+
+
+class Intents:
     type_mapping = {
         PositionType.LONG: "placeholder",
         PositionType.SHORT: "placeholder",
@@ -60,12 +62,16 @@ class Logic:
         """
         pass
 
-    def check(self, row:tuple) -> bool:
+    def check(
+            self, 
+            row:tuple # Part of the data we're taking in
+
+        ) -> bool:
         """
         This is returns a boolean if the specific logic has been met.
         """
+
         is_valid = True
-        
         for col in self.settings.columns[True]:
             if getattr(row, col) == 0:
                 is_valid = False
@@ -76,5 +82,6 @@ class Logic:
                 break
 
         return is_valid
+    
     def placeholder(self):
         print("test")

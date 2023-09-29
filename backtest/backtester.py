@@ -39,7 +39,7 @@ class Backtester:
         position_size = 0
         init_capital = capital
 
-        print(strategies.logic.build())
+        print(strategies.intents.build())
         
         for df_index in range(len(strategies.klines)):
             distance = len(strategies.klines[df_index].df)
@@ -63,12 +63,29 @@ class Backtester:
                     if (i % resolution) == 0:
                         print(f"{round((i/distance)*100, 3)}% COMPLETE")
                 
+
+                """
+                At this point, we're going to look through all of the intents,
+                via:
+                strategies.intents - and call the "check" function
+                to see if we're still looking for this position based on 
+                the specific conditions in the function.
+                
+                """
+
+
+
                 if current_position is None:
-                    for pos_logic in strategies.logic.arguments['logic']:
+                    """
+                    If you've passed the above if statement, you currently don't
+                    have a position in place, at all. We will need to change this
+                    to be a check - for that we have maxed the amount of risk.
+                    """
+                    for pos_logic in strategies.intents.arguments['logic']:
                         # We have found a place where we might be able to make a transaction
                         if pos_logic.check(row):
                             print("VALID!! ------------")
-                            print(pos_logic.settings.arguments)
+                            print(pos_logic.settings.arguments.entry_price)
                             # If verbose
                             """
                             TODO

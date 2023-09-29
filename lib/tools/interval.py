@@ -13,6 +13,7 @@ def get_next_closing_time(interval_tc:int):
 Potentially how I can change my specific interval class to.
 """
 class Interval(Enum):
+    _0m = 0
     _1m = 60
     _5m = 300
     _15m = 900
@@ -41,14 +42,12 @@ class Interval(Enum):
                 return member
         raise ValueError(f"No interval found for '{seconds}' seconds")
 
-    def __init__(self, seconds):
+    def __init__(self, seconds:int=0):
         self.ms = False
 
     def __str__(self) -> str:
         return self.name[1:]
     
-    
-
     def tc_rep(self) -> int:
         return self.value
     
