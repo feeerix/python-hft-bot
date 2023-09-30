@@ -10,9 +10,12 @@ from backtest.strat.composer import get_required_params
 from lib.tools.interval import Interval
 from backtest.position import Position, PositionType, Trade, TradeArgs
 
-
-
 class Intents:
+    """
+    An intent is a class with that holds information about creating a position.
+
+    """
+
     type_mapping = {
         PositionType.LONG: "placeholder",
         PositionType.SHORT: "placeholder",
@@ -70,13 +73,20 @@ class Intents:
         """
         This is returns a boolean if the specific logic has been met.
         """
+        print(row)
 
         is_valid = True
         for col in self.settings.columns[True]:
+            print("COL TRUE")
+            print(col)
+            exit()
             if getattr(row, col) == 0:
                 is_valid = False
                 break
         for col in self.settings.columns[False]:
+            print("COL FALSE")
+            print(col)
+            exit()
             if getattr(row, col) == 1:
                 is_valid = False
                 break

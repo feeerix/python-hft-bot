@@ -33,17 +33,19 @@ def cross(values_a:List[Union[int, float]], values_b:List[Union[int, float]], in
 class TriggerFunction(Enum):
     ABOVE = "above"
     BELOW = "below"
-    CROSS = "cross"
+    CROSS_ABOVE = "cross_above"
+    CROSS_BELOW = "cross_below"
 
 class Trigger:
 
     function_map = {
         TriggerFunction.ABOVE: above,
         TriggerFunction.BELOW: below,
-        TriggerFunction.CROSS: cross
+        TriggerFunction.CROSS_ABOVE: cross,
+        TriggerFunction.CROSS_BELOW: cross
     }
     function_params = {
-        TriggerFunction.CROSS: {"inverse": False},  # Default is "cross above"
+        TriggerFunction.CROSS_ABOVE: {"inverse": False},  # Default is "cross above"
         TriggerFunction.CROSS_BELOW: {"inverse": True}  # If you have a separate enum for "cross below"
         # ... add parameters for other functions if necessary
     }
@@ -53,7 +55,8 @@ class Trigger:
         self.verbose = verbose
         
         # Add the func into the class
-        self.ind_func = getattr(ta, _settings.func_name)
+
+        self.ind_func = TriggerFunction(_settings.func_name)        
         
         # Settings - a way to set up the indicator
         self.settings = _settings
@@ -85,7 +88,6 @@ class Trigger:
         NOTE - row is a List of List, and is a essentially a 2D array
 
         """
-        
         # _utility = ('above', 'above_value', 'below', 'below_value', 'cross')
         values_a = [row[column_mapping[0]] for row in rows[-(lookback+1):]]  # Using lookback to decide how many values you need
         values_b = [row[column_mapping[1]] for row in rows[-(lookback+1):]]

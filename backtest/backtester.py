@@ -63,18 +63,13 @@ class Backtester:
                     if (i % resolution) == 0:
                         print(f"{round((i/distance)*100, 3)}% COMPLETE")
                 
-
                 """
                 At this point, we're going to look through all of the intents,
                 via:
                 strategies.intents - and call the "check" function
                 to see if we're still looking for this position based on 
                 the specific conditions in the function.
-                
                 """
-
-                
-
 
                 if current_position is None:
                     """

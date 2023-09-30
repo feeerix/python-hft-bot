@@ -165,18 +165,17 @@ columns to select what is above another etc.
 Additionally - this will be wha
 """
 
-
 trigger_indicators = [
     Trigger(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
     Trigger(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
     Trigger(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
     Trigger(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
-    Trigger(Settings("stochrsi_oversold_k", "below_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}), Interval._4h),
-    Trigger(Settings("stochrsi_oversold_d", "below_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0}), Interval._4h),
-    Trigger(Settings("stochrsi_overbought_k", "above_value", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0}), Interval._4h),
-    Trigger(Settings("stochrsi_overbought_d", "above_value", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0}), Interval._4h),
-    Trigger(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h),
-    Trigger(Settings("stochrsi_bullcross", "cross", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "above": False}), Interval._4h)
+    Trigger(Settings("stochrsi_oversold_k", "below", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}), Interval._4h),
+    Trigger(Settings("stochrsi_oversold_d", "below", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0}), Interval._4h),
+    Trigger(Settings("stochrsi_overbought_k", "above", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0}), Interval._4h),
+    Trigger(Settings("stochrsi_overbought_d", "above", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0}), Interval._4h),
+    Trigger(Settings("stochrsi_bullcross", "cross_above", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h),
+    Trigger(Settings("stochrsi_bullcross", "cross_above", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "above": False}), Interval._4h)
 ]
 # def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
 trigger_dbs = Database("trigger_db", DatabaseType.TRIGGERS, True, triggers=trigger_indicators)
@@ -203,16 +202,17 @@ intent_blocks = [
                 PositionType.from_string("long"), # Position Type
                 0, # Fee PCT
                 0 # Total Fee
-            ), 
+            ),
             { # Columns that are:
                 True:[ # Triggers Required to be true
-                    # "EMA_8_B_EMA_21", 
-                    # "EMA_144_A_EMA_233",
-                    # "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5",
-                    # "STOCHRSIk_21_21_5_5_B_20_0",
-                    # "STOCHRSId_21_21_5_5_B_20_0"
+                    Trigger(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+                    Trigger(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+                    Trigger(Settings("stochrsi_oversold_k", "below", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}), Interval._4h),
+                    Trigger(Settings("stochrsi_oversold_d", "below", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0}), Interval._4h),
+                    Trigger(Settings("stochrsi_bullcross", "cross_above", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
                 ],
                 False:[ # Required to be false
+                    
                 ]
             }
         ),
@@ -222,27 +222,32 @@ intent_blocks = [
         Settings(
             "bearish_short", 
             "short", 
-            { # This dictionary is piped into Position factory to create our position object
-                "symbol": None, # If none - for any
-                "trade_type": "limit", # limit / market / stoplimit / stopmarket / trailing
-                "time_in_force": "GTC", # GTC: Good Till Cancel / IOC: Immediate or Cancel / FOK: Fill or Kill
-                "fee_pct": 0.1,
-                "time_valid": 0, # 0 if GTC/IOC/FOK otherwise validity in seconds and will cancel
-                "stop_types": [], # list of stops
-                "size": 100,
-                "timestamp": 0,
-            }, 
-            {
-                True:[
-                    "EMA_8_A_EMA_21", 
-                    "EMA_144_B_EMA_233",
-                    "STOCHRSIk_21_21_5_5_XB_STOCHRSId_21_21_5_5",
-                    "STOCHRSIk_21_21_5_5_A_80_0",
-                    "STOCHRSId_21_21_5_5_A_80_0"
+            TradeArgs(
+                eth, # Quote
+                usdt, # Base
+                1.0, # Amount
+                1.0, # Size
+                0, # Entry - Need a way to dynamically call this
+                0, # Entry Execute Price
+                0, # Init Timestamp
+                0, # Execute Timestamp
+                0, # Fill Timestamp
+                TradeType.LIMIT, # TradeType
+                PositionType.from_string("short"), # Position Type
+                0, # Fee PCT
+                0 # Total Fee
+            ), 
+            { # Columns that are:
+                True:[ # Triggers Required to be true
+                    Trigger(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+                    Trigger(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+                    Trigger(Settings("stochrsi_overbought_k", "above", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0}), Interval._4h),
+                    Trigger(Settings("stochrsi_overbought_d", "above", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0}), Interval._4h),
+                    Trigger(Settings("stochrsi_bullcross", "cross_below", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
                 ],
-                False:[
+                False:[ # Required to be false
+
                 ],
-                
             }
         ),
         [Interval.from_string('4h')]
@@ -274,9 +279,6 @@ Next step is to make sure we can implement our signals, and then the logic for t
 Once we have done that, we will add to the positions database, and then create a performance
 database, with the corresponding trades (A DB WITHIN DB?!) and then continue from there.
 """
-
-# print(test_strat.klines[0].df)
-
 
 exit()
 

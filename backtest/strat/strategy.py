@@ -126,12 +126,6 @@ class Strategy:
     def __str__(self) -> str:
         return f"STRATEGY >> Name: {self.name} "
     
-    """
-    TODO - A more representative string that is able to define the whole database
-    """
-    def __str__(self) -> str:
-        return f"STRATEGY: {self.name}"
-    
     @property
     def df_columns(self) -> Dict[str, list]:
         """
