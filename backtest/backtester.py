@@ -73,6 +73,7 @@ class Backtester:
                 
                 """
 
+                
 
 
                 if current_position is None:

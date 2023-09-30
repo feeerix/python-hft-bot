@@ -46,7 +46,7 @@ class Strategy:
             signals:List[Database]=[], 
             intents:Database=None, 
             positions:Database=None,
-            trigger:bool=False, # Trigger to start building all databases
+            begin_build:bool=False, # Trigger to start building all databases
             retreive:bool=False, # If we want to get the settings
             verbose:bool=False
     ): 
@@ -120,7 +120,7 @@ class Strategy:
             if isinstance(value, Database) and value is [None]:
                 raise ValueError(f"The attribute {attr} of type Database is None.")
             
-        if trigger:
+        if begin_build:
             self.build()
 
     def __str__(self) -> str:
@@ -176,8 +176,13 @@ class Strategy:
                         df=kline_db.df
                     )
             
-            for trigger in self.triggers.arguments['triggers']:
-                kline_db.df = trigger.build_trigger(df=kline_db.df)
+            """
+            Triggers, are now changed so that they're not calculated for the entire
+            dataframe, but they are checked on the fly
+            """
+
+            # for trigger in self.triggers.arguments['triggers']:
+            #     kline_db.df = trigger.build_trigger(df=kline_db.df)
 
             if self.verbose:
                 print("------------------------------ DATAFRAME ------------------------------")

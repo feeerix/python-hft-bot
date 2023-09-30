@@ -205,12 +205,12 @@ intent_blocks = [
                 0 # Total Fee
             ), 
             { # Columns that are:
-                True:[ # Required to be true
-                    "EMA_8_B_EMA_21", 
-                    "EMA_144_A_EMA_233",
-                    "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5",
-                    "STOCHRSIk_21_21_5_5_B_20_0",
-                    "STOCHRSId_21_21_5_5_B_20_0"
+                True:[ # Triggers Required to be true
+                    # "EMA_8_B_EMA_21", 
+                    # "EMA_144_A_EMA_233",
+                    # "STOCHRSIk_21_21_5_5_XA_STOCHRSId_21_21_5_5",
+                    # "STOCHRSIk_21_21_5_5_B_20_0",
+                    # "STOCHRSId_21_21_5_5_B_20_0"
                 ],
                 False:[ # Required to be false
                 ]
