@@ -210,7 +210,6 @@ class Backtester:
             if self.verbose:
                 if (i % resolution) == 0:
                     print(f"{round((i/distance)*100, 3)}% COMPLETE")
-
             
             # If long position is possible and no position is open, open long position
             if row['long1'] == 1 and position is None:

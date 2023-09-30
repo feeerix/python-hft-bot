@@ -36,6 +36,7 @@ class TriggerFunction(Enum):
     CROSS_ABOVE = "cross_above"
     CROSS_BELOW = "cross_below"
 
+
 class Trigger:
 
     function_map = {
@@ -44,6 +45,7 @@ class Trigger:
         TriggerFunction.CROSS_ABOVE: cross,
         TriggerFunction.CROSS_BELOW: cross
     }
+
     function_params = {
         TriggerFunction.CROSS_ABOVE: {"inverse": False},  # Default is "cross above"
         TriggerFunction.CROSS_BELOW: {"inverse": True}  # If you have a separate enum for "cross below"
@@ -60,7 +62,6 @@ class Trigger:
         
         # Settings - a way to set up the indicator
         self.settings = _settings
-
         self.interval = _interval
 
         if df is not None:

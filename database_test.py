@@ -186,7 +186,7 @@ intent_blocks = [
     Intents(
         Settings(
             "bullish_long", # Name
-            "long", # Func_name // Side
+            PositionType.LONG, # Func_name // Side
             # arguments // This dictionary is piped into Position factory to create our position object
             TradeArgs(
                 eth, # Quote
@@ -199,7 +199,7 @@ intent_blocks = [
                 0, # Execute Timestamp
                 0, # Fill Timestamp
                 TradeType.LIMIT, # TradeType
-                PositionType.from_string("long"), # Position Type
+                PositionType.LONG, # Position Type
                 0, # Fee PCT
                 0 # Total Fee
             ),
@@ -221,7 +221,7 @@ intent_blocks = [
     Intents(
         Settings(
             "bearish_short", 
-            "short", 
+            PositionType.SHORT, 
             TradeArgs(
                 eth, # Quote
                 usdt, # Base
@@ -233,7 +233,7 @@ intent_blocks = [
                 0, # Execute Timestamp
                 0, # Fill Timestamp
                 TradeType.LIMIT, # TradeType
-                PositionType.from_string("short"), # Position Type
+                PositionType.SHORT, # Position Type
                 0, # Fee PCT
                 0 # Total Fee
             ), 

@@ -9,6 +9,7 @@ from backtest.strat.settings.settings import Settings
 from backtest.strat.composer import get_required_params
 from lib.tools.interval import Interval
 from backtest.position import Position, PositionType, Trade, TradeArgs
+from backtest.strat.trigger import Trigger, TriggerFunction
 
 class Intents:
     """
@@ -28,7 +29,7 @@ class Intents:
         self.verbose = verbose
         
         # Add the func into the class
-        self.ind_func = getattr(self, self.type_mapping[PositionType.from_string(_settings.func_name.upper())])
+        self.ind_func = getattr(self, self.type_mapping[_settings.func_name])
         
         # Settings - a way to set up the indicator
         self.settings = _settings
@@ -78,7 +79,16 @@ class Intents:
         is_valid = True
         for col in self.settings.columns[True]:
             print("COL TRUE")
-            print(col)
+            print(self.settings.func_name)
+            
+            print(self.settings)
+            exit()
+            print(col.confirm(
+                row, # rows:List[tuple], 
+                # function_type: TriggerFunction,
+                # column_mapping: List[str], # ["column_a", "column_b"]
+                # lookback:int=0
+            ))
             exit()
             if getattr(row, col) == 0:
                 is_valid = False

@@ -61,7 +61,7 @@ class Settings:
             self.utility = True
         
     def __str__(self) -> str:
-        return f"{self.name} - FUNC NAME: {self.func_name} - ARGUMENTS: {self.arguments}"
+        return f"{self.name} - FUNC NAME: {self.func_name} - ARGUMENTS: {self.arguments} - COLUMNS: {self.columns}"
     
     def hash(self) -> str:
         return hashlib.md5(bytes(repr(sorted(self.data.items())), "utf-8")).hexdigest()
