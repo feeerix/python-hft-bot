@@ -67,41 +67,30 @@ class Intents:
         pass
 
     def check(
-            self, 
-            row:tuple # Part of the data we're taking in
-
+            self,
+            df:pd.DataFrame, # We just pass in the whole DF
+            current_idx:int,
         ) -> bool:
         """
         This is returns a boolean if the specific logic has been met.
+        There is a "True" and a "False" key value pair and they both have to be
+        met with all their Triggers being true or false to open the position.
         """
-        print(row)
 
         is_valid = True
         for col in self.settings.columns[True]:
             print("COL TRUE")
-            print(self.settings.func_name)
             
-            print(self.settings)
-            exit()
+            row_chunk = list(df[current_idx:current_idx+2].itertuples(index=False))    
             print(col.confirm(
-                row, # rows:List[tuple], 
-                # function_type: TriggerFunction,
-                # column_mapping: List[str], # ["column_a", "column_b"]
-                # lookback:int=0
+                row_chunk, # rows:List[tuple], 
+                col.settings.func_name, # function_type: TriggerFunction
+                col.settings.arguments, # column_mapping: List[str], # ["column_a", "column_b"] - THIS LINE HERE
+                # values=col.settings.arguments['value']
             ))
-            exit()
-            if getattr(row, col) == 0:
-                is_valid = False
-                break
-        for col in self.settings.columns[False]:
-            print("COL FALSE")
-            print(col)
-            exit()
-            if getattr(row, col) == 1:
-                is_valid = False
-                break
+        # ------------------------------------------------------------
+        exit()
 
-        return is_valid
     
     def placeholder(self):
         print("test")

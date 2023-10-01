@@ -12,7 +12,7 @@ from lib.tools.exchange import ExchangeType
 from lib.tools.interval import Interval
 from lib.tools.asset import Asset, AssetType
 from lib.tools.network import Network
-from backtest.strat.trigger import Trigger
+from backtest.strat.trigger import Trigger, TriggerFunction
 from backtest.strat.strategy import Strategy
 from backtest.strat.intents import Intents
 from backtest.strat.indicator import Indicator
@@ -166,16 +166,16 @@ Additionally - this will be wha
 """
 
 trigger_indicators = [
-    Trigger(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
-    Trigger(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
-    Trigger(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
-    Trigger(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
-    Trigger(Settings("stochrsi_oversold_k", "below", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}), Interval._4h),
-    Trigger(Settings("stochrsi_oversold_d", "below", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0}), Interval._4h),
-    Trigger(Settings("stochrsi_overbought_k", "above", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0}), Interval._4h),
-    Trigger(Settings("stochrsi_overbought_d", "above", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0}), Interval._4h),
-    Trigger(Settings("stochrsi_bullcross", "cross_above", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h),
-    Trigger(Settings("stochrsi_bullcross", "cross_above", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "above": False}), Interval._4h)
+    Trigger(Settings("144Above233_bullish", TriggerFunction.ABOVE, {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+    Trigger(Settings("144Below233_bearish", TriggerFunction.BELOW, {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+    Trigger(Settings("ema8below_ema21", TriggerFunction.BELOW, {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+    Trigger(Settings("ema8above_ema21", TriggerFunction.ABOVE, {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+    Trigger(Settings("stochrsi_oversold_k", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
+    Trigger(Settings("stochrsi_oversold_d", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
+    Trigger(Settings("stochrsi_overbought_k", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
+    Trigger(Settings("stochrsi_overbought_d", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
+    Trigger(Settings("stochrsi_bullcross", TriggerFunction.CROSS_ABOVE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h),
+    Trigger(Settings("stochrsi_bullcross", TriggerFunction.CROSS_ABOVE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "inverse": False}), Interval._4h)
 ]
 # def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
 trigger_dbs = Database("trigger_db", DatabaseType.TRIGGERS, True, triggers=trigger_indicators)
@@ -205,11 +205,11 @@ intent_blocks = [
             ),
             { # Columns that are:
                 True:[ # Triggers Required to be true
-                    Trigger(Settings("144Above233_bullish", "above", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
-                    Trigger(Settings("ema8below_ema21", "below", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
-                    Trigger(Settings("stochrsi_oversold_k", "below", {"series_a": "STOCHRSIk_21_21_5_5", "value": 20.0}), Interval._4h),
-                    Trigger(Settings("stochrsi_oversold_d", "below", {"series_a": "STOCHRSId_21_21_5_5", "value": 20.0}), Interval._4h),
-                    Trigger(Settings("stochrsi_bullcross", "cross_above", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
+                    Trigger(Settings("144Above233_bullish", TriggerFunction.ABOVE, {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+                    Trigger(Settings("ema8below_ema21", TriggerFunction.BELOW, {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+                    Trigger(Settings("stochrsi_oversold_k", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
+                    Trigger(Settings("stochrsi_oversold_d", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
+                    Trigger(Settings("stochrsi_bullcross", TriggerFunction.CROSS_ABOVE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
                 ],
                 False:[ # Required to be false
                     
@@ -239,11 +239,11 @@ intent_blocks = [
             ), 
             { # Columns that are:
                 True:[ # Triggers Required to be true
-                    Trigger(Settings("144Below233_bearish", "below", {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
-                    Trigger(Settings("ema8above_ema21", "above", {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
-                    Trigger(Settings("stochrsi_overbought_k", "above", {"series_a": "STOCHRSIk_21_21_5_5", "value": 80.0}), Interval._4h),
-                    Trigger(Settings("stochrsi_overbought_d", "above", {"series_a": "STOCHRSId_21_21_5_5", "value": 80.0}), Interval._4h),
-                    Trigger(Settings("stochrsi_bullcross", "cross_below", {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
+                    Trigger(Settings("144Below233_bearish", TriggerFunction.BELOW, {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+                    Trigger(Settings("ema8above_ema21", TriggerFunction.ABOVE, {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+                    Trigger(Settings("stochrsi_overbought_k", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
+                    Trigger(Settings("stochrsi_overbought_d", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
+                    Trigger(Settings("stochrsi_bearcross", TriggerFunction.CROSS_BELOW, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
                 ],
                 False:[ # Required to be false
 

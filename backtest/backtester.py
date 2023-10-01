@@ -51,17 +51,18 @@ class Backtester:
             else:
                 resolution = 100
 
-            for row in strategies.klines[df_index].df.itertuples():
+            for row_idx in range(len(strategies.klines[df_index].df)):
+            # for row in strategies.klines[df_index].df.itertuples():
                 # Row - index
-                i = row.Index
+                # i = row.Index
 
                 if capital < 0:
                     print("You went broke!")
                     break
 
                 if self.verbose:
-                    if (i % resolution) == 0:
-                        print(f"{round((i/distance)*100, 3)}% COMPLETE")
+                    if (row_idx % resolution) == 0:
+                        print(f"{round((row_idx/distance)*100, 3)}% COMPLETE")
                 
                 """
                 At this point, we're going to look through all of the intents,
@@ -79,7 +80,8 @@ class Backtester:
                     """
                     for pos_logic in strategies.intents.arguments['logic']:
                         # We have found a place where we might be able to make a transaction
-                        if pos_logic.check(row):
+                        # row_chunk = List(strategies.klines[df_index].df[row_idx, pos_logic.lookback])
+                        if pos_logic.check(strategies.klines[df_index].df, row_idx):
                             print("VALID!! ------------")
                             print(pos_logic.settings.arguments.entry_price)
                             # If verbose

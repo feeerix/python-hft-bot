@@ -3,6 +3,7 @@ from enum import Enum
 import pandas as pd
 import pandas_ta as ta
 from typing import List, Dict, Union
+import numpy as np
 
 # Local Imports
 from lib.file.writer import *
@@ -12,22 +13,96 @@ from backtest.strat.composer import get_required_params
 from lib.tools.interval import Interval
 
 
-def above(values_a:List[Union[int, float]], values_b:List[Union[int, float]], inverse:bool=False) -> bool:
-    if not inverse:
-        return values_a[0] > values_b[0]
-    else:
-        return values_a[0] < values_b[0]
-    
-def below(values_a:List[Union[int, float]], values_b:List[Union[int, float]], inverse:bool=True) -> bool:
-    return Trigger.above(values_a, values_b, inverse=inverse)
+def above(
+        row:List[tuple],
+        series_a:str,
+        series_b:str,
+        inverse:bool=False, 
+        **kwargs
+    ) -> bool:
+    """
+    Row is length 1
+    We get the values from getattr based on the series and compare them.
+    """
+    values_a = getattr(row[0], series_a)
+    values_b = getattr(row[0], series_b)
 
-def cross(values_a:List[Union[int, float]], values_b:List[Union[int, float]], inverse:bool=False) -> bool:
+    if not inverse:
+        return values_a > values_b
+    else:
+        return values_a < values_b
+    
+def below(
+        row:List[tuple],
+        series_a:str,
+        series_b:str,
+        inverse:bool=True, 
+        **kwargs
+    ) -> bool:
+    """
+    Row is length 1
+    We get the values from getattr based on the series and compare them.
+    We just pass on everything onto the above function, but with inverse flag.
+    """
+    return above(row, series_a, series_b, inverse=inverse, **kwargs)
+
+def above_value(
+        row:List[tuple],
+        series_a:str,
+        series_b:str,
+        inverse:bool=False, 
+        **kwargs
+    ) -> bool:
+    """
+    Row is of length 1.
+    We get the values from getattr based on the series and compare them to a 
+    specific value. We get the value from the kwargs.
+    """
+    values_a = getattr(row[0], series_a)
+    if np.isnan(values_a) or np.isnan(kwargs['value']):    
+        return False
+    
+
+    if not inverse:
+        return values_a[0] > kwargs['value']
+    else:
+        return values_a[0] < kwargs['value']
+
+def below_value(
+        row:List[tuple],
+        series_a:str,
+        series_b:str,
+        inverse:bool=True,
+        **kwargs
+    ):
+    """
+    Row is of length 1.
+    We get the values from getattr based on the series and compare them to a 
+    specific value. We get the value from the kwargs.
+
+    We pass on the arguments with the inverse flag as true.
+    """
+    return above_value(row, series_a, series_b, inverse=inverse, **kwargs)
+
+def cross(
+        row:List[tuple],
+        series_a:str,
+        series_b:str,
+        inverse:bool=False
+    ) -> bool:
+    """
+    Row is of length 2.
+    """
+    values_a = [getattr(row[0], series_a), getattr(row[1], series_a)]
+    values_b = [getattr(row[0], series_b), getattr(row[1], series_b)]
+    
+
     # Check for cross above condition
     if inverse:
-        return values_a[-2] <= values_b[-2] and values_a[-1] > values_b[-1]
+        return values_a[0] <= values_b[0] and values_a[1] > values_b[1]
     
     # Check for cross below condition
-    return values_a[-2] >= values_b[-2] and values_a[-1] < values_b[-1]
+    return values_a[0] >= values_b[0] and values_a[1] < values_b[1]
 
 
 class TriggerFunction(Enum):
@@ -35,7 +110,8 @@ class TriggerFunction(Enum):
     BELOW = "below"
     CROSS_ABOVE = "cross_above"
     CROSS_BELOW = "cross_below"
-
+    ABOVE_VALUE = "above_value"
+    BELOW_VALUE = "below_value"
 
 class Trigger:
 
@@ -43,16 +119,34 @@ class Trigger:
         TriggerFunction.ABOVE: above,
         TriggerFunction.BELOW: below,
         TriggerFunction.CROSS_ABOVE: cross,
-        TriggerFunction.CROSS_BELOW: cross
+        TriggerFunction.CROSS_BELOW: cross,
+        TriggerFunction.ABOVE_VALUE: above_value,
+        TriggerFunction.BELOW_VALUE: below_value
     }
 
     function_params = {
-        TriggerFunction.CROSS_ABOVE: {"inverse": False},  # Default is "cross above"
+        TriggerFunction.CROSS_ABOVE: {"inverse": False, },  # Default is "cross above"
         TriggerFunction.CROSS_BELOW: {"inverse": True}  # If you have a separate enum for "cross below"
         # ... add parameters for other functions if necessary
     }
 
-    def __init__(self, _settings:Settings, _interval:Interval, verbose:bool=True, df:pd.DataFrame=None):
+    function_lookback = {
+        TriggerFunction.ABOVE: 0,
+        TriggerFunction.BELOW: 0,
+        TriggerFunction.CROSS_ABOVE: None,
+        TriggerFunction.CROSS_BELOW: None,
+        TriggerFunction.ABOVE_VALUE: 1,
+        TriggerFunction.BELOW_VALUE: 1
+    }
+
+    def __init__(
+            self, 
+            _settings:Settings, 
+            _interval:Interval, 
+            verbose:bool=True, 
+            df:pd.DataFrame=None,
+            **kwargs
+        ):
         # Verbosity
         self.verbose = verbose
         
@@ -74,31 +168,44 @@ class Trigger:
     @property
     def columns(self):
         return self.settings.columns
+
+    @property
+    def lookback(self):
+        return self.function_lookback[self.settings.func_name]
     
     def confirm(
             self, 
             rows:List[tuple], 
             function_type: TriggerFunction,
-            column_mapping: List[str], # ["column_a", "column_b"]
-            lookback:int=0
+            arguments:dict
         ) -> bool:
         """
         This function will take in a list of rows, minimum of length 1, which is 
         always the length of the lookback.
 
-        NOTE - row is a List of List, and is a essentially a 2D array
-
         """
-        # _utility = ('above', 'above_value', 'below', 'below_value', 'cross')
-        values_a = [row[column_mapping[0]] for row in rows[-(lookback+1):]]  # Using lookback to decide how many values you need
-        values_b = [row[column_mapping[1]] for row in rows[-(lookback+1):]]
-
-        # Get specific parameters for the function type from the function_params dictionary
-        params = self.function_params.get(function_type, {})  # Default to an empty dictionary if no parameters are found
+        print("------------------------------------- CONFIRM FUNCTION IN TRIGGER -------------------------------------")
+        print(f"ROWS: {rows}")
+        print(f"FUNCTION_TYPE: {function_type}")
+        print(f"ARGUMENTS {arguments}")
+        # row:List[tuple],
+        # series_a:str,
+        # series_b:str,
+        # inverse:bool=False
+        arguments['row'] = rows
+        arguments.update(self.function_params.get(function_type, {}))
+        # if arguments['series_b'] == '':
+        #     print()
+        #     exit()
+        result = self.function_map[function_type](**arguments)
+        print(result)
+        return result
+        # print(f"VALUES_A: {values_a}")
+        # print(f"VALUES_B: {values_b}")
+        exit()
 
         # Now call the function using these values
         result = self.function_map[function_type](values_a, values_b, **params)
-
         # Handle the result as needed...
         return result
 
