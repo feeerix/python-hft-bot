@@ -6,9 +6,6 @@ from typing import Dict, Callable
 # Local Imports
 from lib.file.writer import *
 from lib.tools.interval import Interval
-# from backtest.strat.composer import get_required_params, write_required_params
-
-
 
 def import_setting(settings_data:dict, verbose:bool=False):
     ret_data = Settings(

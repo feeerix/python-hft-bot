@@ -6,6 +6,10 @@ from typing import List
 # Local Import
 from lib.tools.asset import Asset
 
+class EntryStyle(Enum):
+    CLOSE = "close" # opens position with close of last candle
+    MARKET = "market" # YOLO's and just market buys at whatever price it is now
+    TWAP = "twap" # enters at twap
 
 class FeeType(Enum):
     MAKER = 'maker'
@@ -49,33 +53,28 @@ class Fee:
     timestamp: float
 
 @dataclass
-class TradeArgs:
+class EntryArgs:
     quote: Asset = None # Quote Asset (ETH in ETHUSD)
     base: Asset = None # Base Asset (USD in ETHUSD)
-    amount: float = 0.0 # Amount of Quote asset being bought or sold
-    size: float = 0.0 # Total Size
-    entry_price: float = 0.0 # Entry Price
-    entry_execute_price: float = 0.0
-    # close_price: float = 0.0 # Don't need these
-    # close_execute_price: float = 0.0 # Don't need these
-    init_timestamp: float = 0.0
-    execute_timestamp: float = 0.0
-    fill_timestamp: float = 0.0
-    trade_type: TradeType = None
-    pos_family: PositionType = None
-    fee_pct: float = 0.0
-    total_fee: float = 0.0
-    
+    expected_amount: float = 0.0 # Amount of Quote asset being bought or sold 
+    expected_size: float = 0.0 # Total Size which accounts for leverage
+    entry_price: EntryStyle = None # EntryStyle - used to calculate requested entry
+    # entry_execute_price: float = 0.0 # Executed price
+    # init_timestamp: float = 0.0 # Time calulcated
+    # execute_timestamp: float = 0.0 # Time initially executed
+    # fill_timestamp: float = 0.0 # Time completed filled
+    trade_type: TradeType = None # TradeType
+    pos_family: PositionType = None # Position Types
 
     def __post_init__(self):
         """
         The post init to get the cumulative fee based on the fee_pct
         """
         # Add to cumulative Fee
-        self.total_fee += self.size * (self.fee_pct / 100)
+        # self.total_fee += self.size * (self.fee_pct / 100)
 
         # Set the size based on quote amount in base asset
-        self.size += self.amount * self.entry_price
+        # self.size += self.amount * self.entry_price
         """
         Just to note, this would mean that the size for ETHUSDC at 1800 for 1.5 ETH
         would mean that the size is:
@@ -103,24 +102,21 @@ class Trade:
 
     def __init__(
             self, 
-            trade_args: TradeArgs
+            entry_args: EntryArgs
             # amount:float,
             # entry:float, 
             # trade_type:TradeType, 
             # fee:Fee
         ):
-        self.trade_args = trade_args
+        self.entry_args = entry_args
 
     @staticmethod
-    def create(trade_args:TradeArgs):
+    def create(entry_args:EntryArgs):
         """
         This method returns a Trade class
         """
-        # amount = trade_args.amount
-        # entry = trade_args.entry_price
-        # fee_amount = amount * (trade_args.fee_pct / 100 )
-        # fee = Fee(Trade.fee_mapping[trade_args.trade_type], fee_amount, trade_args.timestamp)
-        return Trade(trade_args)
+        
+        return Trade(entry_args)
     
     def execute(execute_price:float):
         pass
@@ -187,7 +183,7 @@ class Position:
         #     "timestamp": 0
         # })
 
-
+        print("CREATE POSITION EXIT")
         exit()
 
 """
@@ -214,7 +210,9 @@ class PositionFactory:
     This is a factory to create the positions
     """
     @staticmethod
-    def create_position():
+    def create_position(
+        entry_args:EntryArgs # Entry Arguments
+    ):
         pass
 
 

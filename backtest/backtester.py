@@ -79,11 +79,10 @@ class Backtester:
                     to be a check - for that we have maxed the amount of risk.
                     """
                     for pos_logic in strategies.intents.arguments['logic']:
+                        
                         # We have found a place where we might be able to make a transaction
-                        # row_chunk = List(strategies.klines[df_index].df[row_idx, pos_logic.lookback])
                         if pos_logic.check(strategies.klines[df_index].df, row_idx):
                             print("VALID!! ------------")
-                            print(pos_logic.settings.arguments.entry_price)
                             # If verbose
                             """
                             TODO

@@ -2,13 +2,14 @@
 import pandas as pd
 import pandas_ta as ta
 from typing import List
+from enum import Enum
 
 # Local Imports
 from lib.file.writer import *
 from backtest.strat.settings.settings import Settings
 from backtest.strat.composer import get_required_params
 from lib.tools.interval import Interval
-from backtest.position import Position, PositionType, Trade, TradeArgs
+from backtest.position import Position, PositionType, Trade, EntryArgs
 from backtest.strat.trigger import Trigger, TriggerFunction
 
 class Intents:
@@ -24,7 +25,13 @@ class Intents:
         PositionType.ARB: "placeholder"
     }
 
-    def __init__(self, _settings:Settings, _interval:List[Interval], verbose:bool=True, df:pd.DataFrame=None):
+    def __init__(
+            self, 
+            _settings:Settings, 
+            _interval:List[Interval], 
+            verbose:bool=True, 
+            df:pd.DataFrame=None
+        ):
         # Verbosity
         self.verbose = verbose
         
@@ -43,7 +50,6 @@ class Intents:
 
         if df is not None:
             self.df = self.build_signal(df)
-
     
     def __str__(self) -> str:
         return f"LOGIC -- {self.settings.name}-{self.settings.arguments}"
@@ -78,18 +84,20 @@ class Intents:
         """
 
         is_valid = True
+        
         for col in self.settings.columns[True]:
-            print("COL TRUE")
-            
             row_chunk = list(df[current_idx:current_idx+col.lookback].itertuples(index=False))    
-            print(col.confirm(
+            if not col.confirm(
                 row_chunk, # rows:List[tuple], 
                 col.settings.func_name, # function_type: TriggerFunction
                 col.settings.arguments, # column_mapping: List[str], # ["column_a", "column_b"] - THIS LINE HERE
                 # values=col.settings.arguments['value']
-            ))
-        # ------------------------------------------------------------
+            ):
+                is_valid = False
+                break
 
+        return is_valid
     
     def placeholder(self):
-        print("test")
+        print("placeholder test print")
+        exit()

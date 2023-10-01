@@ -5,7 +5,6 @@ import warnings
 from datetime import datetime
 
 # Loca Imports
-# from lib.api.binance.binance import Binance
 from db.database import Database, DatabaseType
 from lib.tools.symbol import Symbol
 from lib.tools.exchange import ExchangeType
@@ -18,7 +17,7 @@ from backtest.strat.intents import Intents
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
 from backtest.backtester import Backtester
-from backtest.position import TradeType, PositionType, TradeArgs
+from backtest.position import TradeType, PositionType, EntryArgs, EntryStyle
 
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -142,19 +141,19 @@ add those after we've built all the kline and indicator dataframes.
 """
 
 klines_dbs = [
-    klines_4h,
+    # klines_4h,
     # klines_1h, 
     # klines_15m, 
     # klines_5m, 
-    # klines_1m
+    klines_1m
 ]
 
 indicator_dbs = [
-    indicators_4h,
+    # indicators_4h,
     # indicators_1h,
     # indicators_15m,
     # indicators_5m,
-    # indicators_1m
+    indicators_1m
 ]
 
 """
@@ -188,20 +187,14 @@ intent_blocks = [
             "bullish_long", # Name
             PositionType.LONG, # Func_name // Side
             # arguments // This dictionary is piped into Position factory to create our position object
-            TradeArgs(
+            EntryArgs(
                 eth, # Quote
                 usdt, # Base
                 1.0, # Amount
                 1.0, # Size
-                0, # Entry - Need a way to dynamically call this
-                0, # Entry Execute Price
-                0, # Init Timestamp
-                0, # Execute Timestamp
-                0, # Fill Timestamp
+                EntryStyle.CLOSE, # EntryStyle
                 TradeType.LIMIT, # TradeType
                 PositionType.LONG, # Position Type
-                0, # Fee PCT
-                0 # Total Fee
             ),
             { # Columns that are:
                 True:[ # Triggers Required to be true
@@ -210,9 +203,6 @@ intent_blocks = [
                     Trigger(Settings("stochrsi_oversold_k", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
                     Trigger(Settings("stochrsi_oversold_d", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
                     Trigger(Settings("stochrsi_bullcross", TriggerFunction.CROSS_ABOVE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
-                ],
-                False:[ # Required to be false
-                    
                 ]
             }
         ),
@@ -222,20 +212,14 @@ intent_blocks = [
         Settings(
             "bearish_short", 
             PositionType.SHORT, 
-            TradeArgs(
+            EntryArgs(
                 eth, # Quote
                 usdt, # Base
                 1.0, # Amount
                 1.0, # Size
-                0, # Entry - Need a way to dynamically call this
-                0, # Entry Execute Price
-                0, # Init Timestamp
-                0, # Execute Timestamp
-                0, # Fill Timestamp
+                EntryStyle.CLOSE, # EntryStyle
                 TradeType.LIMIT, # TradeType
                 PositionType.SHORT, # Position Type
-                0, # Fee PCT
-                0 # Total Fee
             ), 
             { # Columns that are:
                 True:[ # Triggers Required to be true
@@ -244,10 +228,7 @@ intent_blocks = [
                     Trigger(Settings("stochrsi_overbought_k", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
                     Trigger(Settings("stochrsi_overbought_d", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
                     Trigger(Settings("stochrsi_bearcross", TriggerFunction.CROSS_BELOW, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
-                ],
-                False:[ # Required to be false
-
-                ],
+                ]
             }
         ),
         [Interval.from_string('4h')]

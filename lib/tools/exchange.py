@@ -8,6 +8,8 @@ from lib.file.reader import get_json, get_list
 from lib.tools.interval import Interval
 from lib.tools.symbol import Symbol
 from lib.tools.internal.exchange_type import ExchangeType
+# from backtest.strat.settings.settings import Settings
+
 
 
 class Exchange(ABC):
