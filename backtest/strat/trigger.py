@@ -64,9 +64,9 @@ def above_value(
     
 
     if not inverse:
-        return values_a[0] > kwargs['value']
+        return values_a > kwargs['value']
     else:
-        return values_a[0] < kwargs['value']
+        return values_a < kwargs['value']
 
 def below_value(
         row:List[tuple],
@@ -82,6 +82,7 @@ def below_value(
 
     We pass on the arguments with the inverse flag as true.
     """
+    
     return above_value(row, series_a, series_b, inverse=inverse, **kwargs)
 
 def cross(
@@ -131,10 +132,10 @@ class Trigger:
     }
 
     function_lookback = {
-        TriggerFunction.ABOVE: 0,
-        TriggerFunction.BELOW: 0,
-        TriggerFunction.CROSS_ABOVE: None,
-        TriggerFunction.CROSS_BELOW: None,
+        TriggerFunction.ABOVE: 1,
+        TriggerFunction.BELOW: 1,
+        TriggerFunction.CROSS_ABOVE: 2,
+        TriggerFunction.CROSS_BELOW: 2,
         TriggerFunction.ABOVE_VALUE: 1,
         TriggerFunction.BELOW_VALUE: 1
     }
@@ -184,25 +185,18 @@ class Trigger:
         always the length of the lookback.
 
         """
-        print("------------------------------------- CONFIRM FUNCTION IN TRIGGER -------------------------------------")
-        print(f"ROWS: {rows}")
-        print(f"FUNCTION_TYPE: {function_type}")
-        print(f"ARGUMENTS {arguments}")
-        # row:List[tuple],
-        # series_a:str,
-        # series_b:str,
-        # inverse:bool=False
+        # print("------------------------------------- CONFIRM FUNCTION IN TRIGGER -------------------------------------")
+        # print(f"ROWS: {rows}")
+        # print(f"FUNCTION_TYPE: {function_type}")
+        # print(f"ARGUMENTS {arguments}")
+        # print(getattr(rows[0], arguments['series_a']))
+        
         arguments['row'] = rows
         arguments.update(self.function_params.get(function_type, {}))
-        # if arguments['series_b'] == '':
-        #     print()
-        #     exit()
+        
         result = self.function_map[function_type](**arguments)
-        print(result)
+        
         return result
-        # print(f"VALUES_A: {values_a}")
-        # print(f"VALUES_B: {values_b}")
-        exit()
 
         # Now call the function using these values
         result = self.function_map[function_type](values_a, values_b, **params)

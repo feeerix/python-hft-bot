@@ -81,7 +81,7 @@ class Intents:
         for col in self.settings.columns[True]:
             print("COL TRUE")
             
-            row_chunk = list(df[current_idx:current_idx+2].itertuples(index=False))    
+            row_chunk = list(df[current_idx:current_idx+col.lookback].itertuples(index=False))    
             print(col.confirm(
                 row_chunk, # rows:List[tuple], 
                 col.settings.func_name, # function_type: TriggerFunction
@@ -89,7 +89,6 @@ class Intents:
                 # values=col.settings.arguments['value']
             ))
         # ------------------------------------------------------------
-        exit()
 
     
     def placeholder(self):
