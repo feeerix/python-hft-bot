@@ -7,16 +7,62 @@ from typing import List
 from lib.tools.asset import Asset
 
 class EntryStyle(Enum):
+    """
+    This is the style of entry, whether we want to enter a position.
+
+    """
     CLOSE = "close" # opens position with close of last candle
     MARKET = "market" # YOLO's and just market buys at whatever price it is now
     TWAP = "twap" # enters at twap
 
+class EntryCondition:
+    pass
+
+class ConditionBlocks(Enum):
+    RISK = "risk" # Amount of risk taken
+    NUMBER = "number" # Number of positions
+    MARGIN = "margin" # Margin utilisation
+    DIVERSE = "diverse" # Diversification / Concentration
+    TIME = "time" # Time based control
+    DIRECTION = "direction" # Direction of risk taken
+    EXTERNAL = "external" # External Factor
+    DRAWDOWN = "drawdown" # Drawdown
+
+    @staticmethod
+    def risk_behavior(**kwargs):
+        return "Executing risk behavior..."
+
+    @staticmethod
+    def number_behavior(**kwargs):
+        return "Executing number behavior..."
+    
+    behaviors = {
+        RISK: risk_behavior,
+        NUMBER: number_behavior,
+        # ... add the rest of the conditions here
+    }
+
+    def execute_behavior(self, **kwargs):
+        behavior_func = self.behaviors.get(self, None)
+        if behavior_func:
+            return behavior_func(**kwargs)
+        return "Behavior not found for this condition."
+
 class FeeType(Enum):
+    """
+    This is the type of fee we're using, so whether we pay or get a rebate.
+    It will also include funding or on-chain fees too.
+    """
+
     MAKER = 'maker'
     TAKER = 'taker'
     FUNDING = 'funding'
+    TXFEE = 'txfee'
 
 class PositionType(Enum):
+    """
+    This represents a type of position that we're making.
+    """
     LONG = 'long'
     SHORT = 'short'
     ARB = 'arbitrage'
@@ -53,33 +99,14 @@ class Fee:
     timestamp: float
 
 @dataclass
-class EntryArgs:
+class TradeArgs:
     quote: Asset = None # Quote Asset (ETH in ETHUSD)
     base: Asset = None # Base Asset (USD in ETHUSD)
     expected_amount: float = 0.0 # Amount of Quote asset being bought or sold 
     expected_size: float = 0.0 # Total Size which accounts for leverage
     entry_price: EntryStyle = None # EntryStyle - used to calculate requested entry
-    # entry_execute_price: float = 0.0 # Executed price
-    # init_timestamp: float = 0.0 # Time calulcated
-    # execute_timestamp: float = 0.0 # Time initially executed
-    # fill_timestamp: float = 0.0 # Time completed filled
     trade_type: TradeType = None # TradeType
     pos_family: PositionType = None # Position Types
-
-    def __post_init__(self):
-        """
-        The post init to get the cumulative fee based on the fee_pct
-        """
-        # Add to cumulative Fee
-        # self.total_fee += self.size * (self.fee_pct / 100)
-
-        # Set the size based on quote amount in base asset
-        # self.size += self.amount * self.entry_price
-        """
-        Just to note, this would mean that the size for ETHUSDC at 1800 for 1.5 ETH
-        would mean that the size is:
-        size = 1.5 * 1800 = 2700 (Note this is in USDC terms)
-        """
 
     def __str__(self) -> str:
         return f"{self.quote}{self.base} | {self.trade_type} | {self.pos_family}"
@@ -102,27 +129,24 @@ class Trade:
 
     def __init__(
             self, 
-            entry_args: EntryArgs
-            # amount:float,
-            # entry:float, 
-            # trade_type:TradeType, 
-            # fee:Fee
+            entry_args: TradeArgs
         ):
-        self.entry_args = entry_args
+        """
+        quote
+        base
+        expected order amount
+        expected_amount: float = 0.0 # Amount of Quote asset being bought or sold 
+        expected_size: float = 0.0 # Total Size which accounts for leverage
+        entry_price: EntryStyle = None # EntryStyle - used to calculate requested entry
+        trade_type: TradeType = None # TradeType
+        pos_family: PositionType = None # Position Types
 
-    @staticmethod
-    def create(entry_args:EntryArgs):
         """
-        This method returns a Trade class
-        """
-        
-        return Trade(entry_args)
-    
-    def execute(execute_price:float):
+        self.arguments = entry_args
+
+    def execute(self):
         pass
 
-    def close(self, close_type:FeeType, amount:float, timestampe_ms:float=0):
-        pass
 
 
 """
@@ -142,6 +166,7 @@ class PositionArgs:
     take_profit: List[Trade]
     stop_loss: List[Trade]
 
+
 class Position:
     """
     A Position is created whenever the conditions have been met to do take on some risk.
@@ -151,17 +176,10 @@ class Position:
     This way we can dynamically call our take profits and stop losses when we want to 
     after the position has been created, for example.
     """
-
-    position_mapping = {
-        PositionType.LONG: None,
-        PositionType.SHORT: None,
-        PositionType.ARB: None,
-        PositionType.OPTION: None
-    }
-    def __init__(self, position_type:PositionType, trades:List[Trade]):
+    def __init__(self, position_type: PositionType, trades: List[Trade]=[]) -> None:
         self.position_type = position_type
         self.trades = trades
-    
+
     @staticmethod
     def create(position_type:PositionType, position_arguments:PositionArgs):
         """
@@ -173,16 +191,6 @@ class Position:
         # Create the base trade
         print(position_arguments)
         
-
-        # Trade.create({
-        #     "amount": pos_logic.settings.arguments['size'],
-        #     "entry": None,
-        #     "trade_type": pos_logic.settings.arguments['trade_type'],
-        #     "pos_type": pos_logic.settings.func_name,
-        #     "fee_pct": 0.1,
-        #     "timestamp": 0
-        # })
-
         print("CREATE POSITION EXIT")
         exit()
 
@@ -211,7 +219,7 @@ class PositionFactory:
     """
     @staticmethod
     def create_position(
-        entry_args:EntryArgs # Entry Arguments
+        entry_args:TradeArgs # Entry Arguments
     ):
         pass
 
@@ -225,5 +233,7 @@ This means we can check for specific conditions such as:
 - If we already have an amount of risk on (if we're DCAing for example)
 
 """
+
+@dataclass
 class Conditions(Enum):
     pass

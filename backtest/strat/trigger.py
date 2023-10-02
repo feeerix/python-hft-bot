@@ -150,11 +150,6 @@ class Trigger:
         ):
         # Verbosity
         self.verbose = verbose
-        
-        # Add the func into the class
-
-        self.ind_func = TriggerFunction(_settings.func_name)        
-        
         # Settings - a way to set up the indicator
         self.settings = _settings
         self.interval = _interval

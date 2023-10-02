@@ -17,7 +17,7 @@ from backtest.strat.intents import Intents
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
 from backtest.backtester import Backtester
-from backtest.position import TradeType, PositionType, EntryArgs, EntryStyle
+from backtest.position import TradeType, PositionType, TradeArgs, EntryStyle
 
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -187,7 +187,7 @@ intent_blocks = [
             "bullish_long", # Name
             PositionType.LONG, # Func_name // Side
             # arguments // This dictionary is piped into Position factory to create our position object
-            EntryArgs(
+            TradeArgs(
                 eth, # Quote
                 usdt, # Base
                 1.0, # Amount
@@ -212,7 +212,7 @@ intent_blocks = [
         Settings(
             "bearish_short", 
             PositionType.SHORT, 
-            EntryArgs(
+            TradeArgs(
                 eth, # Quote
                 usdt, # Base
                 1.0, # Amount

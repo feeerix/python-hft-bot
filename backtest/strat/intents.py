@@ -9,13 +9,13 @@ from lib.file.writer import *
 from backtest.strat.settings.settings import Settings
 from backtest.strat.composer import get_required_params
 from lib.tools.interval import Interval
-from backtest.position import Position, PositionType, Trade, EntryArgs
+from backtest.position import Position, PositionType, Trade, TradeArgs
 from backtest.strat.trigger import Trigger, TriggerFunction
 
 class Intents:
     """
     An intent is a class with that holds information about creating a position.
-
+    
     """
 
     type_mapping = {
@@ -32,14 +32,15 @@ class Intents:
             verbose:bool=True, 
             df:pd.DataFrame=None
         ):
+        
         # Verbosity
         self.verbose = verbose
-        
-        # Add the func into the class
-        self.ind_func = getattr(self, self.type_mapping[_settings.func_name])
-        
         # Settings - a way to set up the indicator
         self.settings = _settings
+        # Position - Initialises empty position
+        self.position = Position(self.settings.func_name)
+        # Active
+        self.active = True
 
         """
         Relates to the interval we want to reference.
@@ -71,6 +72,19 @@ class Intents:
         Executes whatever logic is required - creating a position for example etc
         """
         pass
+
+    def conditions(
+            self
+        ):
+        """
+        This function will check if the entry/exit conditions have been met. This can 
+        define whether someone can enter based on risk, whether a position is open etc.
+        
+        """
+        if self.active:
+            pass
+        else:
+            return False
 
     def check(
             self,

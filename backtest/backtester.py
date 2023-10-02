@@ -90,7 +90,7 @@ class Backtester:
                             Think about creating a Position class factory that can
                             create all the lists of Trades based on simplified terms
                             """
-                            
+                            print(strategies.klines[df_index].df.loc[row_idx])
                             if self.verbose:
                                 print("CREATING POSITION")
                                 # PositionType
@@ -717,8 +717,6 @@ class Backtester:
                 if (i % resolution) == 0:
                     print(f"-- {i} --")
                     print(f"{round((i/distance)*100, 3)}% COMPLETE")
-
-
 
     def compute_results(self, positions_df:pd.DataFrame, df:pd.DataFrame, init_capital: int):
         # Create positions dataframe
