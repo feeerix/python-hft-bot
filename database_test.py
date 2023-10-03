@@ -17,7 +17,7 @@ from backtest.strat.intents import Intents
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
 from backtest.backtester import Backtester
-from backtest.position import TradeType, PositionType, TradeArgs, EntryStyle
+from backtest.position import TradeType, PositionType, TradeArgs, EntryStyle, ConditionBlocks
 
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -141,19 +141,19 @@ add those after we've built all the kline and indicator dataframes.
 """
 
 klines_dbs = [
-    # klines_4h,
+    klines_4h,
     # klines_1h, 
     # klines_15m, 
     # klines_5m, 
-    klines_1m
+    # klines_1m
 ]
 
 indicator_dbs = [
-    # indicators_4h,
+    indicators_4h,
     # indicators_1h,
     # indicators_15m,
     # indicators_5m,
-    indicators_1m
+    # indicators_1m
 ]
 
 """
@@ -164,20 +164,20 @@ columns to select what is above another etc.
 Additionally - this will be wha
 """
 
-trigger_indicators = [
-    Trigger(Settings("144Above233_bullish", TriggerFunction.ABOVE, {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
-    Trigger(Settings("144Below233_bearish", TriggerFunction.BELOW, {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
-    Trigger(Settings("ema8below_ema21", TriggerFunction.BELOW, {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
-    Trigger(Settings("ema8above_ema21", TriggerFunction.ABOVE, {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
-    Trigger(Settings("stochrsi_oversold_k", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
-    Trigger(Settings("stochrsi_oversold_d", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
-    Trigger(Settings("stochrsi_overbought_k", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
-    Trigger(Settings("stochrsi_overbought_d", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
-    Trigger(Settings("stochrsi_bullcross", TriggerFunction.CROSS_ABOVE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h),
-    Trigger(Settings("stochrsi_bullcross", TriggerFunction.CROSS_ABOVE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "inverse": False}), Interval._4h)
-]
-# def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
-trigger_dbs = Database("trigger_db", DatabaseType.TRIGGERS, True, triggers=trigger_indicators)
+# trigger_indicators = [
+#     Trigger(Settings("144Above233_bullish", TriggerFunction.ABOVE, {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+#     Trigger(Settings("144Below233_bearish", TriggerFunction.BELOW, {"series_a": "EMA_144", "series_b": "EMA_233"}), Interval._4h),
+#     Trigger(Settings("ema8below_ema21", TriggerFunction.BELOW, {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+#     Trigger(Settings("ema8above_ema21", TriggerFunction.ABOVE, {"series_a": "EMA_8", "series_b": "EMA_21"}), Interval._4h),
+#     Trigger(Settings("stochrsi_oversold_k", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
+#     Trigger(Settings("stochrsi_oversold_d", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
+#     Trigger(Settings("stochrsi_overbought_k", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
+#     Trigger(Settings("stochrsi_overbought_d", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
+#     Trigger(Settings("stochrsi_bullcross", TriggerFunction.CROSS_ABOVE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h),
+#     Trigger(Settings("stochrsi_bullcross", TriggerFunction.CROSS_ABOVE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5", "inverse": False}), Interval._4h)
+# ]
+# # def __init__(self, name:str="", db_type:DatabaseType=None, verbose:bool=False, **kwargs):
+# trigger_dbs = Database("trigger_db", DatabaseType.TRIGGERS, True, triggers=trigger_indicators)
 
 portfolio_db = Database("portfolio_db", DatabaseType.PORTFOLIO, symbols=[])
 
@@ -203,7 +203,14 @@ intent_blocks = [
                     Trigger(Settings("stochrsi_oversold_k", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
                     Trigger(Settings("stochrsi_oversold_d", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
                     Trigger(Settings("stochrsi_bullcross", TriggerFunction.CROSS_ABOVE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
-                ]
+                ],
+                "conditions": {
+                    ConditionBlocks.NUMBER: 1
+                },
+                "values": {
+                    "position_number": 0,
+                    "risk_amount": 0
+                }
             }
         ),
         [Interval.from_string('4h')]
@@ -228,7 +235,14 @@ intent_blocks = [
                     Trigger(Settings("stochrsi_overbought_k", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
                     Trigger(Settings("stochrsi_overbought_d", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
                     Trigger(Settings("stochrsi_bearcross", TriggerFunction.CROSS_BELOW, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
-                ]
+                ],
+                "conditions": {
+                    ConditionBlocks.NUMBER: 1
+                },
+                "values": {
+                    "position_number": 0,
+                    "risk_amount": 0
+                }
             }
         ),
         [Interval.from_string('4h')]
@@ -237,13 +251,19 @@ intent_blocks = [
 
 intent_db = Database("Intent_db", db_type=DatabaseType.INTENTS, logic=intent_blocks)
 
+condition_blocks = [
+    Settings("position_number", ConditionBlocks.NUMBER, {PositionType.LONG: 1, PositionType.SHORT: 1})
+]
+
+condition_db = Database("trigger_db", DatabaseType.TRIGGERS, True, blocks=condition_blocks)
+
 test_strat = Strategy(
     name="test1",
     portfolio=portfolio_db,
     klines=klines_dbs,
     indicators=indicator_dbs,
     orderbook=[Database(db_type=DatabaseType.ORDERBOOK)],
-    triggers=trigger_dbs,
+    conditions=condition_db,
     intents=intent_db,
     positions=Database(db_type=DatabaseType.POSITIONS),
     verbose=True

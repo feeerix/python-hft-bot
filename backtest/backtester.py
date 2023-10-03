@@ -39,7 +39,12 @@ class Backtester:
         position_size = 0
         init_capital = capital
 
-        print(strategies.intents.build())
+        # print(strategies.intents.build())
+        pos_type_list = []
+        for pos_logic in strategies.intents.arguments['logic']:
+            pos_type_list.append(
+                pos_logic.settings.arguments.pos_family
+            )
         
         for df_index in range(len(strategies.klines)):
             distance = len(strategies.klines[df_index].df)
@@ -50,6 +55,26 @@ class Backtester:
                 resolution = 1000
             else:
                 resolution = 100
+
+            """
+            First we want to get all the position types we want to enter
+            and their conditions. 
+            """
+            # print(strategies) # Strategies
+            # print(strategies.intents) # DB of intents
+            # print(strategies.intents.arguments) # list of intent classes under logic
+            # print(strategies.intents.arguments['logic']) # List of intent clases (list of each intent for positions)
+            for pos_logic in strategies.intents.arguments['logic']: # For each position type
+                # print(pos_logic) # each intent class
+                # print(pos_logic.settings) # Intent settings
+                # print(pos_logic.settings.columns) # The column containing other info
+
+                for condition in pos_logic.settings.columns['conditions'].keys():
+                    condition.execute_behavior(
+                        condition_settings=pos_logic.settings.columns['conditions'][condition],
+                        condition_value=pos_logic.settings.columns['values']
+                    )
+                exit()
 
             for row_idx in range(len(strategies.klines[df_index].df)):
             # for row in strategies.klines[df_index].df.itertuples():
@@ -71,6 +96,8 @@ class Backtester:
                 to see if we're still looking for this position based on 
                 the specific conditions in the function.
                 """
+                
+
 
                 if current_position is None:
                     """

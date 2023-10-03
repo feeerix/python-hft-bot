@@ -36,6 +36,7 @@ class DatabaseType(Enum):
     INDICATORS = 'indicators'
     ORDERBOOK = 'orderbook'
     RESULTS = 'results'
+    CONDITIONS = 'conditions'
 
 class DatabaseFactory:
     def create_db(self, db_type:DatabaseType=None):
@@ -65,7 +66,8 @@ class Database:
         DatabaseType.INTENTS: "_intents",
         DatabaseType.POSITIONS: "_positions",
         DatabaseType.PORTFOLIO: "_portfolio",
-        DatabaseType.INFO: "_info"
+        DatabaseType.INFO: "_info",
+        DatabaseType.CONDITIONS: "_conditions"
     }
 
     # Initialises
@@ -264,4 +266,5 @@ class Database:
         # Your implementation here
         pass
 
-    
+    def _conditions(self) -> pd.DataFrame:
+        pass

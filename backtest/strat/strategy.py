@@ -42,7 +42,7 @@ class Strategy:
             klines:List[Database]=[],
             indicators:List[Database]=[], 
             orderbook:List[Database]=[], 
-            triggers:List[Database]=[],
+            conditions:List[Database]=[],
             signals:List[Database]=[], 
             intents:Database=None, 
             positions:Database=None,
@@ -70,7 +70,7 @@ class Strategy:
         """
 
 
-        self.triggers = triggers
+        self.conditions = conditions
         """
         Triggers are just the the boolean versions of signals
         """

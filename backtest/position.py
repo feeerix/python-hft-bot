@@ -29,21 +29,28 @@ class ConditionBlocks(Enum):
     DRAWDOWN = "drawdown" # Drawdown
 
     @staticmethod
-    def risk_behavior(**kwargs):
-        return "Executing risk behavior..."
+    def risk_check(**kwargs) -> bool:
+        print("Executing risk behavior...")
+        return True
 
     @staticmethod
-    def number_behavior(**kwargs):
-        return "Executing number behavior..."
+    def number_check(**kwargs) -> bool:
+        print("Executing number behavior...")
+        print(kwargs)
+        exit()
+        return True
     
-    behaviors = {
-        RISK: risk_behavior,
-        NUMBER: number_behavior,
-        # ... add the rest of the conditions here
-    }
+    @classmethod
+    def get_behavior(cls, condition):
+        behaviors = {
+            cls.RISK: cls.risk_check,
+            cls.NUMBER: cls.number_check,
+            # ... add the rest of the conditions here
+        }
+        return behaviors.get(condition)
 
     def execute_behavior(self, **kwargs):
-        behavior_func = self.behaviors.get(self, None)
+        behavior_func = self.get_behavior(self)
         if behavior_func:
             return behavior_func(**kwargs)
         return "Behavior not found for this condition."
