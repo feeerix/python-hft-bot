@@ -1,7 +1,7 @@
 # Import
 from enum import Enum
-from dataclasses import dataclass
-from typing import List
+from dataclasses import dataclass, field
+from typing import List, Dict
 
 # Local Import
 from lib.tools.asset import Asset
@@ -15,8 +15,21 @@ class EntryStyle(Enum):
     MARKET = "market" # YOLO's and just market buys at whatever price it is now
     TWAP = "twap" # enters at twap
 
+class CloseStyle(Enum):
+    """
+    This will identify how we'll close the position, for example:
+    if we want to close this after we hit a specific profit in a single
+    trade (stop limit, for example) at arbitrary price level, it could
+    be time based or it could be something else as well.
+    """
+    ARBITRARY = "arbitrary"
+    TIME = "time"
+    VALUE = "value" # This refers to a rolling value like ATR
+
+
 class EntryCondition:
     pass
+
 
 class ConditionBlocks(Enum):
     RISK = "risk" # Amount of risk taken
@@ -30,15 +43,17 @@ class ConditionBlocks(Enum):
 
     @staticmethod
     def risk_check(**kwargs) -> bool:
-        print("Executing risk behavior...")
-        return True
+        if kwargs['condition_value'] <= kwargs['condition_setting']:
+            return True
+        else:
+            return False
 
     @staticmethod
     def number_check(**kwargs) -> bool:
-        print("Executing number behavior...")
-        print(kwargs)
-        exit()
-        return True
+        if kwargs['condition_value'] <= kwargs['condition_setting']:
+            return True
+        else:
+            return False
     
     @classmethod
     def get_behavior(cls, condition):
@@ -49,11 +64,20 @@ class ConditionBlocks(Enum):
         }
         return behaviors.get(condition)
 
-    def execute_behavior(self, **kwargs):
+    def check_behavior(self, **kwargs):
         behavior_func = self.get_behavior(self)
         if behavior_func:
             return behavior_func(**kwargs)
         return "Behavior not found for this condition."
+    
+
+@dataclass
+class ConditionValues:
+    NUMBER: int = 0
+    RISK: float = 0.0
+    MARGIN: float = 0.0
+    DIVERSE: dict = field(default_factory=dict) 
+    TIME: int = 0
 
 class FeeType(Enum):
     """
@@ -114,6 +138,7 @@ class TradeArgs:
     entry_price: EntryStyle = None # EntryStyle - used to calculate requested entry
     trade_type: TradeType = None # TradeType
     pos_family: PositionType = None # Position Types
+    close_style: Dict[CloseStyle, str] = None
 
     def __str__(self) -> str:
         return f"{self.quote}{self.base} | {self.trade_type} | {self.pos_family}"
@@ -148,6 +173,14 @@ class Trade:
         trade_type: TradeType = None # TradeType
         pos_family: PositionType = None # Position Types
 
+        ---
+
+        Overall things we might need to have:
+        Expected Price
+        Entry Price
+        Expected Amount
+        Actual Fill
+        
         """
         self.arguments = entry_args
 
@@ -203,6 +236,14 @@ class Position:
 
 """
 TODO
+CREATE A TRADE FACTORY
+
+"""
+
+
+
+"""
+TODO
 CREATE A POSITION FACTORY
 
 When we have a specific position we want to execute, we will have a parent trade
@@ -226,8 +267,9 @@ class PositionFactory:
     """
     @staticmethod
     def create_position(
-        entry_args:TradeArgs # Entry Arguments
+        # entry_args:TradeArgs # Entry Arguments
     ):
+        print("Creating Position...")
         pass
 
 

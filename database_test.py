@@ -17,7 +17,7 @@ from backtest.strat.intents import Intents
 from backtest.strat.indicator import Indicator
 from backtest.strat.settings.settings import Settings
 from backtest.backtester import Backtester
-from backtest.position import TradeType, PositionType, TradeArgs, EntryStyle, ConditionBlocks
+from backtest.position import TradeType, PositionType, TradeArgs, EntryStyle, ConditionBlocks, ConditionValues, CloseStyle
 
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
@@ -195,6 +195,7 @@ intent_blocks = [
                 EntryStyle.CLOSE, # EntryStyle
                 TradeType.LIMIT, # TradeType
                 PositionType.LONG, # Position Type
+                {CloseStyle.VALUE: {"ATRe_21": 2}}
             ),
             { # Columns that are:
                 True:[ # Triggers Required to be true
@@ -204,13 +205,9 @@ intent_blocks = [
                     Trigger(Settings("stochrsi_oversold_d", TriggerFunction.BELOW_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 20.0}), Interval._4h),
                     Trigger(Settings("stochrsi_bullcross", TriggerFunction.CROSS_ABOVE, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
                 ],
-                "conditions": {
-                    ConditionBlocks.NUMBER: 1
-                },
-                "values": {
-                    "position_number": 0,
-                    "risk_amount": 0
-                }
+                "settings": ConditionValues(
+                    NUMBER=1
+                )
             }
         ),
         [Interval.from_string('4h')]
@@ -227,6 +224,7 @@ intent_blocks = [
                 EntryStyle.CLOSE, # EntryStyle
                 TradeType.LIMIT, # TradeType
                 PositionType.SHORT, # Position Type
+                {CloseStyle.VALUE: {"ATRe_21": 2}}
             ), 
             { # Columns that are:
                 True:[ # Triggers Required to be true
@@ -236,13 +234,13 @@ intent_blocks = [
                     Trigger(Settings("stochrsi_overbought_d", TriggerFunction.ABOVE_VALUE, {"series_a": "STOCHRSId_21_21_5_5", "series_b": "", "value": 80.0}), Interval._4h),
                     Trigger(Settings("stochrsi_bearcross", TriggerFunction.CROSS_BELOW, {"series_a": "STOCHRSIk_21_21_5_5", "series_b": "STOCHRSId_21_21_5_5"}), Interval._4h)
                 ],
-                "conditions": {
-                    ConditionBlocks.NUMBER: 1
-                },
-                "values": {
-                    "position_number": 0,
-                    "risk_amount": 0
-                }
+                "settings": ConditionValues(
+                    NUMBER=2
+                )
+                # "values": {
+                #     "position_number": 0,
+                #     "risk_amount": 0
+                # }
             }
         ),
         [Interval.from_string('4h')]
@@ -251,8 +249,20 @@ intent_blocks = [
 
 intent_db = Database("Intent_db", db_type=DatabaseType.INTENTS, logic=intent_blocks)
 
+"""
+-- CONDITION BLOCKS --
+
+We are now testing with a static position with different long and short risk profiles.
+This way we're testing with a static one first, and potentially we'll adjust to a
+dynamic way to set these.
+
+func_name is the type of condition
+arguments are the types of position they relate to
+"""
+
 condition_blocks = [
-    Settings("position_number", ConditionBlocks.NUMBER, {PositionType.LONG: 1, PositionType.SHORT: 1})
+    Settings("position_number", ConditionBlocks.NUMBER, {PositionType.LONG: 1, PositionType.SHORT: 1}),
+    Settings("risk", ConditionBlocks.RISK, {PositionType.LONG: 5.0, PositionType.SHORT: 2.0 })
 ]
 
 condition_db = Database("trigger_db", DatabaseType.TRIGGERS, True, blocks=condition_blocks)

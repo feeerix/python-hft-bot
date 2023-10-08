@@ -6,6 +6,7 @@ from hashlib import sha256
 import time
 import numpy as np
 from typing import List
+from dataclasses import fields
 
 # Local Imports
 # from lib.api.binance.interface import Binance
@@ -60,30 +61,49 @@ class Backtester:
             First we want to get all the position types we want to enter
             and their conditions. 
             """
+
             # print(strategies) # Strategies
             # print(strategies.intents) # DB of intents
             # print(strategies.intents.arguments) # list of intent classes under logic
             # print(strategies.intents.arguments['logic']) # List of intent clases (list of each intent for positions)
-            for pos_logic in strategies.intents.arguments['logic']: # For each position type
-                # print(pos_logic) # each intent class
-                # print(pos_logic.settings) # Intent settings
-                # print(pos_logic.settings.columns) # The column containing other info
+            # for pos_logic in strategies.intents.arguments['logic']: # For each position type
+            #     print(pos_logic) # each intent class
+            #     print(pos_logic.settings) # Intent settings
+            #     print(pos_logic.settings.columns) # The column containing other info
 
-                for condition in pos_logic.settings.columns['conditions'].keys():
-                    condition.execute_behavior(
-                        condition_settings=pos_logic.settings.columns['conditions'][condition],
-                        condition_value=pos_logic.settings.columns['values']
-                    )
-                exit()
+            #     for condition in pos_logic.settings.columns['conditions'].keys():
+            #         condition.execute_behavior(
+            #             condition_settings=pos_logic.settings.columns['conditions'][condition],
+            #             condition_value=pos_logic.settings.columns['values']
+            #         )
+
+            """
+            At the moment, this will imply a time based and candled based system. The reason
+            for doing this at the moment would be that we want to include all the candles with 
+            which we want to make decisions. 
+
+            This will also be the way we want to integrate websocket eventually, so 
+            is part of the reason why we might think about keeping this at the moment.
+
+            """
+            current_values = ConditionValues()
 
             for row_idx in range(len(strategies.klines[df_index].df)):
             # for row in strategies.klines[df_index].df.itertuples():
                 # Row - index
                 # i = row.Index
 
-                if capital < 0:
-                    print("You went broke!")
-                    break
+                """
+                TODO - to add a better capital management system of some sort.
+                """
+                # if capital < 0:
+                #     print("You went broke!")
+                #     break
+
+                """
+                TODO -  is there a better logging system that doesn't interfere with 
+                the for loop per line?
+                """
 
                 if self.verbose:
                     if (row_idx % resolution) == 0:
@@ -97,27 +117,92 @@ class Backtester:
                 the specific conditions in the function.
                 """
                 
+                # for pos_type in strategies.intents.arguments['logic']:
+                #     """
+                #     For each position type:
+                #     """
+                #     print(f"pos_type {pos_type}")
+                #     for conditionBlock in strategies.conditions.arguments['blocks']:
+                #         for positionCondition in conditionBlock.arguments.keys():
+                #             """
+                #             For each one of the settings:
+                #             """
+                #             if positionCondition == pos_type.settings.func_name:
+                #                 print(current_values.NUMBER)
+                #                 print(conditionBlock.arguments[positionCondition])
+                #                 if not conditionBlock.func_name.check_behavior(
+                #                     condition_value=current_values.NUMBER,
+                #                     condition_setting=conditionBlock.arguments[positionCondition]
+                #                 ):
+                                
+                #                     print("break")
+                #                     break
 
+                            # if positionCondition == pos_type
+
+                    # for f in fields(pos_type.settings.columns['settings']):
+                    #     print(f"{f.name} // {getattr(current_values, f.name)}")
+                    #     print(f"Settings: {f.name} // {getattr(pos_type.settings.columns['settings'], f.name)}")
+
+                    # print(strategies.conditions.arguments['blocks'][0].arguments)
+                    # print(strategies.conditions.arguments['blocks'])
+                
+                    # for condition in 
 
                 if current_position is None:
                     """
+                    TODO - adjust this to include the correspoding logic for 
+                    PositionType, ConditionBlocks, ConditionValues.
+
                     If you've passed the above if statement, you currently don't
                     have a position in place, at all. We will need to change this
                     to be a check - for that we have maxed the amount of risk.
                     """
                     for pos_logic in strategies.intents.arguments['logic']:
-                        
                         # We have found a place where we might be able to make a transaction
                         if pos_logic.check(strategies.klines[df_index].df, row_idx):
                             print("VALID!! ------------")
+                            
+                            # print(current_values)
+                            # for conditionBlock in strategies.conditions.arguments['blocks']:
+                            #     for positionCondition in conditionBlock.arguments.keys():
+                                    
+                            #         print(conditionBlock)
+                            #         print(positionCondition)
+                            #         exit()
+
                             # If verbose
                             """
                             TODO
                             BE ABLE TO MAKE A POSITION CLASS WITH A FACTORY
                             Think about creating a Position class factory that can
                             create all the lists of Trades based on simplified terms
+
+                            Let's create a Trade for now, so I can get this up and running.
+                            Additionally, we'll some assumptions about the trade, being we'll
+                            use the close of the previous candle to open the trade
+                            and get an full fill.
                             """
-                            print(strategies.klines[df_index].df.loc[row_idx])
+
+                            print(f"-- CREATING POSITION --")
+                            print(f"POS LOGIC: {pos_logic}")
+                            print(f"POSITION TYPE: {pos_logic.settings.func_name}")
+                            print(f"CURRENT POSITIONS OPEN: {current_values.NUMBER}")
+                            print(f"MAX POSITIONS OPEN: {strategies.conditions.arguments['blocks'][0].arguments[pos_logic.settings.func_name]}")
+                            print(f"CLOSE: {strategies.klines[df_index].df.loc[row_idx].close}")
+                            print(f"EXPECTED ENTRY: {strategies.klines[df_index].df.loc[row_idx].close}")
+                            print(f"ACTUAL ENTRY: AUTO")
+                            print(f"INIT CAPITAL: {init_capital}")
+                            print(f"CURRENT CAPITAL: {capital}")
+                            print(f"EXPECTED RISK: {strategies.conditions.arguments['blocks'][1].arguments[pos_logic.settings.func_name]}")
+                            print(f"EXPECTED TP {pos_logic.settings.arguments.close_style}")
+                            print(strategies.conditions.arguments['blocks'][0].arguments)
+
+                            # print(f"EXPECTED RISK: {}")
+                            # print(f"EXPECTED AMOUNT: {}")
+                            # print(f"ACTUAL FILL")
+
+                            exit()
                             if self.verbose:
                                 print("CREATING POSITION")
                                 # PositionType
